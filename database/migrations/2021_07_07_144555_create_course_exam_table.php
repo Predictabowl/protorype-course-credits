@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCourseExamsTable extends Migration
+class CreateCourseExamTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,8 +15,8 @@ class CreateCourseExamsTable extends Migration
     {
         Schema::create('course_exam', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("course_id")->cascadeOnDelete();
-            $table->foreignId("exam_id")->cascadeOnDelete();
+            $table->foreignId("course_id")->costrained()->cascadeOnDelete();
+            $table->foreignId("exam_id")->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
