@@ -2,17 +2,19 @@
 
 namespace Database\Factories;
 
-use App\Models\Course;
+use App\Models\Exam;
+use App\Models\ExamBlock;
+use App\Models\ExamBlockOption;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CourseFactory extends Factory
+class ExamBlockOptionFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Course::class;
+    protected $model = ExamBlockOption::class;
 
     /**
      * Define the model's default state.
@@ -22,9 +24,8 @@ class CourseFactory extends Factory
     public function definition()
     {
         return [
-            "name" => $this->faker->sentence(4),
-            "code" => $this->faker->bothify("???-##"),
-            "cfu" => 120
+            "exam_id" => $this->faker->numberBetween(1,Exam::count()),
+            "exam_block_id" => $this->faker->numberBetween(1,ExamBlock::count())
         ];
     }
 }

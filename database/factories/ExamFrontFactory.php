@@ -2,17 +2,22 @@
 
 namespace Database\Factories;
 
-use App\Models\Course;
+use App\Models\ExamFront;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CourseFactory extends Factory
+class ExamFrontFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
+     * 
+     * This factory is not needed.
+     * This table must be filled by the algorithm using all the other data,
+     * this also mean that porabily should not be saved but calculated 
+     * every time
      *
      * @var string
      */
-    protected $model = Course::class;
+    protected $model = ExamFront::class;
 
     /**
      * Define the model's default state.
@@ -22,9 +27,7 @@ class CourseFactory extends Factory
     public function definition()
     {
         return [
-            "name" => $this->faker->sentence(4),
-            "code" => $this->faker->bothify("???-##"),
-            "cfu" => 120
+            //
         ];
     }
 }

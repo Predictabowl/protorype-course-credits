@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CourseExam extends Model
+class ExamExamBlockOption extends Model
 {
     use HasFactory;
 
-    protected $table = "course_exam";
-    protected $fillable = ["course_id","exam_id"];
-
+    protected $table = "exam_exam_block_option";
+    protected $fillable = ["exam_id","exam_block_option_id"];
 }

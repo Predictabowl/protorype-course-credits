@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class TakenExam extends Model
 {
     use HasFactory;
+
+    public function front()
+    {
+        return $this->belongsTo(Front::class);
+    }
+
+    public function ssd()
+    {
+        return $this->belongsTo(Ssd::class);
+    }
 }

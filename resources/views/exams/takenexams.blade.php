@@ -1,6 +1,7 @@
 <x-full-layout>
-	<h1>Lista Esami</h1>
+	<h1>Esami Sostenuti</h1>
 	<div class="place-content-center">
+		<h2 class="text-xl font-semibold">{{ auth()->user()->name }}</h2>
 		<table class="min-w-full rounded-lg">
 			<thead>
 				<tr class="bg-gray-100">
@@ -14,7 +15,7 @@
 				<tr>
 					<td>{{ $exam->ssd->code }}</td>
 					<td>{{ $exam->name }}</td>
-					<td class="text-center">{{ $exam->cfu }}</td>
+					<td class="text-center">placeholder</td>
 				</tr>
 			@endforeach
 			</tbody>

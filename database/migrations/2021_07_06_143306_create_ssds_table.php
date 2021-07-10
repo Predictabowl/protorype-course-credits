@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTakenExamsTable extends Migration
+class CreateSsdsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class CreateTakenExamsTable extends Migration
      */
     public function up()
     {
-        Schema::create('taken_exams', function (Blueprint $table) {
+        Schema::create('ssds', function (Blueprint $table) {
             $table->id();
+            $table->string("code")->unique();
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ class CreateTakenExamsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('taken_exams');
+        Schema::dropIfExists('ssds');
     }
 }

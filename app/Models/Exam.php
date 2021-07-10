@@ -9,8 +9,23 @@ class Exam extends Model
 {
     use HasFactory;
 
-    public function courses()
+
+    public function ssd()
     {
-        return $this->belongsToMany(Course::class)->withTimestamps();
+        return $this->belongsTo(Ssd::class);
+    }
+
+    public function examApprovations()
+    {
+        return $this->hasMany(ExamBlockOption::class,"exam_block_option_id");
+    }
+
+    public function examBlockOptions()
+    {
+        return $this->belongsToMany(ExamBlockOption::class);
+    }
+
+    public function fronts(){
+        return $this->belongsToMany(Front::class);
     }
 }

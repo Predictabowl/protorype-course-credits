@@ -10,6 +10,8 @@ class ExamController extends Controller
     public function index()
     {
         $exams = Exam::all();
-        return view("exams.index",compact("exams"));
+        return view("exams.index",[
+            "exams" => $exams
+        ]);
     }
 }

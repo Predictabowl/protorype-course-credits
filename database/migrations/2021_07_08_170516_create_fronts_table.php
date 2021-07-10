@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCourseExamTable extends Migration
+class CreateFrontsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateCourseExamTable extends Migration
      */
     public function up()
     {
-        Schema::create('course_exam', function (Blueprint $table) {
+        Schema::create('fronts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("course_id")->costrained()->cascadeOnDelete();
-            $table->foreignId("exam_id")->constrained()->cascadeOnDelete();
+            $table->foreignId("course_id"); //Which constraints? it should not be deleted if the course is missing
+            $table->foreignId("user_id")->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ class CreateCourseExamTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('course_exam');
+        Schema::dropIfExists('fronts');
     }
 }

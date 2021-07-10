@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Front;
+use App\Models\Ssd;
 use App\Models\TakenExam;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,7 +24,10 @@ class TakenExamFactory extends Factory
     public function definition()
     {
         return [
-            //
+            "name" => $this->faker->sentence(4),
+            "ssd_id" => $this->faker->numberBetween(1,Ssd::count()),
+            "front_id" => $this->faker->numberBetween(1,Front::count()),
+            "cfu" => $this->faker->numberBetween(3,12)
         ];
     }
 }

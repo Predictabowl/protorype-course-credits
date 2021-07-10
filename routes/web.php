@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\TakenExamController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,3 +28,5 @@ require __DIR__.'/auth.php';
 //------------------
 
 Route::get("/exams",[ExamController::class,"index"]);
+
+Route::get("/takenexams",[TakenExamController::class,"index"]);

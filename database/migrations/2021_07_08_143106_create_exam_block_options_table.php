@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCoursesTable extends Migration
+class CreateExamBlockOptionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateCoursesTable extends Migration
      */
     public function up()
     {
-        Schema::create('courses', function (Blueprint $table) {
+        Schema::create('exam_block_options', function (Blueprint $table) {
             $table->id();
-            $table->string("code")->unique();
-            $table->string("name");
-            $table->unsignedSmallInteger("cfu");
+            $table->foreignId("exam_id")->constrained()->cascadeOnDelete();
+            $table->foreignId("exam_block_id")->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateCoursesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('courses');
+        Schema::dropIfExists('exam_block_options');
     }
 }

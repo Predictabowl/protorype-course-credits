@@ -9,8 +9,12 @@ class Course extends Model
 {
     use HasFactory;
 
-    public function exams()
+    public function examBlocks()
     {
-        return $this->belongsToMany(Exam::class)->withTimestamps();
+        return $this->hasMany(ExamBlock::class)->withTimestamps();
+    }
+
+    public function fronts(){
+        return $this->hasMany(Front::class);
     }
 }

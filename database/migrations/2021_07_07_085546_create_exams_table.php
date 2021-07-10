@@ -15,7 +15,7 @@ class CreateExamsTable extends Migration
     {
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
-            $table->string("ssd")->unique();
+            $table->foreignId("ssd_id")->constrained()->cascadeOnDelete();
             $table->string("name");
             $table->integer("cfu");
             $table->timestamps();
