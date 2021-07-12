@@ -11,7 +11,7 @@ class ExamBlock extends Model
 
     public function examBlockOptions()
     {
-        return $this->hasMany(ExamBlockOption::class)->withTimestamps();
+        return $this->hasMany(ExamBlockOption::class);
     }
 
     public function course()

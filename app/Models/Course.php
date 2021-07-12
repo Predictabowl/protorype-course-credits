@@ -11,7 +11,7 @@ class Course extends Model
 
     public function examBlocks()
     {
-        return $this->hasMany(ExamBlock::class)->withTimestamps();
+        return $this->hasMany(ExamBlock::class);
     }
 
     public function fronts(){
