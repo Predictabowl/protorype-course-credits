@@ -51,7 +51,8 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
 
     public function refreshStudyPlan(): StudyPlanBuilder {
         $this->blockLinkers = [];
-        $this->declaredExams = $this->frontManager->getTakenExams();
+        $this->declaredExams = $this->frontManager->getTakenExams()
+                ->map(fn ($taken)=> new LinkedTakenExam($taken));
         $this->frontManager->getExamBlocks()->each(fn ($block)=>
             $this->blockLinkers[$block->getId()] = new ExamBlockLinker($block));
         $this->examOptions = $this->frontManager->getExamOptions();
@@ -75,33 +76,55 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
     }
 
     private function processAndInsert() {
-        $this->declaredExams->each(function ($takenExam) {
-            $linkedExam = new LinkedTakenExam($takenExam);
-            $this->processBySsd($linkedExam);
-        });
+        $leftover = $this->declaredExams->map(fn ($linkedExam) =>
+            $this->processBySsd($linkedExam))->sum();
+        if($leftover > 0){
+            $this->declaredExams->each(fn($linkedExam) =>
+                $this->processByCompatibility($linkedExam));
+        }
     }
     
-    private function processBySsd (LinkedTakenExam $linkedExam){
-    $eligibles = $this->getOptionsBySsdSorted($linkedExam->getTakenExam())
-            ->toArray();
-        foreach ($eligibles as $eligible) {
-            $this->linkExams($eligible, $linkedExam);
+    public function processByCompatibility(LinkedTakenExam $linkedExam):int {
+        $takenExam = $linkedExam->getTakenExam();
+        //var_dump($takenExam);
+        $eligibles = $this->getOptionsSorted(
+                $this->examOptions->filter(function(ExamOptionDTO $option) use($takenExam){ 
+                        $val = collect($option->getCompatibleOptions());
+                        //$val = $val->contains(fn($option) => $option->getSsd() === $takenExam->getSsd());
+                        $val = $val->contains(function($option) use($takenExam){
+                            return $option->getSsd() === $takenExam->getSsd();
+                        });
+                        return $val;
+                }),$takenExam);
+        //var_dump($eligibles);
+        return $this->linkExam($eligibles, $linkedExam);
+    }
+    
+    public function processBySsd (LinkedTakenExam $linkedExam): int{
+        $takenExam = $linkedExam->getTakenExam();
+        $eligibles = $this->getOptionsSorted(
+                $this->examOptions->filter(fn($option) => 
+                        $option->getSsd() === $takenExam->getSsd())
+                ,$takenExam);
+        
+        return $this->linkExam($eligibles, $linkedExam);
+    }
+    
+    private function linkExam($options, LinkedTakenExam $linkedExam): int{
+        foreach ($options as $option) {
+            if ($this->blockLinkers[$option->getBlock()->getId()]->linkExam($option->getId())){
+                $this->studyPlan->addExamLink($option, $linkedExam);
+            }
             if ($linkedExam->getActualCfu() === 0){
                 break;
             }
         }
+        //var_dump($linkedExam->getActualCfu());
+        return $linkedExam->getActualCfu();
     }
     
-    private function linkExams(ExamOptionDTO $option, LinkedTakenExam $linkedExam){
-        if ($this->blockLinkers[$option->getBlock()->getId()]->linkExam($option->getId())){
-            $this->studyPlan->addExamLink($option, $linkedExam);
-        }
-    }
-    
-    private function getOptionsBySsdSorted(TakenExamDTO $takenExam){
-        return $this->examOptions
-            ->filter(fn($option) => $option->getSsd() === $takenExam->getSsd())
-            ->map(fn($option) => [
+    private function getOptionsSorted(Collection $options, TakenExamDTO $takenExam){
+        return $options->map(fn($option) => [
                 "object" => $option,
                 "distance" => $this->eDistance->calculateDistance($option, $takenExam)])
             ->sortBy("distance")

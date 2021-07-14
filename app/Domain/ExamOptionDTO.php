@@ -29,6 +29,7 @@ class ExamOptionDTO {
         $this->cfu = $cfu;
         $this->ssd = $ssd;
         $this->compatibleOptions = [];
+        $block->addOption($this);
     }
     
     public function getExamName(): string {
