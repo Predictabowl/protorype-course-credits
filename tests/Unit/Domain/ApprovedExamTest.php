@@ -2,44 +2,68 @@
 
 namespace Tests\Unit\Domain;
 
+/** This technically an integration test, but it's more work mocking
+ * than using the DTO
+*/
 use App\Domain\ApprovedExam;
-use App\Domain\DeclaredExam;
-use InvalidArgumentException;
+use App\Domain\ExamBlockDTO;
+use App\Domain\ExamOptionDTO;
+use App\Domain\LinkedTakenExam;
+use App\Domain\TakenExamDTO;
 use PHPUnit\Framework\TestCase;
 
 class ApprovedExamTest extends TestCase
 {
-    const FIXTURE_CFU = 12;
-
-
+    
     protected function setUp(): void
     {
-        
+        //parent::setUp();
+        //$this->seed(\Database\Seeders\DatabaseSeederTest::class);
     }
 
-    public function test_throw_if_cfu_not_positive()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new ApprovedExam("test",0);
-    }
 
     public function test_Integration_value()
     {
-        $sut = new ApprovedExam("test name",self::FIXTURE_CFU);
+        $option = $this->createOption(12);
+        $sut = new ApprovedExam($option);
+        $sut->addTakenExam($this->createTakenExam(3,"taken1"));
+        $sut->addTakenExam($this->createTakenExam(2,"taken2"));
 
-        $this->assertEquals($sut->addDeclaredExams(new DeclaredExam("1",5)),
-            self::FIXTURE_CFU-5);
-
-        $sut->addDeclaredExams(new DeclaredExam("2",3));
-        $this->assertEquals($sut->getIntegrationValue(),self::FIXTURE_CFU-5-3);
+        $this->assertEquals(7,$sut->getIntegrationValue());
     }
 
-    public function test_declaredExam_is_not_added_if_cfu_value_is_too_high(){
-        $sut = new ApprovedExam("test name",self::FIXTURE_CFU);
+    public function test_takenExam_is_not_added_if_Integration_is_zero(){
+        $option = $this->createOption(12);
+        $sut = new ApprovedExam($option);
         
-        $this->assertEquals($sut->addDeclaredExams(new DeclaredExam("1",self::FIXTURE_CFU+1)),-1);
-        $this->assertEmpty($sut->getDeclaredExams());   
+        $takenExam1 = $this->createTakenExam(12,"taken1");
+        $sut->addTakenExam($takenExam1);
+        $takenExam2 = $this->createTakenExam(2,"taken2");
+        
+        $this->assertEquals($takenExam2,$sut->addTakenExam($takenExam2));
+        $this->assertCount(1,$sut->getTakenExams());
+        $this->assertEquals($takenExam1->getTakenExam(),
+                $sut->getTakenExams()[$takenExam1->getTakenExam()->getPK()]->getTakenExam());
     }
 
+    public function test_addTakenExam_is_split_if_cfu_value_is_too_high(){
+        $option = $this->createOption(12);
+        $sut = new ApprovedExam($option);
+        $takenExam = $sut->addTakenExam($this->createTakenExam(13));
+        
+        $this->assertEquals(1,$takenExam->getActualCfu());
+        $this->assertEquals(0,$sut->getIntegrationValue());
+    }
+
+
+    private function createOption($cfu = 12): ExamOptionDTO
+    {
+        return new ExamOptionDTO("test", new ExamBlockDTO(1), $cfu,"ssd");
+    }
+    
+    private function createTakenExam($cfu = 9, $name = "taken", $actual = null): LinkedTakenExam
+    {
+        return new LinkedTakenExam(new TakenExamDTO($name,"ssd",$cfu), $actual);
+    }
    
 }

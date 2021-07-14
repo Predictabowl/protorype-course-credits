@@ -2,17 +2,13 @@
 
 namespace App\Domain;
 
-use App\Models\TakenExam;
-use InvalidArgumentException;
-
 /**
  * 
  */
 class ApprovedExam
 {
-    private $name;
-    private $cfu;
-    private $declaredExams;
+    private $examOption;
+    private $linkedTakenExams;
 
 
     /**
@@ -20,39 +16,32 @@ class ApprovedExam
      * @param    $name   
      * @param    $declaredExams   
      */
-    public function __construct($name, int $cfu)
+    public function __construct(ExamOptionDTO $examOption)
     {
-        $this->name = $name;
-        $this->validateAndSetCfu($cfu);
-        $this->declaredExams = [];
+        $this->examOption = $examOption;
+        $this->linkedTakenExams = [];
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getExamOption(): ExamOptionDTO
+    {
+        return $this->examOption;
     }
 
 
     /**
      * @return mixed
      */
-    public function getName()
+    public function getTakenExams()
     {
-        return $this->name;
+        return $this->linkedTakenExams;
     }
-
-    /**
-     * @param mixed $name
-     *
-     * @return self
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDeclaredExams()
-    {
-        return $this->declaredExams;
+    
+    public function getTakenExam($pk): LinkedTakenExam{
+        return $this->linkedTakenExams[$pk];
     }
 
     /**
@@ -63,64 +52,26 @@ class ApprovedExam
      *
      * @return Integration Value decifit.
      */
-    public function addDeclaredExams(DeclaredExam $declaredExam): int
+    public function addTakenExam(LinkedTakenExam $exam): LinkedTakenExam
     {
-        $value = $this->getIntegrationValue() - $declaredExam->getDistributedCfu();
-        if ($value >= 0){
-            $this->declaredExams[] = $declaredExam;
+        $value = $this->getIntegrationValue();
+        if ($value < 1){
+            return $exam;
         }
 
-        return $value;
-    }
-
-    public function addTakenExam(TakenExam $exam, int $cfuValue = 0): int
-    {
-        $integrationValue = $this->getIntegrationValue();
-        if ($integrationValue < 1){
-            return 0;
-        } elseif ($integrationValue < $cfuValue){
-            $cfuValue = $integrationValue;
-        }
-        $takenExam = new ExamAssignedValue($exam,$cfuValue);
-        $this->takenExams[$exam->id] = $takenExam;
-        return $takenExam->getCfuValue();
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getCfu(): int
-    {
-        return $this->cfu;
-    }
-
-    /**
-     * @param mixed $cfu
-     *
-     * @return self
-     */
-    public function setCfu(int $cfu)
-    {
-        $this->validateAndSetCfu($cfu);
-
-        return $this;
-    }
-
-    private function validateAndSetCfu(int $value)
-    {
-        if ($value <= 0){
-            throw new InvalidArgumentException("The cfu value must be positive");
+        if ($value > $exam->getActualCfu()){
+            $value = $exam->getActualCfu();
         }
 
-        $this->cfu = $value;
-
+        $this->linkedTakenExams[$exam->getTakenExam()->getPK()] = $exam->split($value);
+        return $exam;
     }
 
     public function getIntegrationValue(): int
     {
-        return $this->cfu - collect($this->declaredExams)
-            ->map(fn ($item) => $item->getDistributedCfu())
+        return $this->examOption->getCfu() -
+            collect($this->linkedTakenExams)
+            ->map(fn ($item) => $item->getActualCfu())
             ->sum();
     }
 }

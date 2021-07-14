@@ -9,7 +9,7 @@ use App\Services\Interfaces\FrontManager;
 use Illuminate\Support\Collection;
 
 /**
- * 
+ * No Implemented Yet
  */
 class FrontManagerImpl implements FrontManager
 {
@@ -49,13 +49,20 @@ class FrontManagerImpl implements FrontManager
 
 	public function getDeclaredExams(): Collection
 	{
+		// to check if it have a N+1 queries problem via ssd
 		return $this->front->takenexams->map(fn ($exam) => 
-			new DeclaredExam($exam->name, $exam->cfu));
+			new DeclaredExam($exam));
 	}
 
 	private function setUp(){
 		$this->studyPlan  = $this->front->course->first()->with("examBlocks.examBlockOptions.examApproved")->first();
 	}
 
+
+
+	public function getExamsBySsd(string $ssd): Collection
+	{
+		throw new \Exception('Method getExamsBySsd() is not implemented.');
+	}
 
 }
