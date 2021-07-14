@@ -15,21 +15,27 @@ namespace App\Domain;
  */
 class ExamBlockDTO {
     
+    private $id;
     private $examOptions;
     private $numExams;
     
-    public function __construct(int $numExams) {
+    public function __construct($id, int $numExams) {
+        $this->id = $id;
         $this->examOptions = [];
         $this->numExams = $numExams;
     }
     
+    public function getId() {
+        return $this->id;
+    }
+
     public function addOption(ExamOptionDTO $option) {
-        $this->examOptions[$option->getExamName()] = $option;
+        $this->examOptions[$option->getId()] = $option;
         return $this;
     }
     
     public function removeOption(ExamOptionDTO $option) {
-        unset($this->examOptions[$option->getExamName()]);
+        unset($this->examOptions[$option->getId()]);
         return $this;
     }
 
@@ -39,5 +45,9 @@ class ExamBlockDTO {
 
     public function getExamOptions() {
         return $this->examOptions;
+    }
+    
+    public function getExamOption($id) {
+        return $this->examOptions[$id];
     }
 }

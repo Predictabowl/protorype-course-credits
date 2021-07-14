@@ -28,7 +28,6 @@ class ApprovedExamTest extends TestCase
         $sut = new ApprovedExam($option);
         $sut->addTakenExam($this->createTakenExam(3,"taken1"));
         $sut->addTakenExam($this->createTakenExam(2,"taken2"));
-
         $this->assertEquals(7,$sut->getIntegrationValue());
     }
 
@@ -43,7 +42,7 @@ class ApprovedExamTest extends TestCase
         $this->assertEquals($takenExam2,$sut->addTakenExam($takenExam2));
         $this->assertCount(1,$sut->getTakenExams());
         $this->assertEquals($takenExam1->getTakenExam(),
-                $sut->getTakenExams()[$takenExam1->getTakenExam()->getPK()]->getTakenExam());
+                $sut->getTakenExams()[$takenExam1->getTakenExam()->getId()]->getTakenExam());
     }
 
     public function test_addTakenExam_is_split_if_cfu_value_is_too_high(){
@@ -58,12 +57,12 @@ class ApprovedExamTest extends TestCase
 
     private function createOption($cfu = 12): ExamOptionDTO
     {
-        return new ExamOptionDTO("test", new ExamBlockDTO(1), $cfu,"ssd");
+        return new ExamOptionDTO(1,"test", new ExamBlockDTO(1,2), $cfu,"ssd");
     }
     
     private function createTakenExam($cfu = 9, $name = "taken", $actual = null): LinkedTakenExam
     {
-        return new LinkedTakenExam(new TakenExamDTO($name,"ssd",$cfu), $actual);
+        return new LinkedTakenExam(new TakenExamDTO($name,$name,"ssd",$cfu), $actual);
     }
    
 }

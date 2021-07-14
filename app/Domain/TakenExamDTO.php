@@ -15,11 +15,13 @@ namespace App\Domain;
  */
 class TakenExamDTO {
 
+    private $id;
     private $examName;
     private $cfu;
     private $ssd;
     
-    public function __construct(string $examName, string $ssd, int $maxCfu) {
+    public function __construct($id, string $examName, string $ssd, int $maxCfu) {
+        $this->id = $id;
         $this->examName = $examName;
         $this->cfu = $maxCfu;
         $this->ssd = $ssd;
@@ -37,8 +39,7 @@ class TakenExamDTO {
         return $this->ssd;
     }
     
-    //override as fit to get a primary key
-    public function getPK(){
-        return $this->examName;
+    public function getId(){
+        return $this->id;
     }
 }

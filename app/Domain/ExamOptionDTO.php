@@ -15,13 +15,15 @@ namespace App\Domain;
  */
 class ExamOptionDTO {
 
+    private $id;
     private $examName;
     private $block;
     private $cfu;
     private $ssd;
     private $compatibleOptions;
 
-    public function __construct(string $examName, ExamBlockDTO $block, int $cfu, string $ssd) {
+    public function __construct($id, string $examName, ExamBlockDTO $block, int $cfu, string $ssd) {
+        $this->id = $id;
         $this->examName = $examName;
         $this->block = $block;
         $this->cfu = $cfu;
@@ -29,25 +31,24 @@ class ExamOptionDTO {
         $this->compatibleOptions = [];
     }
     
-    public function getExamName() {
+    public function getExamName(): string {
         return $this->examName;
     }
 
-    public function getBlock() {
+    public function getBlock(): ExamBlockDTO {
         return $this->block;
     }
 
-    public function getCfu() {
+    public function getCfu(): int {
         return $this->cfu;
     }
 
-    public function getSsd() {
+    public function getSsd(): string {
         return $this->ssd;
     }
     
-    //override as fit to get a primary key
-    public function getPK(){
-        return $this->examName;
+    public function getId(){
+        return $this->id;
     }
 
     public function getCompatibleOptions() {

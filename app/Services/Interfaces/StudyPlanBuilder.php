@@ -10,6 +10,6 @@ interface StudyPlanBuilder {
 
     public function getStudyPlan(): StudyPlan;
     public function getTakenExams(): Collection;
-    public function refreshStudyPlan();
-    public function setFront(Front $front);
+    public function refreshStudyPlan(): StudyPlanBuilder;
+    public function setFront(Front $front): StudyPlanBuilder;
 }

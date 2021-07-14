@@ -8,8 +8,15 @@ use App\Domain\TakenExamDTO;
 
 class ExamDistanceByName implements ExamDistance {
 
+    /**
+     * The function assumes that the names are already trimmed.
+     * 
+     * @param ExamOptionDTO $option
+     * @param TakenExamDTO $taken
+     * @return int distance
+     */
     public function calculateDistance(ExamOptionDTO $option, TakenExamDTO $taken): int {
-        return levenshtein($option->getExamName(),
-                $taken->getExamName(), 1, 2, 1);
+        return levenshtein(strtolower($option->getExamName()),
+                strtolower($taken->getExamName()), 1, 1, 1);
     }
 }

@@ -12,29 +12,28 @@ class StudyPlan {
      */
     public function __construct() {
         $this->approvedExams = [];
-        $this->leftovers = [];
     }
 
-    public function addExam(ApprovedExam $exam) {
-        $key = $exam->getExamOption()->getPK();
-        if(!isset($this->approvedExams[$key])){
-            $this->approvedExams[$key] = $exam;        
-        }
-
-        return $this;
-    }
+//    public function addExam(ApprovedExam $exam) {
+//        $key = $exam->getExamOption()->getId();
+//        if(!isset($this->approvedExams[$key])){
+//            $this->approvedExams[$key] = $exam;        
+//        }
+//
+//        return $this;
+//    }
     
     public function addExamLink(ExamOptionDTO $option, LinkedTakenExam $taken): LinkedTakenExam {
-        $pk = $option->getPK();
-        $appExam = (isset($this->approvedExams[$pk])) ?
-                $this->approvedExams[$pk] : new ApprovedExam($option);
-        $leftover = $appExam->addTakenExam($taken);
-        $this->approvedExams[$pk] = $appExam;
-        return $leftover;
+        $id = $option->getId();
+        $appExam = (isset($this->approvedExams[$id])) ?
+                $this->approvedExams[$id] : new ApprovedExam($option);
+        $linkInserted = $appExam->addTakenExam($taken);
+        $this->approvedExams[$id] = $appExam;
+        return $linkInserted;
     }
 
-    public function getExam($pk): ApprovedExam {
-        return $this->approvedExams[$pk];
+    public function getExam($id): ApprovedExam {
+        return $this->approvedExams[$id];
     }
 
     public function getExams() {

@@ -9,6 +9,7 @@ class ApprovedExam
 {
     private $examOption;
     private $linkedTakenExams;
+    private $integrationValue;
 
 
     /**
@@ -20,8 +21,8 @@ class ApprovedExam
     {
         $this->examOption = $examOption;
         $this->linkedTakenExams = [];
+        $this->calculateIntegrationValue();
     }
-
 
     /**
      * @return string
@@ -40,8 +41,8 @@ class ApprovedExam
         return $this->linkedTakenExams;
     }
     
-    public function getTakenExam($pk): LinkedTakenExam{
-        return $this->linkedTakenExams[$pk];
+    public function getTakenExam($id): LinkedTakenExam{
+        return $this->linkedTakenExams[$id];
     }
 
     /**
@@ -54,22 +55,36 @@ class ApprovedExam
      */
     public function addTakenExam(LinkedTakenExam $exam): LinkedTakenExam
     {
-        $value = $this->getIntegrationValue();
-        if ($value < 1){
+        if (!$this->isTakenExamAddable($exam)){
             return $exam;
         }
 
+        $value = $this->getIntegrationValue();
         if ($value > $exam->getActualCfu()){
             $value = $exam->getActualCfu();
         }
 
-        $this->linkedTakenExams[$exam->getTakenExam()->getPK()] = $exam->split($value);
+        $this->linkedTakenExams[$exam->getTakenExam()->getId()] = $exam->split($value);
+        $this->calculateIntegrationValue();
         return $exam;
     }
+    
+    public function isTakenExamAddable(LinkedTakenExam $exam): bool
+    {
+        if ($this->getIntegrationValue() < 1){
+            return false;
+        }
+        return true;
+    }
 
+    
     public function getIntegrationValue(): int
     {
-        return $this->examOption->getCfu() -
+        return $this->integrationValue;
+    }
+    
+    private function calculateIntegrationValue(){
+        $this->integrationValue = $this->examOption->getCfu() -
             collect($this->linkedTakenExams)
             ->map(fn ($item) => $item->getActualCfu())
             ->sum();
