@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Services;
 
+use App\Domain\ExamBlockDTO;
+use App\Domain\TakenExamDTO;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
@@ -11,6 +13,7 @@ use App\Models\Ssd;
 use App\Models\TakenExam;
 use App\Models\User;
 use App\Services\Implementations\FrontManagerImpl;
+use Database\Seeders\DatabaseSeederTest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -18,11 +21,15 @@ use Tests\TestCase;
 class FrontManagerImplTest extends TestCase
 {
     use RefreshDatabase;
+    
+    private $front;
 
     protected function setUp():void
     {
         parent::setUp();
-        $this->populateDB();
+        $this->seed(DatabaseSeederTest::class);
+        $this->front = new FrontManagerImpl(Front::first());
+        //$this->populateDB();
     }
 
     /**
@@ -32,17 +39,28 @@ class FrontManagerImplTest extends TestCase
      */
     public function test_example()
     {
-        //$response = $this->get('/');
-        //$response->assertStatus(200);
-        $sut = new FrontManagerImpl(Front::first());
-        dd($sut->getDeclaredExams());
+        $response = $this->get('/');
+        $response->assertStatus(200);
+    }
+    
+    public function test_getExamBlocks() {
+        $blocks = $this->front->getExamBlocks();
+        
+        $this->assertEquals(2, $blocks->count());
+        $this->assertContainsOnlyInstancesOf(ExamBlockDTO::class, $blocks);
+    }
+    
+    public function test_getTakenExams() {
+        $exams = $this->front->getTakenExams();
+        
+        $this->assertEquals(4, $exams->count());
+        $this->assertContainsOnlyInstancesOf(TakenExamDTO::class, $exams);
+        
     }
 
 
-        private function populateDB()
+    private function populateDB()
     {
-        //$this->seed();
-        
         User::factory()->create();
 
         $this->course = Course::factory()->create([

@@ -1,9 +1,9 @@
 <?php
 
-
 namespace App\Services\Implementations;
 
-use App\Domain\DeclaredExam;
+use App\Domain\ExamBlockDTO;
+use App\Domain\TakenExamDTO;
 use App\Models\Front;
 use App\Services\Interfaces\FrontManager;
 use Illuminate\Support\Collection;
@@ -11,58 +11,50 @@ use Illuminate\Support\Collection;
 /**
  * No Implemented Yet
  */
-class FrontManagerImpl implements FrontManager
-{
-	private $studyPlan;
-	private $front;
-	
-	function __construct(Front $front = null)
-	{
-		if(isset($front)){
-			$this->front = $front;
-			$this->setUp();
-		} else {
-			$this->studyPlan = collect([]);
-		}
-	}
+class FrontManagerImpl implements FrontManager {
 
-	public function setFront(Front $front)
-	{
-		$this->front = $front;
-		$this->setUp();
-	}
+    private $front;
+    private $blocks;
+    private $takenExams;
 
-	public function getExamBlocks(): Collection
-	{
-		return $this->studyPlan->examBlocks;
-	}
+    function __construct(Front $front = null) {
+        $this->front = $front;
+        if (isset($front)) {
+            $this->setUp();
+        }
+    }
 
-	public function getTakenExams(): Collection
-	{
-		return $this->front->takenexams;
-	}
+    public function setFront(Front $front) {
+        $this->front = $front;
+        $this->setUp();
+    }
 
-	public function getStudyPlan(): Collection
-	{
-		return $this->studyPlan;
-	}
+    public function getExamBlocks(): Collection {
+        return $this->blocks;
+    }
 
-	public function getDeclaredExams(): Collection
-	{
-		// to check if it have a N+1 queries problem via ssd
-		return $this->front->takenexams->map(fn ($exam) => 
-			new DeclaredExam($exam));
-	}
-
-	private function setUp(){
-		$this->studyPlan  = $this->front->course->first()->with("examBlocks.examBlockOptions.examApproved")->first();
-	}
+    public function getTakenExams(): Collection {
+        return $this->takenExams;
+    }
 
 
+    public function getExamOptions(): Collection {
+        
+    }
 
-	public function getExamsBySsd(string $ssd): Collection
-	{
-		throw new \Exception('Method getExamsBySsd() is not implemented.');
-	}
-
+    
+    private function setUp() {
+        $course = $this->front->course->first()->with("examBlocks.examBlockOptions.examApproved")->first();
+        $this->blocks = $course->examBlocks->map(function ($block) {
+            return new ExamBlockDTO($block->id, $block->max_exams);
+        });
+        
+        $this->takenExams = $this->front->takenExams->map(function ($taken) {
+            return new TakenExamDTO(
+                    $taken->id,
+                    $taken->name,
+                    $taken->ssd->code,
+                    $taken->cfu);
+        });
+    }
 }

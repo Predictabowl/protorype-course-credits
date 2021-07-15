@@ -19,11 +19,6 @@ class Front extends Model
         return $this->hasMany(TakenExam::class);
     }
 
-    public function recognizedExams()
-    {
-        return $this->hasMany(Exam::class,"exam_id");
-    }
-
     public function course()
     {
         return $this->belongsTo(Course::class);

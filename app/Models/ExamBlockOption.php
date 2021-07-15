@@ -14,13 +14,13 @@ class ExamBlockOption extends Model
         return $this->belongsTo(ExamBlock::class);
     }
 
-    public function examApproved()
+    public function exam()
     {
-        return $this->belongsTo(Exam::class,"exam_id");
+        return $this->belongsTo(Exam::class);
     }
 
-    public function eligibleExams()
+    public function ssds()
     {
-        return $this->belongsToMany(Exam::class,"exam_id");
+        return $this->belongsToMany(Ssd::class);
     }
 }

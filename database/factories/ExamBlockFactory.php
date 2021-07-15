@@ -23,7 +23,7 @@ class ExamBlockFactory extends Factory
     public function definition()
     {
         return [
-            "cfu" => $this->faker->numberBetween(6,12),
+            //"cfu" => $this->faker->numberBetween(6,12),
             "max_exams" => $this->faker->numberBetween(1,3),
             "course_id" => $this->faker->numberBetween(1,Course::count())
         ];

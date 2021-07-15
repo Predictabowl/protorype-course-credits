@@ -2,19 +2,19 @@
 
 namespace Database\Factories;
 
-use App\Models\Exam;
+use App\Models\ExamBlockOptionSsd;
+use App\Models\Ssd;
 use App\Models\ExamBlockOption;
-use App\Models\ExamExamBlockOption;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ExamExamBlockOptionFactory extends Factory
+class ExamBlockOptionSsdFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = ExamExamBlockOption::class;
+    protected $model = ExamBlockOptionSsd::class;
 
     /**
      * Define the model's default state.
@@ -24,8 +24,8 @@ class ExamExamBlockOptionFactory extends Factory
     public function definition()
     {
         return [
-            "exam_id" => $this->faker->numberBetween(1,Exam::count()),
-            "exam_block_option_id" => $this->faker->numberBetween(1,ExamBlockOption::count())
+            "ssd_id" => $this->faker->numberBetween(1, Ssd::count()),
+            "exam_block_option_id" => $this->faker->numberBetween(1, ExamBlockOption::count())
         ];
     }
 }

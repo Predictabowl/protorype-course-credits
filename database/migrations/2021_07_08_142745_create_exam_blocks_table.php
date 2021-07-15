@@ -15,7 +15,7 @@ class CreateExamBlocksTable extends Migration
     {
         Schema::create('exam_blocks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedTinyInteger("cfu"); //unused
+            //$table->unsignedTinyInteger("cfu"); //unused
             $table->unsignedTinyInteger("max_exams");
             $table->foreignId("course_id")->constrained()->cascadeOnDelete();
             $table->timestamps();

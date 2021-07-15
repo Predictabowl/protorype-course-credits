@@ -8,6 +8,8 @@ use App\Services\Interfaces\ExamDistance;
 use App\Services\Implementations\ExamDistanceByName;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Implementations\StudyPlanBuilderImpl;
+use App\Services\Interfaces\DTOMapper;
+use App\Services\Implementations\DTOMapperImpl;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,9 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //$this->app->bind(CourseExamRepository::class, CourseExamRepositoryImpl::class);
         $this->app->bind(ExamDistance::class, ExamDistanceByName::class);
         $this->app->bind(StudyPlanBuilder::class, StudyPlanBuilderImpl::class);
+        $this->app->bind(DTOMapper::class, DTOMapperImpl::class);
     }
 
     /**

@@ -24,7 +24,6 @@ class DatabaseSeederTest extends Seeder
         User::factory()->create();
 
         $this->course = Course::factory()->create([
-            "code" => "code01",
             "name" => "Course Test"
         ]);
 
@@ -37,13 +36,11 @@ class DatabaseSeederTest extends Seeder
         $ssds = Ssd::factory(10)->create();
 
         $block1 = ExamBlock::factory()->create([
-            "cfu" => 12,
             "max_exams" => 2,
             "course_id" => $this->course->id
         ]);
 
         $block2 = ExamBlock::factory()->create([
-            "cfu" => 18,
             "max_exams" => 1,
             "course_id" => $this->course->id
         ]);
@@ -74,17 +71,17 @@ class DatabaseSeederTest extends Seeder
 
 
         $option1 = ExamBlockOption::factory()->create([
-            "exam_id" => $exam1->id,
+            "ssd_id" => 1,
             "exam_block_id" => $block1->id
         ]);
 
         $option2 = ExamBlockOption::factory()->create([
-            "exam_id" => $exam2->id,
+            "ssd_id" => 2,
             "exam_block_id" => $block1->id
         ]);
 
         $option3 = ExamBlockOption::factory()->create([
-            "exam_id" => $exam3->id,
+            "ssd_id" => 3,
             "exam_block_id" => $block2->id
         ]);
 
@@ -111,7 +108,7 @@ class DatabaseSeederTest extends Seeder
         ]);
         
         TakenExam::factory()->create([
-            "name" => "test exam 03 mod 3",
+            "name" => "test exam 04 mod 3",
             "cfu" => 18,
             "ssd_id" => 3,
             "front_id" => 1

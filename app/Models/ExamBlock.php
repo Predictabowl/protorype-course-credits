@@ -16,6 +16,6 @@ class ExamBlock extends Model
 
     public function course()
     {
-        return $this->belongsTo(Course::class)->withTimestamps();
+        return $this->belongsTo(Course::class);
     }
 }
