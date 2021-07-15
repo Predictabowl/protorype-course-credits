@@ -4,7 +4,7 @@ namespace App\Services\Implementations;
 
 use App\Domain\LinkedTakenExam;
 use App\Domain\TakenExamDTO;
-use App\Domain\ExamOptionDTO;
+use App\Domain\ExamBlockOption;
 use App\Domain\StudyPlan;
 use App\Domain\ExamBlockLinker;
 use App\Services\Interfaces\ExamDistance;

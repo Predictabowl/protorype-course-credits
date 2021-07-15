@@ -2,7 +2,7 @@
 
 namespace App\Services\Interfaces;
 
-use App\Domain\ExamOptionDTO;
+use App\Domain\ExamBlockOption;
 use App\Domain\TakenExamDTO;
 
 interface ExamDistance1

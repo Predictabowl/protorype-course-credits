@@ -3,7 +3,7 @@
 namespace App\Services\Implementations;
 
 use App\Services\Interfaces\ExamDistance;
-use App\Domain\ExamOptionDTO;
+use App\Domain\ExamBlockOption;
 use App\Domain\TakenExamDTO;
 
 class ExamDistanceByName1 implements ExamDistance1 {
@@ -12,7 +12,7 @@ class ExamDistanceByName1 implements ExamDistance1 {
     private $taken;
     private $distance;
     
-    public function __construct(ExamOptionDTO $option, TakenExamDTO $taken) {
+    public function __construct(ExamBlockOption $option, TakenExamDTO $taken) {
         $this->option = $option;
         $this->taken = $taken;
         $this->distance = $this->calculateDistance();

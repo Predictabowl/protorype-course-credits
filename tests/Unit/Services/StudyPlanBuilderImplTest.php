@@ -96,7 +96,7 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->assertEquals(0,$studyPlan->getExam(4)->getIntegrationValue());
         $this->assertCount(2,$studyPlan->getExam(4)->getTakenExams());
         
-        dd($studyPlan->getExam(12));
+        //dd($studyPlan->getExam(12));
         $this->assertCount(1,$studyPlan->getExam(12)->getTakenExams());
         $this->assertEquals(3,$studyPlan->getExam(12)->getIntegrationValue());
         //$test = $this->planBuilder->testAssignBySsd();
