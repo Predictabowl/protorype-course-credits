@@ -14,6 +14,10 @@ use App\Models\TakenExam;
 
 class DatabaseSeederTest extends Seeder
 {
+    
+    public const FIXTURE_NUM_BLOCKS = 3;
+    public const FIXTURE_NUM_TAKENEXAMS = 4;
+    public const FIXTURE_NUM_EXAMS = 4;
     /**
      * Run the database seeds.
      *
@@ -44,6 +48,11 @@ class DatabaseSeederTest extends Seeder
             "max_exams" => 1,
             "course_id" => $this->course->id
         ]);
+        
+        $block3 = ExamBlock::factory()->create([
+            "max_exams" => 1,
+            "course_id" => $this->course->id
+        ]);
 
         $exam1 = Exam::factory()->create([
             "ssd_id" => 1,
@@ -71,19 +80,26 @@ class DatabaseSeederTest extends Seeder
 
 
         $option1 = ExamBlockOption::factory()->create([
-            "ssd_id" => 1,
+            "exam_id" => 1,
             "exam_block_id" => $block1->id
         ]);
 
         $option2 = ExamBlockOption::factory()->create([
-            "ssd_id" => 2,
+            "exam_id" => 2,
             "exam_block_id" => $block1->id
         ]);
 
         $option3 = ExamBlockOption::factory()->create([
-            "ssd_id" => 3,
+            "exam_id" => 3,
             "exam_block_id" => $block2->id
         ]);
+           
+        $option4 = ExamBlockOption::factory()->create([
+            "exam_id" => 4,
+            "exam_block_id" => $block2->id
+        ]);
+        
+        $option1->ssds()->attach([1,2,3]);
 
 
         TakenExam::factory()->create([

@@ -39,8 +39,8 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         return $this->studyPlan;
     }
 
-    public function setFront(Front $front): StudyPlanBuilder {
-        $this->frontManager->setFront($front);
+    public function setFront(int $id): StudyPlanBuilder {
+        $this->frontManager->setFront($id);
         $this->refreshStudyPlan();
         return $this;
     }

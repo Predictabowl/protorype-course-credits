@@ -13,6 +13,8 @@ use App\Models\Ssd;
 use App\Models\TakenExam;
 use App\Models\User;
 use App\Services\Implementations\FrontManagerImpl;
+use App\Services\Interfaces\DTOMapper;
+use App\Services\Implementations\DTOMapperImpl;
 use Database\Seeders\DatabaseSeederTest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -23,12 +25,15 @@ class FrontManagerImplTest extends TestCase
     use RefreshDatabase;
     
     private $front;
+    private $mapper;
 
     protected function setUp():void
     {
         parent::setUp();
         $this->seed(DatabaseSeederTest::class);
-        $this->front = new FrontManagerImpl(Front::first());
+        //$this->mapper = $this->createMock(DTOMapper::class);
+        //$this->front = new FrontManagerImpl($this->mapper,1);
+        $this->front = new FrontManagerImpl(new DTOMapperImpl(),1);
         //$this->populateDB();
     }
 
@@ -46,15 +51,24 @@ class FrontManagerImplTest extends TestCase
     public function test_getExamBlocks() {
         $blocks = $this->front->getExamBlocks();
         
-        $this->assertEquals(2, $blocks->count());
+        $this->assertEquals(DatabaseSeederTest::FIXTURE_NUM_BLOCKS, $blocks->count());
         $this->assertContainsOnlyInstancesOf(ExamBlockDTO::class, $blocks);
     }
     
     public function test_getTakenExams() {
         $exams = $this->front->getTakenExams();
         
-        $this->assertEquals(4, $exams->count());
+        $this->assertEquals(DatabaseSeederTest::FIXTURE_NUM_EXAMS, $exams->count());
         $this->assertContainsOnlyInstancesOf(TakenExamDTO::class, $exams);
+        
+    }
+    
+    public function test_getExamOptions() {
+        $exams = $this->front->getExamOptions();
+        
+        //$this->assertEquals(DatabaseSeederTest::FIXTURE_NUM_EXAMS, $exams->count());
+        //$this->assertContainsOnlyInstancesOf(TakenExamDTO::class, $exams);
+        dd($exams);
         
     }
 

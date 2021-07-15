@@ -6,27 +6,29 @@ use App\Domain\ExamBlockDTO;
 use App\Domain\TakenExamDTO;
 use App\Models\Front;
 use App\Services\Interfaces\FrontManager;
+use App\Factories\Interfaces\RepositoriesFactory;
 use Illuminate\Support\Collection;
+//use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * No Implemented Yet
  */
-class FrontManagerImpl implements FrontManager {
+class FrontManagerImpl implements FrontManager{
 
-    private $front;
     private $blocks;
     private $takenExams;
+    //private $examOptions;
+    private $repositoriesFactory;
 
-    function __construct(Front $front = null) {
-        $this->front = $front;
-        if (isset($front)) {
-            $this->setUp();
+    function __construct(RepositoriesFactory $repositoriesFactory, int $id = 0) {
+        $this->repositoriesFactory = $repositoriesFactory;
+        if ($id > 0){
+            $this->setUp($id);
         }
     }
 
-    public function setFront(Front $front) {
-        $this->front = $front;
-        $this->setUp();
+    public function setFront(int $id) {
+        $this->setUp($id);
     }
 
     public function getExamBlocks(): Collection {
@@ -39,22 +41,20 @@ class FrontManagerImpl implements FrontManager {
 
 
     public function getExamOptions(): Collection {
-        
+        return $this->blocks->map(fn(ExamBlockDTO $block) => 
+                $block->getExamOptions())->flatten()->unique();
     }
 
     
-    private function setUp() {
-        $course = $this->front->course->first()->with("examBlocks.examBlockOptions.examApproved")->first();
-        $this->blocks = $course->examBlocks->map(function ($block) {
-            return new ExamBlockDTO($block->id, $block->max_exams);
-        });
+    private function setUp(int $id) {
+        //$front = Front::find($id)->with("takenExams.ssd");
+        //$course = $front->course->first()->with("examBlocks.examBlockOptions.exam")->first();
         
-        $this->takenExams = $this->front->takenExams->map(function ($taken) {
-            return new TakenExamDTO(
-                    $taken->id,
-                    $taken->name,
-                    $taken->ssd->code,
-                    $taken->cfu);
-        });
+        $this->blocks =  $this->repositoriesFactory->getExamBlockRepository()mapExamBlock($block));
+        
+        $this->takenExams = $front->takenExams->map(fn ($taken) =>
+            $this->repositoriesFactory- $this->getTakenExams());
+        
+        //$this->examOptions = $course->examBlocks;//WIP
     }
 }

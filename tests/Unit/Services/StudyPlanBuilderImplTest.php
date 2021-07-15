@@ -5,7 +5,6 @@ namespace Tests\Unit\Services;
 use App\Domain\ExamOptionDTO;
 use App\Domain\ExamBlockDTO;
 use App\Domain\TakenExamDTO;
-use App\Models\Front;
 use App\Services\Implementations\StudyPlanBuilderImpl;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Interfaces\FrontManager;
@@ -86,7 +85,7 @@ class StudyPlanBuilderImplTest extends TestCase
                 ->will($this->onConsecutiveCalls(7,9,3));
         $this->setupMocks();
         
-        $this->planBuilder->setFront(new Front());
+        $this->planBuilder->setFront(1);
         
         $orederedOptions = $this->planBuilder->getOptionsBySsd($takenExam);
         
@@ -110,7 +109,7 @@ class StudyPlanBuilderImplTest extends TestCase
                 ->will($this->onConsecutiveCalls(7,5));
         $this->setupMocks();
         
-        $this->planBuilder->setFront(new Front());
+        $this->planBuilder->setFront(1);
         
         $orederedOptions = $this->planBuilder->getOptionsByCompatibility($takenExam);
         
@@ -125,7 +124,7 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->examDistance->expects($this->any())                
                 ->method("calculateDistance")->willReturn(1);
         
-        $studyPlan = $this->planBuilder->setFront(new Front())
+        $studyPlan = $this->planBuilder->setFront(1)
                 ->getStudyPlan();
         
         $this->assertEquals(3, $studyPlan->getExam(1)->getIntegrationValue());
