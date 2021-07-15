@@ -53,6 +53,15 @@ class ApprovedExamTest extends TestCase
         $this->assertEquals(1,$takenExam->getActualCfu());
         $this->assertEquals(0,$sut->getIntegrationValue());
     }
+    
+    public function test_addTakenExam_is_not_added_if_actual_cfu_is_0(){
+        $option = $this->createOption(12);
+        $sut = new ApprovedExam($option);
+        $takenExam = $sut->addTakenExam($this->createTakenExam(12,"name",0));
+
+        $this->assertEquals(12,$sut->getIntegrationValue());
+        $this->assertCount(0,$sut->getTakenExams());
+    }
 
 
     private function createOption($cfu = 12): ExamOptionDTO

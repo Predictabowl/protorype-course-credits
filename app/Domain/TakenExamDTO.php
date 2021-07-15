@@ -8,12 +8,14 @@
 
 namespace App\Domain;
 
+use App\Domain\Interfaces\ExamDTO;
+
 /**
  * Description of TakenExamDTO
  *
  * @author piero
  */
-class TakenExamDTO {
+class TakenExamDTO implements ExamDTO{
 
     private $id;
     private $examName;
@@ -27,15 +29,15 @@ class TakenExamDTO {
         $this->ssd = $ssd;
     }
     
-    public function getExamName() {
+    public function getExamName(): string {
         return $this->examName;
     }
 
-    public function getCfu() {
+    public function getCfu(): int {
         return $this->cfu;
     }
     
-    public function getSsd() {
+    public function getSsd(): string {
         return $this->ssd;
     }
     

@@ -2,10 +2,9 @@
 
 namespace App\Services\Interfaces;
 
-use App\Domain\ExamOptionDTO;
-use App\Domain\TakenExamDTO;
+use App\Domain\Interfaces\ExamDTO;
 
 interface ExamDistance
 {
-	public function calculateDistance(ExamOptionDTO $option, TakenExamDTO $taken): int;
+	public function calculateDistance(ExamDTO $exam1, ExamDTO $exam2): int;
 }

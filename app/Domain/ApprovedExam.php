@@ -71,7 +71,7 @@ class ApprovedExam
     
     public function isTakenExamAddable(LinkedTakenExam $exam): bool
     {
-        if ($this->getIntegrationValue() < 1){
+        if (($this->getIntegrationValue() < 1) || ($exam->getActualCfu() < 1)){
             return false;
         }
         return true;

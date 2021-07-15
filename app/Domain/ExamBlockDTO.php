@@ -13,7 +13,7 @@ namespace App\Domain;
  *
  * @author piero
  */
-class ExamBlockDTO {
+class ExamBlockDTO{
     
     private $id;
     private $examOptions;

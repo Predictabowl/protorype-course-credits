@@ -8,12 +8,15 @@
 
 namespace App\Domain;
 
+use App\Domain\Interfaces\ExamDTO;
+use Illuminate\Support\Collection;
+
 /**
  * Description of ExamOptionDTO
  *
  * @author piero
  */
-class ExamOptionDTO {
+class ExamOptionDTO implements ExamDTO{
 
     private $id;
     private $examName;
@@ -28,7 +31,7 @@ class ExamOptionDTO {
         $this->block = $block;
         $this->cfu = $cfu;
         $this->ssd = $ssd;
-        $this->compatibleOptions = [];
+        $this->compatibleOptions = collect([]);
         $block->addOption($this);
     }
     
@@ -52,11 +55,15 @@ class ExamOptionDTO {
         return $this->id;
     }
 
-    public function getCompatibleOptions() {
+    public function getCompatibleOptions(): Collection {
         return $this->compatibleOptions;
     }
 
-    public function addCompatibleOption(ExamOptionDTO $option){
-        $this->compatibleOptions[] = $option;
+    public function addCompatibleOption(string $ssd){
+        $this->compatibleOptions->push($ssd);
+    }
+    
+    public function setCompatibleOptions(Collection $ssds){
+        $this->compatibleOptions = $ssds;
     }
 }

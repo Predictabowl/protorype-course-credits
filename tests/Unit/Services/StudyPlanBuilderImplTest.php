@@ -39,13 +39,15 @@ class StudyPlanBuilderImplTest extends TestCase
             new TakenExamDTO(5,"Istituzione random","IUS/07",4),
             new TakenExamDTO(6,"Storia test","IUS/03",6),
             new TakenExamDTO(7,"Storia test II","IUS/03",6),
+            new TakenExamDTO(8,"Test name 8","IUS/0",9),
         ]); 
        
         $block1 = new ExamBlockDTO(1,2);
         $block2 = new ExamBlockDTO(2,2);
         $block3 = new ExamBlockDTO(3,1);
         $block4 = new ExamBlockDTO(4,1);
-        $this->blocks = [$block1, $block2, $block3, $block4];
+        $block5 = new ExamBlockDTO(5,1);
+        $this->blocks = [$block1, $block2, $block3, $block4,$block5];
         
         $this->options = collect([
             new ExamOptionDTO(1,"Diritto Privato a distanza", $block1, 12, "IUS/01"),
@@ -54,9 +56,11 @@ class StudyPlanBuilderImplTest extends TestCase
             new ExamOptionDTO(4,"Diritto di qualcosa", $block2, 9, "IUS/03"),
             new ExamOptionDTO(5,"Istituzione generica", $block3, 6, "IUS/07"),
             new ExamOptionDTO(12,"Storia di qualcosa", $block4, 6, "STO/19"),
+            new ExamOptionDTO(13,"Altro esame IUS/09", $block5, 9, "IUS/12"),
         ]);
         
-        $this->options[3]->addCompatibleOption($this->options[5]);
+        $this->options[5]->addCompatibleOption("IUS/03");
+        $this->options[6]->addCompatibleOption("IUS/04");
     }
     
     private function setupMocks(){
@@ -70,14 +74,49 @@ class StudyPlanBuilderImplTest extends TestCase
                 ->method("getExamBlocks")->willReturn(collect($this->blocks));
     }
 
-    public function test_populate_data() {
+    public function test_getOptionsBySsd() {
+        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/01",5);
+        $option1 = new ExamOptionDTO(1,"test 1", $this->blocks[0], 12, "IUS/01");
+        $option2 = new ExamOptionDTO(2,"test 2", $this->blocks[0], 12, "IUS/09");
+        $option3 = new ExamOptionDTO(3,"test 3", $this->blocks[1], 12, "IUS/01");
+        $option4 = new ExamOptionDTO(4,"test 4", $this->blocks[2], 9, "IUS/01");
+        $this->options = collect([$option1,$option2,$option3,$option4]);
+        $this->examDistance->expects($this->exactly(3))                
+                ->method("calculateDistance")
+                ->will($this->onConsecutiveCalls(7,9,3));
         $this->setupMocks();
-        $this->examDistance->expects($this->any())
-                ->method("calculateDistance")->willReturn(1);
+        
         $this->planBuilder->setFront(new Front());
         
-        $this->assertCount(sizeof($this->takenExams), $this->planBuilder->getTakenExams());
-        //$this->assertEquals($this->takenExams, $this->planBuilder->getTakenExams());
+        $orederedOptions = $this->planBuilder->getOptionsBySsd($takenExam);
+        
+        $this->assertCount(3, $orederedOptions);
+        $this->assertEquals($option4, $orederedOptions->first());
+        $this->assertEquals($option3, $orederedOptions->last());
+    }
+    
+    public function test_getOptionsByCompatibility() {
+        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5);
+        $option1 = new ExamOptionDTO(1,"test 1", $this->blocks[0], 12, "IUS/01");
+        $option2 = new ExamOptionDTO(2,"test 2", $this->blocks[0], 12, "IUS/09");
+        $option3 = new ExamOptionDTO(3,"test 3", $this->blocks[1], 12, "IUS/07");
+        $option4 = new ExamOptionDTO(4,"test 4", $this->blocks[2], 9, "IUS/01");
+        $option1->addCompatibleOption("IUS/02");
+        $option4->addCompatibleOption("IUS/02");
+        $option4->addCompatibleOption("IUS/07");
+        $this->options = collect([$option1,$option2,$option3,$option4]);
+        $this->examDistance->expects($this->exactly(2))                
+                ->method("calculateDistance")
+                ->will($this->onConsecutiveCalls(7,5));
+        $this->setupMocks();
+        
+        $this->planBuilder->setFront(new Front());
+        
+        $orederedOptions = $this->planBuilder->getOptionsByCompatibility($takenExam);
+        
+        $this->assertCount(2, $orederedOptions);
+        $this->assertEquals($option4, $orederedOptions->first());
+        $this->assertEquals($option1, $orederedOptions->last());
     }
     
     public function test_real_learning() {
@@ -102,49 +141,4 @@ class StudyPlanBuilderImplTest extends TestCase
         //$test = $this->planBuilder->testAssignBySsd();
         //var_dump($test);
     }
-    
-//    public function test_collection_learning(){
-//        $o = new ExamOptionDTO(4,"Istituzione di Diritto ", $this->blocks[1], 12, "IUS/09");
-//        $this->takenExams->forget($this->takenExams->search($o));
-//        var_dump($this->takenExams);
-//    }
-    
-    // public function test_auto_assigned_distributed_cfu_when_not_set()
-    // {
-    //     $exams = collect([new ApprovedExam("exam a","ssd1",12),
-    //         new ApprovedExam("exam b","ssd1",9),
-    //         new ApprovedExam("exam c","ssd1",12),
-    //         new ApprovedExam("exam something","ssd1",6)]);
-
-    //     $declaredExam = new DeclaredExam("exam b m1","ssd1",9);
-
-    //     $factory = new ExamDistanceFactoryImpl();
-
-    //     $oredered = $exams->map(fn (ApprovedExam $exam) =>
-    //             $factory->getInstance($exam,$declaredExam))
-    //         ->sort(fn ($a, $b) => ($a->getDistance() < $b->getDistance())? -1 : 1)
-    //         ->map(fn ($item) => $item->getExam1());
-
-    //     dd($oredered);
-    // }
-
-//    public function test_learning()
-//    {
-//         $this->frontManager->expect($this->once())
-//             ->method("getExamBlock")
-//             ->will($this->mockExamBlock());
-//    }
-
-
-//    private function mockExamBlock()
-//    {
-//        $block = new ExamBlock();
-//        $block->setRawAttributes([
-//            "max_exams" => 2,
-//            "course_id" => 1
-//        ]);
-//        return $block;
-//    }
-
-
 }
