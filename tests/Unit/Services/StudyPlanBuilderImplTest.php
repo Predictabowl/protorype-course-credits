@@ -37,7 +37,8 @@ class StudyPlanBuilderImplTest extends TestCase
             new TakenExamDTO(3,"Diritto Commerciale mod I","IUS/04",5),
             new TakenExamDTO(4,"Diritto Commerciale mod II","IUS/07",5),
             new TakenExamDTO(5,"Istituzione random","IUS/07",4),
-            new TakenExamDTO(6,"Storia test","STO/19",7),
+            new TakenExamDTO(6,"Storia test","IUS/03",6),
+            new TakenExamDTO(7,"Storia test II","IUS/03",6),
         ]); 
        
         $block1 = new ExamBlockDTO(1,2);
@@ -50,11 +51,12 @@ class StudyPlanBuilderImplTest extends TestCase
             new ExamOptionDTO(1,"Diritto Privato a distanza", $block1, 12, "IUS/01"),
             new ExamOptionDTO(2,"Istituzione di Diritto ", $block1, 12, "IUS/09"),
             new ExamOptionDTO(3,"Diritto commerciale a distanza", $block2, 12, "IUS/04"),
-            new ExamOptionDTO(4,"Diritto di qualcosa", $block2, 12, "IUS/03"),
+            new ExamOptionDTO(4,"Diritto di qualcosa", $block2, 9, "IUS/03"),
             new ExamOptionDTO(5,"Istituzione generica", $block3, 6, "IUS/07"),
+            new ExamOptionDTO(12,"Storia di qualcosa", $block4, 6, "STO/19"),
         ]);
         
-        $this->options[3]->addCompatibleOption(new ExamOptionDTO(12,"Storia di qualcosa", $block4, 6, "STO/19"),);
+        $this->options[3]->addCompatibleOption($this->options[5]);
     }
     
     private function setupMocks(){
@@ -91,7 +93,12 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->assertEquals(6, $studyPlan->getExam(2)->getIntegrationValue());
         $this->assertEquals(7, $studyPlan->getExam(3)->getIntegrationValue());
         
-        dd($studyPlan->getExam(4));
+        $this->assertEquals(0,$studyPlan->getExam(4)->getIntegrationValue());
+        $this->assertCount(2,$studyPlan->getExam(4)->getTakenExams());
+        
+        dd($studyPlan->getExam(12));
+        $this->assertCount(1,$studyPlan->getExam(12)->getTakenExams());
+        $this->assertEquals(3,$studyPlan->getExam(12)->getIntegrationValue());
         //$test = $this->planBuilder->testAssignBySsd();
         //var_dump($test);
     }

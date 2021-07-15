@@ -88,14 +88,17 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         $takenExam = $linkedExam->getTakenExam();
         //var_dump($takenExam);
         $eligibles = $this->getOptionsSorted(
-                $this->examOptions->filter(function(ExamOptionDTO $option) use($takenExam){ 
-                        $val = collect($option->getCompatibleOptions());
-                        //$val = $val->contains(fn($option) => $option->getSsd() === $takenExam->getSsd());
-                        $val = $val->contains(function($option) use($takenExam){
-                            return $option->getSsd() === $takenExam->getSsd();
-                        });
-                        return $val;
-                }),$takenExam);
+                $this->examOptions->filter(fn($option) => 
+                    $option->getSsd() === $takenExam->getSsd())
+                    ->map(fn($option) => $option->getCompatibleOptions())
+                    ->flatten(),$takenExam);
+//                $this->examOptions->filter(function(ExamOptionDTO $option) use($takenExam){ 
+//                        $val = collect($option->getCompatibleOptions());
+//                        $val = $val->contains(function($option) use($takenExam){
+//                            return $option->getSsd() === $takenExam->getSsd();
+//                        });
+//                        return $val;
+//                }),$takenExam);
         //var_dump($eligibles);
         return $this->linkExam($eligibles, $linkedExam);
     }
