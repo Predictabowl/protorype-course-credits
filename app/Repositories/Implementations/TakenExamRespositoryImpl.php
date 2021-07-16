@@ -46,5 +46,8 @@ class TakenExamRespositoryImpl implements TakenExamRepository{
         return new TakenExamDTO($exam->id, $exam->name, $exam->ssd->code, $exam->cfu);
     }
 
+    public function delete($id) {
+        TakenExam::destroy($id);
+    }
 
 }

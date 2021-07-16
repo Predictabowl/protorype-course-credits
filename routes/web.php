@@ -42,6 +42,8 @@ Route::get("/front",[FrontController::class,"index"])->middleware("auth");
 
 Route::post("/front",[FrontController::class,"create"])->middleware("auth");
 
+Route::get("/front/remove/{id}",[FrontController::class,"delete"])->middleware("auth");
+
 Route::get("/tests", function(){
     $course  = Course::first()->with("examBlocks.examBlockOptions.examApproved")->get();
     // $result = $course ->first()->examBlocks->map(fn ($block) => $block->examBlockOptions

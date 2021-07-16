@@ -55,6 +55,7 @@
                         <th>ssd</th>
                         <th>Nome</th>
                         <th>CFU</th>
+                        <th/>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,6 +64,7 @@
                         <td>{{ $exam->getSsd() }}</td>
                         <td>{{ $exam->getExamName() }}</td>
                         <td class="text-center">{{ $exam->getCfu() }}</td>
+                        <td><a href="/front/remove/{{$exam->getId()}}" class="ml-6 text-xs font-bold uppercase hover:bg-gray-200">Remove</a></td>
                     </tr>
                     @endforeach
                 </tbody>

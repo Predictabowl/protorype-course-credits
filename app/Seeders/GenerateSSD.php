@@ -27,7 +27,7 @@ class GenerateSSD {
     
     public static function createAll(){
     
-            GenerateSSD::arrayCreate([
+        GenerateSSD::arrayCreate([
             "MAT" => 9,
             "INF" => 1,
             "FIS" => 8,
@@ -57,5 +57,10 @@ class GenerateSSD {
             "SECS-S" => 6,
             "SPS" => 14
         ]);
+    }
+    
+    public static function truncateAndCreateAll() {
+        Ssd::truncate();
+        GenerateSSD::createAll();
     }
 }

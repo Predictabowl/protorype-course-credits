@@ -82,5 +82,28 @@ class TakenExamRepositoryImplTest extends TestCase
         ]);
     }
     
+    public function test_delete_success() {
+        $ssd = Ssd::factory()->create();
+        $front = Front::factory()->create([
+               "user_id" => User::factory()->create(),
+                "course_id" => Course::factory()->create()
+            ]);
+        TakenExam::factory(2)->create();
+        $taken = [
+            "id" => 5,
+            "name" => "Mario",
+            "cfu" => 7,
+            "ssd_id" => $ssd->id,
+            "front_id" => $front->id,
+        ];
+        TakenExam::factory()->create($taken);
+        
+        $this->assertDatabaseHas("taken_exams", $taken);
+        
+        $this->repository->delete(5);
+        
+        $this->assertDatabaseCount("taken_exams", 2);
+        $this->assertDatabaseMissing("taken_exams", $taken);
+    }
 
 }

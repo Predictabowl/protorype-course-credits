@@ -11,6 +11,7 @@ use App\Models\Front;
 use App\Models\Ssd;
 use App\Models\TakenExam;
 use App\Models\User;
+use App\Seeders\GenerateSSD;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -29,8 +30,9 @@ class DatabaseSeeder extends Seeder
             "email" => "mario@email.com",
             "password" => Hash::make("password")
         ]);
+        GenerateSSD::createAll();
+        
         Course::factory()->create();
-        Ssd::factory(15)->create();
 
         Front::factory()->create(["user_id" => 1]);
         Front::factory()->create(["user_id" => 2]);

@@ -7,7 +7,6 @@ use App\Domain\TakenExamDTO;
 use App\Services\Interfaces\FrontManager;
 use App\Factories\Interfaces\RepositoriesFactory;
 use Illuminate\Support\Collection;
-//use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * It caches the results and always return the cached ones until
@@ -64,6 +63,13 @@ class FrontManagerStatic implements FrontManager{
     public function saveTakenExam(TakenExamDTO $exam) {
         $this->repositoriesFactory->getTakenExamRepository()
                 ->save($exam, $this->id);
+        $this->takenExams = null;
+    }
+
+    public function deleteTakenExam($id) {
+        $this->repositoriesFactory->getTakenExamRepository()
+                ->delete($id);
+        $this->takenExams = null;
     }
 
 }

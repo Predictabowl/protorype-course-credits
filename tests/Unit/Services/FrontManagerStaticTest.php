@@ -88,8 +88,23 @@ class FrontManagerStaticTest extends TestCase
         $exam = new TakenExamDTO(1, "testname", "IUS/0", 7);
         $this->takenRepo->expects($this->once())->method("save")
                 ->with($exam,4);
+        $this->takenRepo->expects($this->exactly(2))->method("getFromFront");
         
-        $this->front->setFront(4)->saveTakenExam($exam);
+        $this->front->setFront(4)->getTakenExams();
+        $this->front->saveTakenExam($exam);
+        $this->front->getTakenExams();
+        $this->front->getTakenExams();
+    }
+    
+    public function test_delete_takenExam() {
+        $this->takenRepo->expects($this->once())->method("delete")
+                ->with(1);
+        $this->takenRepo->expects($this->exactly(2))->method("getFromFront");
+        
+        $this->front->setFront(3)->getTakenExams();
+        $this->front->deleteTakenExam(1);
+        $this->front->getTakenExams();
+        $this->front->getTakenExams();
     }
 
 }

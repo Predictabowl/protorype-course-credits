@@ -13,4 +13,5 @@ interface FrontManager
 	public function getTakenExams(): Collection;
         public function getExamOptions(): Collection;
         public function saveTakenExam(TakenExamDTO $exam);
+        public function deleteTakenExam($id);
 }

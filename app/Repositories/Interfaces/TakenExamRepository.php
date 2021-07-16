@@ -22,4 +22,6 @@ interface TakenExamRepository {
     public function getFromFront($frontId): Collection;
     
     public function save(TakenExamDTO $exam, int $frontId);
+    
+    public function delete($id);
 }
