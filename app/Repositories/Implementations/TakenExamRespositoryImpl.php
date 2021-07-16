@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\TakenExamRepository;
 use App\Domain\TakenExamDTO;
 use App\Models\TakenExam;
 use App\Models\Front;
+use App\Models\Ssd;
 use Illuminate\Support\Collection;
 
 /**
@@ -31,8 +32,19 @@ class TakenExamRespositoryImpl implements TakenExamRepository{
                 fn($exam) => $this->mapTakenExam($exam));
     }
     
+    public function save(TakenExamDTO $exam, int $frontId) {
+        TakenExam::create([
+           "name" => $exam->getExamName(),
+            "cfu" => $exam->getCfu(),
+            "ssd_id" => Ssd::where("code",$exam->getSsd())->first()->id,
+            "front_id" => $frontId
+        ]);
+    }
+    
+    
     public function mapTakenExam(TakenExam $exam): TakenExamDTO {
         return new TakenExamDTO($exam->id, $exam->name, $exam->ssd->code, $exam->cfu);
     }
+
 
 }

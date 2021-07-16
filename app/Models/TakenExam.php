@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class TakenExam extends Model
 {
     use HasFactory;
+    
+    protected $fillable = ["name","cfu","ssd_id", "front_id"];
 
     public function front()
     {

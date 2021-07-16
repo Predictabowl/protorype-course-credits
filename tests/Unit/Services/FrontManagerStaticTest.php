@@ -83,5 +83,13 @@ class FrontManagerStaticTest extends TestCase
         $this->front->getTakenExams();
         $this->front->getExamOptions();
     }
+    
+    public function test_save_takenExam() {
+        $exam = new TakenExamDTO(1, "testname", "IUS/0", 7);
+        $this->takenRepo->expects($this->once())->method("save")
+                ->with($exam,4);
+        
+        $this->front->setFront(4)->saveTakenExam($exam);
+    }
 
 }

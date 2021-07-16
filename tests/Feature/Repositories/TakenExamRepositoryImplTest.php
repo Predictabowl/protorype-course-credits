@@ -63,5 +63,24 @@ class TakenExamRepositoryImplTest extends TestCase
         $this->assertContainsOnlyInstancesOf(TakenExamDTO::class, $sut);
     }
     
+    public function test_save_success(){
+        $ssd = Ssd::factory()->create();
+        $front = Front::factory()->create([
+               "user_id" => User::factory()->create(),
+                "course_id" => Course::factory()->create()
+            ]);
+        $exam = new TakenExamDTO(0, "test name", $ssd->code, 6);
+        
+        
+        $this->repository->save($exam, $front->id);
+        
+        $this->assertDatabaseHas("taken_exams", [
+            "front_id" => $front->id,
+            "ssd_id" => $ssd->id,
+            "name" => "test name",
+            "cfu" => 6
+        ]);
+    }
+    
 
 }

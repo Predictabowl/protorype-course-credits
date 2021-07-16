@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Ssd extends Model
 {
     use HasFactory;
+    
+    protected $fillable = ["code"];
 
     public function exams()
     {

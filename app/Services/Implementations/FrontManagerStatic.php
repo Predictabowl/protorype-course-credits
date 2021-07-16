@@ -3,6 +3,7 @@
 namespace App\Services\Implementations;
 
 use App\Domain\ExamBlockDTO;
+use App\Domain\TakenExamDTO;
 use App\Services\Interfaces\FrontManager;
 use App\Factories\Interfaces\RepositoriesFactory;
 use Illuminate\Support\Collection;
@@ -58,6 +59,11 @@ class FrontManagerStatic implements FrontManager{
             $options = collect([]);
         }
         return $options;
+    }
+
+    public function saveTakenExam(TakenExamDTO $exam) {
+        $this->repositoriesFactory->getTakenExamRepository()
+                ->save($exam, $this->id);
     }
 
 }

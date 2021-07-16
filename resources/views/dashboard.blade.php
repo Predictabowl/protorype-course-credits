@@ -14,7 +14,7 @@
                         <a href="/exams">Lista Esami</a>
                     </p>
                     <p class="hover:underline text-blue-500">
-                        <a href="/takenexams">Esami Sostenuti</a>
+                        <a href="/front">Compila Prospetto</a>
                     </p>
                 </div>
             </div>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\TakenExamController;
+use App\Http\Controllers\FrontController;
 use App\Models\Course;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,10 @@ require __DIR__.'/auth.php';
 Route::get("/exams",[ExamController::class,"index"]);
 
 Route::get("/takenexams",[TakenExamController::class,"index"]);
+
+Route::get("/front",[FrontController::class,"index"])->middleware("auth");
+
+Route::post("/front",[FrontController::class,"create"])->middleware("auth");
 
 Route::get("/tests", function(){
     $course  = Course::first()->with("examBlocks.examBlockOptions.examApproved")->get();

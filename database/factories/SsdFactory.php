@@ -22,7 +22,7 @@ class SsdFactory extends Factory
     public function definition()
     {
         return [
-            "code" => $this->faker->bothify("???/##")
+            "code" => strtoupper($this->faker->bothify("???/##"))
         ];
     }
 }

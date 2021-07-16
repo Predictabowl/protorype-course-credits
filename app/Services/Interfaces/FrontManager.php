@@ -3,7 +3,8 @@
 
 namespace App\Services\Interfaces;
 
-use Illuminate\Support\Collection;;
+use Illuminate\Support\Collection;
+use App\Domain\TakenExamDTO;
 
 interface FrontManager
 {
@@ -11,4 +12,5 @@ interface FrontManager
 	public function getExamBlocks(): Collection;
 	public function getTakenExams(): Collection;
         public function getExamOptions(): Collection;
+        public function saveTakenExam(TakenExamDTO $exam);
 }
