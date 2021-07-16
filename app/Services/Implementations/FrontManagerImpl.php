@@ -17,7 +17,6 @@ class FrontManagerImpl implements FrontManager{
 
     private $blocks;
     private $takenExams;
-    //private $examOptions;
     private $repositoriesFactory;
 
     function __construct(RepositoriesFactory $repositoriesFactory, int $id = 0) {
@@ -52,10 +51,10 @@ class FrontManagerImpl implements FrontManager{
         //$course = $front->course->first()->with("examBlocks.examBlockOptions.exam")->first();
         
         $this->blocks =  $this->repositoriesFactory->getExamBlockRepository()
-                ->getAll($id);
+                ->getFromFront($id);
         
         $this->takenExams = $this->repositoriesFactory->getTakenExamRepository()
-                ->getAll($id);
+                ->getFromFront($id);
         
         //$this->examOptions = $course->examBlocks;//WIP
     }

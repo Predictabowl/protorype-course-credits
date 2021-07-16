@@ -26,7 +26,7 @@ class TakenExamRespositoryImpl implements TakenExamRepository{
         return $this->mapTakenExam($exam);
     }
 
-    public function getAll($frontId): Collection {
+    public function getFromFront($frontId): Collection {
         return Front::with("takenExams.ssd")->find($frontId)->takenExams->map(
                 fn($exam) => $this->mapTakenExam($exam));
     }

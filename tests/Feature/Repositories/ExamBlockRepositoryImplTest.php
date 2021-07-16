@@ -72,7 +72,7 @@ class ExamBlockRepositoryImplTest extends TestCase
         
     }
     
-    public function test_getAll_without_options(){
+    public function test_getFromFront_without_options(){
         $course = Course::factory()->create();
         User::factory()->create();
         $front = Front::factory()->create([
@@ -83,13 +83,13 @@ class ExamBlockRepositoryImplTest extends TestCase
             "course_id" => $course
         ]);
         
-        $sut = $this->repository->getAll($front->id);
+        $sut = $this->repository->getFromFront($front->id);
         
         $this->assertCount(3,$sut);
         $this->assertContainsOnlyInstancesOf(ExamBlockDTO::class, $sut);
     }
     
-    public function test_getAll_with_options(){
+    public function test_getFromFront_with_options(){
         $course = Course::factory()->create();
         User::factory()->create();
         $front = Front::factory()->create([
@@ -116,7 +116,7 @@ class ExamBlockRepositoryImplTest extends TestCase
             "exam_block_id" => $blocks[2]
         ]);
         
-        $sut = $this->repository->getAll($front->id);
+        $sut = $this->repository->getFromFront($front->id);
         
         $this->assertCount(3,$sut[0]->getExamOptions());
         $this->assertCount(2,$sut[1]->getExamOptions());

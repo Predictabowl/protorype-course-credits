@@ -57,7 +57,7 @@ class TakenExamRepositoryImplTest extends TestCase
             "front_id" => $front
         ]);
         
-        $sut = $this->repository->getAll($front->id);
+        $sut = $this->repository->getFromFront($front->id);
         
         $this->assertCount(3, $sut);
         $this->assertContainsOnlyInstancesOf(TakenExamDTO::class, $sut);

@@ -118,10 +118,10 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->assertEquals($option1, $orederedOptions->last());
     }
     
+    // WIP Test!!!
     public function test_real_learning() {
         $this->setupMocks();
-        //$this->examDistance->expects($this->exactly(sizeof($this->options)))
-        $this->examDistance->expects($this->any())                
+        $this->examDistance->expects($this->exactly(10))                
                 ->method("calculateDistance")->willReturn(1);
         
         $studyPlan = $this->planBuilder->setFront(1)
@@ -134,10 +134,7 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->assertEquals(0,$studyPlan->getExam(4)->getIntegrationValue());
         $this->assertCount(2,$studyPlan->getExam(4)->getTakenExams());
         
-        //dd($studyPlan->getExam(12));
         $this->assertCount(1,$studyPlan->getExam(12)->getTakenExams());
         $this->assertEquals(3,$studyPlan->getExam(12)->getIntegrationValue());
-        //$test = $this->planBuilder->testAssignBySsd();
-        //var_dump($test);
     }
 }

@@ -21,7 +21,7 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         return $this->mapExamBlock($block);
     }
 
-    public function getAll($frontId): Collection {
+    public function getFromFront($frontId): Collection {
         $front = Front::with("course.examBlocks.examBlockOptions.exam.ssd")->find($frontId);
         return $front->course->examBlocks->map(fn($block) => $this->mapExamBlock($block));
     }

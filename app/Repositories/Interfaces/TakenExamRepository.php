@@ -19,5 +19,5 @@ interface TakenExamRepository {
     
     public function get($id): TakenExamDTO;
     
-    public function getAll($frontId): Collection;
+    public function getFromFront($frontId): Collection;
 }

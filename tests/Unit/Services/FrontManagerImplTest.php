@@ -35,7 +35,7 @@ class FrontManagerImplTest extends TestCase
     
     public function test_getExamBlocks() {
         $blocks = collect([new ExamBlockDTO(1, 2), new ExamBlockDTO(1, 1)]);
-        $this->blockRepo->expects($this->once())->method("getAll")
+        $this->blockRepo->expects($this->once())->method("getFromFront")
                 ->willReturn($blocks);
         
         $sut = $this->front->setFront(1)->getExamBlocks();
@@ -46,7 +46,7 @@ class FrontManagerImplTest extends TestCase
     public function test_getTakenExams() {
         $exams = collect([new TakenExamDTO(1, "name", "ssd1", 6),
                 new TakenExamDTO(2, "name 2", "ssd2", 9)]);
-        $this->takenRepo->expects($this->once())->method("getAll")
+        $this->takenRepo->expects($this->once())->method("getFromFront")
                 ->willReturn($exams);
         
         $sut = $this->front->setFront(17)->getTakenExams();
@@ -62,7 +62,7 @@ class FrontManagerImplTest extends TestCase
         $option1 = new ExamOptionDTO(1, "name 1", $block1, 12, "ssd1");
         $option2 = new ExamOptionDTO(2, "name 2", $block1, 12, "ssd2");
         $option3 = new ExamOptionDTO(3, "name 3", $block2, 12, "ssd3");
-        $this->blockRepo->expects($this->once())->method("getAll")
+        $this->blockRepo->expects($this->once())->method("getFromFront")
                 ->willReturn(collect([$block1,$block2]));
         
         $exams = $this->front->setFront(3)->getExamOptions();
