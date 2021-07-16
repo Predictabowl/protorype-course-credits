@@ -1,60 +1,47 @@
 <?php
 
-namespace Tests\Feature\Services;
+namespace Tests\Unit\Services;
 
 use App\Domain\ExamBlockDTO;
 use App\Domain\TakenExamDTO;
-use App\Models\Course;
-use App\Models\Exam;
-use App\Models\ExamBlock;
-use App\Models\ExamBlockOption;
-use App\Models\Front;
-use App\Models\Ssd;
-use App\Models\TakenExam;
-use App\Models\User;
 use App\Services\Implementations\FrontManagerImpl;
-use App\Services\Interfaces\DTOMapper;
-use App\Services\Implementations\DTOMapperImpl;
-use Database\Seeders\DatabaseSeederTest;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
+use App\Factories\Interfaces\RepositoriesFactory;
+use App\Repositories\Interfaces\TakenExamRepository;
+use App\Repositories\Interfaces\ExamBlockRepository;
+use PHPUnit\Framework\TestCase;
 
 class FrontManagerImplTest extends TestCase
 {
-    use RefreshDatabase;
-    
     private $front;
-    private $mapper;
+    private $factory;
+    private $takenRepo;
+    private $blockRepo;
+    
 
     protected function setUp():void
     {
-        parent::setUp();
-        $this->seed(DatabaseSeederTest::class);
-        //$this->mapper = $this->createMock(DTOMapper::class);
-        //$this->front = new FrontManagerImpl($this->mapper,1);
-        $this->front = new FrontManagerImpl(new DTOMapperImpl(),1);
-        //$this->populateDB();
-    }
-
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function test_example()
-    {
-        $response = $this->get('/');
-        $response->assertStatus(200);
+        $this->factory = $this->createMock(RepositoriesFactory::class);
+        $this->takenRepo = $this->createMock(TakenExamRepository::class);
+        $this->blockRepo = $this->createMock(ExamBlockRepository::class);
+        
+        $this->factory->method("getTakenExamRepository")
+                ->willReturn($this->takenRepo);
+        $this->factory->method("getExamBlockRepository")
+                ->willReturn($this->blockRepo);
+        
+        $this->front = new FrontManagerImpl($this->factory);
     }
     
     public function test_getExamBlocks() {
-        $blocks = $this->front->getExamBlocks();
+        $blocks = collect([new ExamBlockDTO(1, 2)]);
+        $this->blockRepo->expects($this->exactly(1))->method("getAll")
+                ->willReturn($blocks);
         
-        $this->assertEquals(DatabaseSeederTest::FIXTURE_NUM_BLOCKS, $blocks->count());
-        $this->assertContainsOnlyInstancesOf(ExamBlockDTO::class, $blocks);
+        $sut = $this->front->setFront(1)->getExamBlocks();
+        
+        $this->assertSame($blocks, $sut);
     }
-    
+    /*
     public function test_getTakenExams() {
         $exams = $this->front->getTakenExams();
         
@@ -70,7 +57,7 @@ class FrontManagerImplTest extends TestCase
         //$this->assertContainsOnlyInstancesOf(TakenExamDTO::class, $exams);
         dd($exams);
         
-    }
+    }*/
 
 
     private function populateDB()

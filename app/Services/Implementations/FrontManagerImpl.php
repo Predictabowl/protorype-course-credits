@@ -27,8 +27,9 @@ class FrontManagerImpl implements FrontManager{
         }
     }
 
-    public function setFront(int $id) {
+    public function setFront(int $id): FrontManager {
         $this->setUp($id);
+        return $this;
     }
 
     public function getExamBlocks(): Collection {
@@ -50,10 +51,11 @@ class FrontManagerImpl implements FrontManager{
         //$front = Front::find($id)->with("takenExams.ssd");
         //$course = $front->course->first()->with("examBlocks.examBlockOptions.exam")->first();
         
-        $this->blocks =  $this->repositoriesFactory->getExamBlockRepository()mapExamBlock($block));
+        $this->blocks =  $this->repositoriesFactory->getExamBlockRepository()
+                ->getAll($id);
         
-        $this->takenExams = $front->takenExams->map(fn ($taken) =>
-            $this->repositoriesFactory- $this->getTakenExams());
+        $this->takenExams = $this->repositoriesFactory->getTakenExamRepository()
+                ->getAll($id);
         
         //$this->examOptions = $course->examBlocks;//WIP
     }
