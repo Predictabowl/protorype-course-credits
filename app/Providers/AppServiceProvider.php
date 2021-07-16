@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-//use App\Repositories\Implementations\CourseExamRepositoryImpl;
-//use App\Repositories\Interfaces\CourseExamRepository;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Implementations\ExamDistanceByName;
 use App\Services\Interfaces\StudyPlanBuilder;

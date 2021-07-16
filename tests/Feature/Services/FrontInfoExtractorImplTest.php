@@ -1,5 +1,7 @@
 <?php
 
+// Not used anymore, just keeping around for the populatedatabse copy-paste
+
 namespace Tests\Feature\Services;
 
 use App\Models\Course;
