@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Exam;
+use App\Models\Ssd;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ExamFactory extends Factory
@@ -22,7 +23,7 @@ class ExamFactory extends Factory
     public function definition()
     {
         return [
-            "ssd" => $this->faker->bothify("???/##"),
+            "ssd_id" => $this->faker->numberBetween(1,Ssd::count()),
             "name" => $this->faker->sentence(),
             "cfu" => $this->faker->numberBetween(3,12)
         ];

@@ -23,7 +23,8 @@ class CourseFactory extends Factory
     {
         return [
             "name" => $this->faker->sentence(4),
-            "code" => $this->faker->bothify("???-##")
+            //"code" => $this->faker->bothify("???-##"),
+            "cfu" => 180
         ];
     }
 }

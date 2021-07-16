@@ -12,7 +12,7 @@
 			<tbody>
 			@foreach($exams as $exam)
 				<tr>
-					<td>{{ $exam->ssd }}</td>
+					<td>{{ $exam->ssd->code }}</td>
 					<td>{{ $exam->name }}</td>
 					<td class="text-center">{{ $exam->cfu }}</td>
 				</tr>
