@@ -5,13 +5,13 @@ namespace Tests\Unit\Services;
 use App\Domain\ExamBlockDTO;
 use App\Domain\TakenExamDTO;
 use App\Domain\ExamOptionDTO;
-use App\Services\Implementations\FrontManagerImpl;
+use App\Services\Implementations\FrontManagerStatic;
 use App\Factories\Interfaces\RepositoriesFactory;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use PHPUnit\Framework\TestCase;
 
-class FrontManagerImplTest extends TestCase
+class FrontManagerStaticTest extends TestCase
 {
     private $front;
     private $factory;
@@ -30,7 +30,7 @@ class FrontManagerImplTest extends TestCase
         $this->factory->method("getExamBlockRepository")
                 ->willReturn($this->blockRepo);
         
-        $this->front = new FrontManagerImpl($this->factory,1);
+        $this->front = new FrontManagerStatic($this->factory,1);
     }
     
     public function test_getExamBlocks() {
@@ -38,7 +38,7 @@ class FrontManagerImplTest extends TestCase
         $this->blockRepo->expects($this->once())->method("getFromFront")
                 ->willReturn($blocks);
         
-        $sut = $this->front->getExamBlocks();
+        $sut = $this->front->setFront(1)->getExamBlocks();
         
         $this->assertSame($blocks, $sut);
     }
@@ -49,7 +49,7 @@ class FrontManagerImplTest extends TestCase
         $this->takenRepo->expects($this->once())->method("getFromFront")
                 ->willReturn($exams);
         
-        $sut = $this->front->getTakenExams();
+        $sut = $this->front->setFront(17)->getTakenExams();
         
         $this->assertSame($exams, $sut);
         
@@ -65,16 +65,16 @@ class FrontManagerImplTest extends TestCase
         $this->blockRepo->expects($this->once())->method("getFromFront")
                 ->willReturn(collect([$block1,$block2]));
         
-        $exams = $this->front->getExamOptions();
+        $exams = $this->front->setFront(3)->getExamOptions();
         
         $this->assertSame([$option1,$option2,$option3],
                 [$exams[0],$exams[1],$exams[2]]);
         
     }
     
-    public function test_repos_are_called_everytime() {
-        $this->blockRepo->expects($this->exactly(4))->method("getFromFront");
-        $this->takenRepo->expects($this->exactly(2))->method("getFromFront");
+    public function test_repos_are_called_only_once() {
+        $this->blockRepo->expects($this->once())->method("getFromFront");
+        $this->takenRepo->expects($this->once())->method("getFromFront");
         
         $this->front->getExamBlocks();
         $this->front->getTakenExams();

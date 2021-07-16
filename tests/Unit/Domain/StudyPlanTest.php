@@ -65,7 +65,31 @@ class StudyPlanTest extends TestCase{
                 ->getIntegrationValue());
         $this->assertEquals(8, $this->studyPlan->getExam($option2->getId())
                 ->getIntegrationValue());
-
+    }
+    
+    public function test_getIntegrationValue_with_empty_studyPlan() {
+        $integration = $this->studyPlan->getIntegrationValue();
+        
+        $this->assertEquals(0, $integration);
+    }
+    
+    public function test_getIntegrationValue() {
+        $block1 = new ExamBlockDTO(1,2);
+        $block2 = new ExamBlockDTO(2,1);
+        $option1 = new ExamOptionDTO(1,"option1", $block1, 9, "ssd1");
+        $option2 = new ExamOptionDTO(2,"option2", $block1, 12, "ssd2");
+        $option3 = new ExamOptionDTO(3,"option3", $block2, 18, "ssd1");
+        $taken1 = new LinkedTakenExam(new TakenExamDTO(1,"taken1", "ssd1", 10));
+        $taken2 = new LinkedTakenExam(new TakenExamDTO(2,"taken2", "ssd2", 6));
+        $taken3 = new LinkedTakenExam(new TakenExamDTO(2,"taken2", "ssd1", 9));
+        
+        $this->studyPlan->addExamLink($option1, $taken1);
+        $this->studyPlan->addExamLink($option2, $taken2);
+        $this->studyPlan->addExamLink($option3, $taken3);
+        
+        $value = $this->studyPlan->getIntegrationValue();
+        
+        $this->assertEquals(15, $value);
     }
     
 }

@@ -30,5 +30,10 @@ class StudyPlan {
     public function getExams() {
         return $this->approvedExams;
     }
+    
+    public function getIntegrationValue(): int {
+        return collect($this->approvedExams)->map(fn(ApprovedExam $exam) =>
+                $exam->getIntegrationValue())->sum();
+    }
 
 }

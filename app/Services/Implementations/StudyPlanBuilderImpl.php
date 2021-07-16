@@ -8,7 +8,6 @@ use App\Domain\ExamOptionDTO;
 use App\Domain\StudyPlan;
 use App\Domain\ExamBlockLinker;
 use App\Services\Interfaces\ExamDistance;
-use App\Models\Front;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\StudyPlanBuilder;
 use Illuminate\Support\Collection;
@@ -23,7 +22,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
     private $eDistance;
     private $declaredExams;
     private $examOptions;
-    private $blockLinkers;
+    private $blockLinkers; //keep tracks of wich options in a block are linked
 
     function __construct(FrontManager $frontManager, ExamDistance $eDistance) {
         $this->frontManager = $frontManager;
@@ -87,7 +86,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
     }
     
     public function getOptionsBySsd(TakenExamDTO $takenExam){
-        return $this->getOptionsSorted(
+        return $this->sortOptions(
                 $this->examOptions->filter(fn($option) => 
                         $option->getSsd() === $takenExam->getSsd())
                 ,$takenExam);
@@ -102,12 +101,21 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
 //    }
     
     public function getOptionsByCompatibility(TakenExamDTO $takenExam){
-        return $this->getOptionsSorted(
+        return $this->sortOptions(
                 $this->examOptions->filter(fn(ExamOptionDTO $option) => 
                     $option->getCompatibleOptions()->contains(
                         fn(string $ssd) => $ssd === $takenExam->getSsd()))
                 ,$takenExam);
     }
+    
+    /**
+     * Link the takenExam to the examOptions sequentially, until all
+     * the credits of takenExam are linked or the options are exhausted.
+     * 
+     * @param type $options
+     * @param LinkedTakenExam $linkedExam
+     * @return int leftover cfu from takenExam
+     */
     
     private function linkExam($options, LinkedTakenExam $linkedExam): int{
         foreach ($options as $option) {
@@ -121,7 +129,15 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         return $linkedExam->getActualCfu();
     }
     
-    private function getOptionsSorted(Collection $options, TakenExamDTO $takenExam){
+    /**
+     * Sort ascending base on examDistance value
+     * 
+     * @param Collection $options
+     * @param TakenExamDTO $takenExam
+     * @return type
+     */
+    
+    private function sortOptions(Collection $options, TakenExamDTO $takenExam){
         return $options->map(fn($option) => [
                 "object" => $option,
                 "distance" => $this->eDistance->calculateDistance($option, $takenExam)])

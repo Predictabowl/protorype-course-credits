@@ -9,34 +9,44 @@ use Illuminate\Support\Collection;
 //use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
- * On every call it uses the repositories to make new queries,
- * so care must be used if used on static content as will make a lot
- * of useless queries.
+ * It caches the results and always return the cached ones until
+ * setFront is called to refresh the queries.
  */
+class FrontManagerStatic implements FrontManager{
 
-class FrontManagerImpl implements FrontManager{
-
+    private $blocks;
+    private $takenExams;
     private $repositoriesFactory;
-    private $frontId;
+    private $id;
 
-    function __construct(RepositoriesFactory $repositoriesFactory, int $frontId = 0) {
+    function __construct(RepositoriesFactory $repositoriesFactory, int $id = 0) {
         $this->repositoriesFactory = $repositoriesFactory;
-        $this->frontId = $frontId;
+        if ($id > 0){
+            $this->setFront($id);
+        }
     }
 
     public function setFront(int $id): FrontManager {
-        $this->frontId = $id;
+        $this->id = $id;
+        $this->blocks = null;
+        $this->takenExams = null;
         return $this;
     }
 
     public function getExamBlocks(): Collection {
-        return  $this->repositoriesFactory->getExamBlockRepository()
-                ->getFromFront($this->frontId);
+        if (!isset($this->blocks)){
+            $this->blocks =  $this->repositoriesFactory->getExamBlockRepository()
+                ->getFromFront($this->id);
+        }
+        return  $this->blocks;
     }
 
     public function getTakenExams(): Collection {
-        return $this->repositoriesFactory->getTakenExamRepository()
-                ->getFromFront($this->frontId);
+        if (!isset($this->takenExams)){
+            $this->takenExams = $this->repositoriesFactory->getTakenExamRepository()
+                ->getFromFront($this->id);
+        }
+        return $this->takenExams;
     }
 
     public function getExamOptions(): Collection {
@@ -49,4 +59,5 @@ class FrontManagerImpl implements FrontManager{
         }
         return $options;
     }
+
 }
