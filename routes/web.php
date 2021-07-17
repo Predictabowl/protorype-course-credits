@@ -34,15 +34,13 @@ require __DIR__.'/auth.php';
 
 //------------------
 
-Route::get("/exams",[ExamController::class,"index"]);
-
-Route::get("/takenexams",[TakenExamController::class,"index"]);
+Route::get("/exams",[ExamController::class,"index"]); //only for testing purposes
 
 Route::get("/front",[FrontController::class,"index"])->middleware("auth");
 
-Route::post("/front",[FrontController::class,"create"])->middleware("auth");
+Route::post("/front/row",[TakenExamController::class,"create"])->middleware("auth");
 
-Route::get("/front/remove/{id}",[FrontController::class,"delete"])->middleware("auth");
+Route::delete("/front/row",[TakenExamController::class,"delete"])->middleware("auth");
 
 Route::get("/tests", function(){
     $course  = Course::first()->with("examBlocks.examBlockOptions.examApproved")->get();

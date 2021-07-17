@@ -14,6 +14,7 @@ use App\Models\Front;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use Tests\TestCase;
 
@@ -28,6 +29,12 @@ class ExamBlockRepositoryImplTest extends TestCase
         $this->repository = new ExamBlockRepositoryImpl();
     }
     
+    public function test_get_when_not_present(){
+        $sut = $this->repository->get(2);
+        
+        $this->assertNull($sut);
+    }
+    
     public function test_get_block_without_options()
     {
         $block = ExamBlock::factory()->create([
@@ -39,6 +46,7 @@ class ExamBlockRepositoryImplTest extends TestCase
         $this->assertEquals(
                 [$block->id, $block->max_exams],
                 [$sut->getId(), $sut->getNumExams()]);
+        $this->assertEmpty($sut->getExamOptions());
         
     }
     
@@ -72,6 +80,24 @@ class ExamBlockRepositoryImplTest extends TestCase
         
     }
     
+    public function test_getFromFront_when_front_not_present() {
+        $this->expectException(ModelNotFoundException::class);
+        
+        $this->repository->getFromFront(3);
+    }
+    
+    public function test_getFromFront_when_front_is_empty() {
+        Front::factory()->create([
+           "course_id" => Course::factory()->create(),
+           "user_id" => User::factory()->create()
+        ]);
+        
+        $sut = $this->repository->getFromFront(1);
+        
+        $this->assertEmpty($sut);
+    }
+
+
     public function test_getFromFront_without_options(){
         $course = Course::factory()->create();
         User::factory()->create();

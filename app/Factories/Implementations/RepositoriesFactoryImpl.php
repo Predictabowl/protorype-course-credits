@@ -7,6 +7,8 @@ use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Implementations\ExamBlockRepositoryImpl;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Implementations\TakenExamRespositoryImpl;
+use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Implementations\FrontRepositoryImpl;
 /**
  * Description of RepositoriesFactoryImpl
  *
@@ -20,6 +22,10 @@ class RepositoriesFactoryImpl implements RepositoriesFactory{
 
     public function getTakenExamRepository(): TakenExamRepository {
         return new TakenExamRespositoryImpl();
+    }
+
+    public function getFrontRepository(): FrontRepository {
+        return new FrontRepositoryImpl();
     }
 
 }

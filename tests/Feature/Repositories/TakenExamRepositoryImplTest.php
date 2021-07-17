@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Course;
 use App\Models\Front;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\WithFaker;
 
 use Tests\TestCase;
@@ -26,8 +27,14 @@ class TakenExamRepositoryImplTest extends TestCase
         $this->repository = new TakenExamRespositoryImpl();
     }
     
+    
+    public function test_get_when_not_present(){
+        $sut = $this->repository->get(1);
+        
+        $this->assertNull($sut);
+    }
    
-    public function test_get()
+    public function test_get_successful()
     {
         $taken = TakenExam::factory()->create([
             "ssd_id" => Ssd::factory()->create(),
@@ -45,7 +52,7 @@ class TakenExamRepositoryImplTest extends TestCase
         
     }
     
-    public function test_getAll()
+    public function test_getAll_when_empty()
     {
         Ssd::factory(3)->create();
         $front = Front::factory()->create([
@@ -53,7 +60,20 @@ class TakenExamRepositoryImplTest extends TestCase
                 "course_id" => Course::factory()->create()
             ]);
         
-        $taken = TakenExam::factory(3)->create([
+        $sut = $this->repository->getFromFront($front->id);
+        
+        $this->assertEmpty($sut);
+    }
+    
+    public function test_getFrontFront_success()
+    {
+        Ssd::factory(3)->create();
+        $front = Front::factory()->create([
+               "user_id" => User::factory()->create(),
+                "course_id" => Course::factory()->create()
+            ]);
+        
+        TakenExam::factory(3)->create([
             "front_id" => $front
         ]);
         
@@ -61,6 +81,24 @@ class TakenExamRepositoryImplTest extends TestCase
         
         $this->assertCount(3, $sut);
         $this->assertContainsOnlyInstancesOf(TakenExamDTO::class, $sut);
+    }
+    
+    public function test_getFrontFront_when_front_not_present()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->repository->getFromFront(1);
+    }
+    
+    public function test_getFrontFront_when_front_is_empty()
+    {
+        $front = Front::factory()->create([
+               "user_id" => User::factory()->create(),
+               "course_id" => Course::factory()->create()
+            ]);
+        
+        $sut = $this->repository->getFromFront($front->id);
+        
+        $this->assertEmpty($sut);
     }
     
     public function test_save_success(){

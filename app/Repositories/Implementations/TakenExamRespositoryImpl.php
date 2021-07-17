@@ -14,6 +14,7 @@ use App\Models\TakenExam;
 use App\Models\Front;
 use App\Models\Ssd;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * Description of TakenExamRespositoryImpl
@@ -22,13 +23,17 @@ use Illuminate\Support\Collection;
  */
 class TakenExamRespositoryImpl implements TakenExamRepository{
     
-    public function get($id): TakenExamDTO {
+    public function get($id): ?TakenExamDTO {
         $exam = TakenExam::with("ssd")->find($id);
         return $this->mapTakenExam($exam);
     }
 
     public function getFromFront($frontId): Collection {
-        return Front::with("takenExams.ssd")->find($frontId)->takenExams->map(
+        $front = Front::with("takenExams.ssd")->find($frontId);
+        if (!isset($front)){
+            throw new ModelNotFoundException("Could not find Front with id: ".$frontId);
+        }
+        return $front->takenExams->map(
                 fn($exam) => $this->mapTakenExam($exam));
     }
     
@@ -41,13 +46,15 @@ class TakenExamRespositoryImpl implements TakenExamRepository{
         ]);
     }
     
+    public function delete($id): int {
+        return TakenExam::destroy($id);
+    }
     
-    public function mapTakenExam(TakenExam $exam): TakenExamDTO {
+    
+    public function mapTakenExam(?TakenExam $exam): ?TakenExamDTO {
+        if (!isset($exam)){
+            return null;
+        }
         return new TakenExamDTO($exam->id, $exam->name, $exam->ssd->code, $exam->cfu);
     }
-
-    public function delete($id) {
-        TakenExam::destroy($id);
-    }
-
 }

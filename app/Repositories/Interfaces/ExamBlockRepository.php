@@ -11,6 +11,6 @@ use Illuminate\Support\Collection;
  */
 interface ExamBlockRepository {
     
-    public function get($id): ExamBlockDTO;
+    public function get($id): ?ExamBlockDTO;
     public function getFromFront($frontId): Collection;
 }

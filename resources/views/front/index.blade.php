@@ -1,7 +1,7 @@
 <x-full-layout>
 
     <x-panel>
-        <form method="POST" action="#">
+        <form method="POST" action="/front/row">
         {{--<form method="POST" action="/post/{{$post->slug}}/comments">--}}
             @csrf
             <header class="flex items-center">
@@ -60,11 +60,22 @@
                 </thead>
                 <tbody>
                     @foreach($exams as $exam)
-                    <tr>
+                    <tr class="hover:bg-blue-100">
                         <td>{{ $exam->getSsd() }}</td>
                         <td>{{ $exam->getExamName() }}</td>
                         <td class="text-center">{{ $exam->getCfu() }}</td>
-                        <td><a href="/front/remove/{{$exam->getId()}}" class="ml-6 text-xs font-bold uppercase hover:bg-gray-200">Remove</a></td>
+                        <td>
+                            {{-- <a href="/front/remove/{{$exam->getId()}}" class="ml-6 text-xs font-bold uppercase hover:bg-gray-200">Remove</a> --}}
+                            <form method="POST" action="/front/row">
+                                @csrf
+                                @method("DELETE")
+                                <input type="hidden" name="id" value="{{$exam->getId()}}">
+                                <x-button-sm>
+                                    Elimina
+                                </x-button-sm>
+                            </form>
+                        </td>
+
                     </tr>
                     @endforeach
                 </tbody>

@@ -15,7 +15,7 @@ class CreateFrontsTable extends Migration
     {
         Schema::create('fronts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("course_id"); //Which constraints? it should not be deleted if the course is missing
+            $table->foreignId("course_id")->constrained()->cascadeOnDelete();
             $table->foreignId("user_id")->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

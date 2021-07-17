@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Front extends Model
 {
     use HasFactory;
+    
+    protected $fillable = ["user_id", "course_id"];
 
     public function user()
     {
