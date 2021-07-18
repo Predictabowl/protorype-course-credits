@@ -15,8 +15,10 @@ class CreateFrontsTable extends Migration
     {
         Schema::create('fronts', function (Blueprint $table) {
             $table->id();
+            // In theory course_id could be null, in practice it require too many
+            // integrity checks in the code, so it's not worth it.
             $table->foreignId("course_id")->constrained()->cascadeOnDelete();
-            $table->foreignId("user_id")->constrained()->cascadeOnDelete();
+            $table->foreignId("user_id")->unique()->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

@@ -4,6 +4,7 @@ namespace App\Services\Implementations;
 
 use App\Domain\ExamBlockDTO;
 use App\Domain\TakenExamDTO;
+use \App\Models\Front;
 use App\Services\Interfaces\FrontManager;
 use App\Factories\Interfaces\RepositoriesFactory;
 use Illuminate\Support\Collection;
@@ -21,21 +22,22 @@ class FrontManagerStatic implements FrontManager{
     private $repositoriesFactory;
     private $id;
 
-    function __construct(RepositoriesFactory $repositoriesFactory) {
+    function __construct(RepositoriesFactory $repositoriesFactory, $userId, $create = true) {
         $this->repositoriesFactory = $repositoriesFactory;
+        $this->setUser($userId, $create);
     }
 
-    public function setFront(int $id): int{
-        $this->blocks = null;
-        $this->takenExams = null;
-        $front = $this->repositoriesFactory->getFrontRepository()->get($id);
-        if (!isset($front)){
-             $this->id = null;
-            return 0;
-        }
-        $this->id = $id;
-        return 1;
-    }
+//    public function setFront(int $id): int{
+//        $this->blocks = null;
+//        $this->takenExams = null;
+//        $front = $this->repositoriesFactory->getFrontRepository()->get($id);
+//        if (!isset($front)){
+//             $this->id = null;
+//            return 0;
+//        }
+//        $this->id = $id;
+//        return 1;
+//    }
 
     public function getExamBlocks(): Collection {
         if (!isset($this->blocks)){
@@ -76,17 +78,17 @@ class FrontManagerStatic implements FrontManager{
         $this->takenExams = null;
     }
 
-    public function deleteActiveFront(): int {
-        throw new Exception("Method deleteActiveFront not implemented yet");
-    }
+//    public function deleteActiveFront(): int {
+//        throw new Exception("Method deleteActiveFront not implemented yet");
+//    }
 
-    public function changeCourse($courseId): int {
+    public function setCourse($courseId): int {
         $front = $this->repositoriesFactory->getFrontRepository()
                 ->updateCourse($this->id, $courseId);
         return isset($front) ? 1 : 0;
     }
 
-    public function createFront($courseId, $userId): int {
+    public function createFront($courseId = null): int {
         $front = $this->repositoriesFactory->getFrontRepository()
                 ->save($courseId, $userId);
         if (!isset($front)){
@@ -96,19 +98,22 @@ class FrontManagerStatic implements FrontManager{
         return 1;
     }
 
-    public function setFromUser(int $userId): int{
-        
+    public function setUser(int $userId, bool $create = true): int{
+        $repo = $this->repositoriesFactory->getFrontRepository();
         try{
-            $front = $this-> repositoriesFactory-> getFrontRepository()
-                    ->getFromUser($userId);
+            $front = $repo->getFromUser($userId);
             if (!isset($front)){
-                return 0;
+                if ($create){
+                    $front = $repo->save(new Front(["user_id" => $userId]));
+                } else {
+                    return 0;
+                }
             }
             $this->id = $front->id;
+            return 1;
         } catch (ModelNotFoundException $ex){
             throw new UserNotFoundException($ex->getMessage(),$ex->getCode(),$ex);
         }
-        return 1;
     }
 
     public function getActiveFrontId(): ?int {

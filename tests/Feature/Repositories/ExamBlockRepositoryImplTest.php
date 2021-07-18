@@ -85,7 +85,7 @@ class ExamBlockRepositoryImplTest extends TestCase
         
         $this->repository->getFromFront(3);
     }
-    
+
     public function test_getFromFront_when_front_is_empty() {
         Front::factory()->create([
            "course_id" => Course::factory()->create(),

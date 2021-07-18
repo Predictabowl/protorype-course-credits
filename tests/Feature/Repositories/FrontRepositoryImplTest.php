@@ -29,58 +29,63 @@ class FrontRepositoryImplTest extends TestCase
         $this->repository = new FrontRepositoryImpl();
     }
     
-    public function test_save_when_not_present()
+    public function test_save_successful()
     {
-        $front = $this->repository->save(2,3);
+        $front = new Front([
+            "user_id" => 3,
+            "course_id" => 2
+        ]);
         
-        $this->assertInstanceOf(Front::class, $front);
+        $saved = $this->repository->save($front);
+        
+        $this->assertInstanceOf(Front::class, $saved);
         
         $this->assertEquals([1,2,3],
-                [$front["id"], $front["course_id"], $front["user_id"]]);
+                [$saved["id"], $saved["course_id"], $saved["user_id"]]);
         $this->assertDatabaseHas("fronts", [
             "id" => 1,
             "course_id" => 2,
             "user_id" => 3
         ]);
     }
+
+    public function test_save_when_id_not_null()
+    {
+        $new = new Front([
+            "user_id" => 2
+        ]);
+        $new->id = 3;
+        $this->expectException(\InvalidArgumentException::class);
+        
+        $front = $this->repository->save($new);
+        
+        $this->assertDatabaseCount("fronts", 0);
+    }
+
     
-    public function test_save_when_already_present()
+    public function test_save_when_user_id_already_present()
     {
         Front::create([
             "course_id" => 3,
             "user_id" => 2
         ]);
         
-        $front = $this->repository->save(3,2);
-        
-        $this->assertInstanceOf(Front::class, $front);
-        
-        $this->assertEquals([1,3,2],
-                [$front["id"], $front["course_id"], $front["user_id"]]);
-        $this->assertDatabaseCount("fronts", 1);
-        $this->assertDatabaseHas("fronts", [
-            "id" => 1,
-            "course_id" => 3,
-            "user_id" => 2
-        ]);
-    }
-    
-    public function test_save_when_same_user_but_different_course_is_present(){
-        Front::create([
-            "course_id" => 3,
+        $new = new Front([
+            "course_id" => 1,
             "user_id" => 2
         ]);
         
-        $front = $this->repository->save(2,2);
+        $front = $this->repository->save($new);
         
         $this->assertNull($front);
+        
         $this->assertDatabaseCount("fronts", 1);
         $this->assertDatabaseMissing("fronts", [
-            "id" => 1,
-            "course_id" => 2,
+            "course_id" => 1,
             "user_id" => 2
         ]);
     }
+
     
     public function test_delete_when_not_present(){
         Front::factory()->create();
@@ -95,7 +100,7 @@ class FrontRepositoryImplTest extends TestCase
         Front::create([
             "id" => 1,
             "course_id" => 2,
-            "user_id" => 1
+            "user_id" => 3
         ]);
         $frontArray = [
             "id" => 2,

@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        User::factory()->create();
-        User::factory()->create([
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create([
             "email" => "mario@email.com",
             "password" => Hash::make("password")
         ]);
@@ -34,8 +34,11 @@ class DatabaseSeeder extends Seeder
         
         Course::factory()->create();
 
-        Front::factory()->create(["user_id" => 1]);
-        Front::factory()->create(["user_id" => 2]);
+        $front1 = Front::factory()->create(["user_id" => 1]);
+        $front2 = Front::factory()->create(["user_id" => 2]);
+        $user1->front()->associate($front1);
+        $user2->front()->associate($front2);
+        
 
         Exam::factory(20)->create();
         ExamBlock::factory(10)->create();

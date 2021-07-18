@@ -38,37 +38,59 @@ class FrontManagerStaticTest extends TestCase
         $this->factory->method("getFrontRepository")
                 ->willReturn($this->frontRepo);
         $this->manager = new FrontManagerStatic($this->factory);
+        
+        
     }
     
     
-    public function test_setFromUser_when_user_not_present(){
+    public function test_setUser_when_user_not_present(){
         
         $this->frontRepo->method("getFromUser")->will($this->
                 throwException(new ModelNotFoundException("message")));
         
         $this->expectException(UserNotFoundException::class);
         
-        $this->manager->setFromUser(1);
+        $this->manager->setUser(1);
     }
     
-    public function test_setFromUser_when_front_not_present(){
+    public function test_setUser_when_front_not_present(){
+        $toSave = new Front(["user_id" => 2]);
+        $saved = new Front(["user_id" => 2]);
+        $saved->id = 5;
         $this->frontRepo->method("getFromUser")->willReturn(null);
+        $this->frontRepo->expects($this->once())
+                ->method("save")
+                ->with($toSave)
+                ->willReturn($saved);
         
-        $sut = $this->manager->setFromUser(1);
+        $sut = $this->manager->setUser(2);
         
-        $this->assertEquals(0, $sut);
-        $this->assertNull($this->manager->getActiveFrontId());
+        $this->assertEquals(1, $sut);
+        $this->assertEquals(5,$this->manager->getActiveFrontId());
     }
     
-    public function test_setFromUser_success(){
+    public function test_setUser_when_front_exists(){
         $front = new Front();
-        $front["id"] = 13;
-        $this->frontRepo->method("getFromUser")->willReturn($front);
+        $front->id = 13;
+        $this->frontRepo->expects($this->once())
+                ->method("getFromUser")
+                ->with(1)
+                ->willReturn($front);
         
-        $sut = $this->manager->setFromUser(1);
+        $sut = $this->manager->setUser(1);
         
         $this->assertEquals(1,$sut);
         $this->assertEquals(13, $this->manager->getActiveFrontId());
+    }
+    
+    public function test_setUser_When_front_not_exist_without_creating_it() {
+        $this->frontRepo->method("getFromUser")->willReturn(null);
+        $this->frontRepo->expects($this->never())->method("save");
+
+        $sut = $this->manager->setUser(2,false);
+        
+        $this->assertEquals(0, $sut);
+        $this->assertNull($this->manager->getActiveFrontId());
     }
     
 
@@ -128,9 +150,16 @@ class FrontManagerStaticTest extends TestCase
         $exam = new TakenExamDTO(1, "testname", "IUS/0", 7);
         $this->takenRepo->expects($this->once())->method("save")
                 ->with($exam,4);
-        $this->takenRepo->expects($this->exactly(2))->method("getFromFront");
-        $this->frontRepo->method("get")->willReturn(new Front);
-        $this->manager->setFront(4);
+        $this->takenRepo->expects($this->exactly(1))
+                ->method("getFromFront")
+                ->with($this->anything());
+//        $front = new Front();
+//        $front->id = 4;
+//        $this->frontRepo->method("getFromUser")
+//                ->with(3)
+//                ->willReturn($front);
+//        
+//        $this->manager->setUser(3);
         
         $this->manager->getTakenExams();
         $this->manager->saveTakenExam($exam);
@@ -150,35 +179,37 @@ class FrontManagerStaticTest extends TestCase
     }
 
 
-    public function test_setFront_when_front_not_present(){
-        $this->frontRepo->method("get")->willReturn(null);
-                
-        $sut = $this->manager->setFront(1);
-        
-        $this->assertEquals(0, $sut);
-        $this->assertNull($this->manager->getActiveFrontId());
-        
-    }
-    
-    public function test_setFront_when_front_present(){
-        $this->frontRepo->method("get")->willReturn(new Front);
-
-        $sut = $this->manager->setFront(3);
-        
-        $this->assertEquals(1,$sut);
-        $this->assertEquals(3, $this->manager->getActiveFrontId());
-    }
+//    public function test_setFront_when_front_not_present(){
+//        $this->frontRepo->method("get")->willReturn(null);
+//                
+//        $sut = $this->manager->setFront(1);
+//        
+//        $this->assertEquals(0, $sut);
+//        $this->assertNull($this->manager->getActiveFrontId());
+//        
+//    }
+//    
+//    public function test_setFront_when_front_present(){
+//        $this->frontRepo->method("get")->willReturn(new Front);
+//
+//        $sut = $this->manager->setFront(3);
+//        
+//        $this->assertEquals(1,$sut);
+//        $this->assertEquals(3, $this->manager->getActiveFrontId());
+//    }
     
     public function test_changeCourse_success(){
         $this->frontRepo->expects($this->once())
                 ->method("updateCourse")
                 ->with(3,2)
                 ->willReturn(new Front());
-        $this->frontRepo->method("get")->willReturn(new Front());
+        $front = new Front();
+        $front->id = 3;
+        $this->frontRepo->method("get")->willReturn($front);
         
-        $this->manager->setFront(3);
+        $this->manager->setUser(5);
         
-        $this->assertEquals(1, $this->manager->changeCourse(2));
+        $this->assertEquals(1, $this->manager->setCourse(2));
     }
     
     public function test_changeCourse_failure(){
@@ -193,7 +224,7 @@ class FrontManagerStaticTest extends TestCase
         $this->assertEquals(0, $this->manager->changeCourse(2));
     }
     
-    public function test_createFront_success(){
+    public function test_createFront_when_not_present(){
         $front = new Front();
         $front["id"] = 7;
         $this->frontRepo->expects($this->once())
@@ -215,5 +246,9 @@ class FrontManagerStaticTest extends TestCase
         $sut = $this->manager->createFront(3,4);
         $this->assertEquals(0,$sut);
         $this->assertNull($this->manager->getActiveFrontId());
+    }
+    
+    private function setUserMock(){
+        
     }
 }

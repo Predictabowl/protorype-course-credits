@@ -24,7 +24,7 @@ class FrontFactory extends Factory
     public function definition()
     {
         return [
-            "user_id" => $this->faker->numberBetween(1,User::count()),
+            "user_id" => User::factory()->create(),
             "course_id" => $this->faker->numberBetween(1,Course::count()),
         ];
     }

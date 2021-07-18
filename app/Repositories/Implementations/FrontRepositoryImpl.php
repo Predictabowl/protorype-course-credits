@@ -25,21 +25,18 @@ class FrontRepositoryImpl implements FrontRepository{
         return Front::destroy($id);
     }
 
-    public function save($courseId, $userId): ?Front {
-        $front = Front::where("user_id", $userId)->first();
-        
-        if (!isset($front)){
-            $front = Front::create([
-                "user_id" => $userId,
-                "course_id" => $courseId
-            ]);
-        }
-
-        else if ($front["course_id"] != $courseId){
-            $front = null;
+    public function save(Front $front): ?Front {
+        if (isset($front->id)){
+            throw new \InvalidArgumentException("The id of a new Front must be null");
         }
         
-        return $front;
+        $found = Front::where("user_id", $front->user_id)->first();
+        
+        if (isset($found)){
+            return null;
+        }
+        
+        return $front->save() ? $front : null;
     }
 
     public function updateCourse($id, $courseId): ?Front {

@@ -21,8 +21,23 @@ interface FrontRepository {
     
     public function getFromUser($id): ?Front;
 
-    public function save($courseId, $userId): ?Front;
+    /**
+     * Create a new Front if not present.
+     * 
+     * @param type $courseId
+     * @param type $userId
+     * @return Front|null the saved Front
+     */
+    public function save(Front $front): ?Front;
     
+    /**
+     * Update the course of an existing front.
+     * 
+     * Return the updated front
+     * @param type $id
+     * @param type $courseId
+     * @return Front|null the updated front.
+     */
     public function updateCourse($id, $courseId): ?Front;
 
     public function delete($id): int;
