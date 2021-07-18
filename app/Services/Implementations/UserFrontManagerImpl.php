@@ -6,6 +6,8 @@ use App\Domain\ExamBlockDTO;
 use App\Domain\TakenExamDTO;
 use \App\Models\Front;
 use App\Factories\Interfaces\RepositoriesFactory;
+use App\Repositories\Interfaces\UserRepository;
+use App\Repositories\Interfaces\FrontRepository;
 use Illuminate\Support\Collection;
 use App\Exceptions\Custom\UserNotFoundException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -19,48 +21,27 @@ use App\Services\Interfaces\FrontInfoManager;
 class UserFrontManagerImpl implements UserFrontManager{
 
     private $id;
+    private $factory;
 
-    function __construct($userId) {
-        $this->setUser($userId, $create);
+    function __construct($userId, RepositoriesFactory $factory) {
+        $this->factory = $factory;
+        $this->id = $userId;
     }
 
-  
-    public function setCourse($courseId): int {
-        $front = $this->repositoriesFactory->getFrontRepository()
-                ->updateCourse($this->id, $courseId);
-        return isset($front) ? 1 : 0;
-    }
-
-    public function createFront($courseId = null): int {
-        $front = $this->repositoriesFactory->getFrontRepository()
-                ->save($courseId, $userId);
-        if (!isset($front)){
-            return 0;
+    public function createFront($courseId): bool {
+        $courseRepo = $this->factory->getCourseRepository();
+        $course = $courseRepo->get($courseId);
+        if (!isset($course)){
+            return false;
         }
-        $this->id = $front->id;
-        return 1;
-    }
-
-    public function setUser(int $userId, bool $create = true): int{
-        $repo = $this->repositoriesFactory->getFrontRepository();
-        try{
-            $front = $repo->getFromUser($userId);
-            if (!isset($front)){
-                if ($create){
-                    $front = $repo->save(new Front(["user_id" => $userId]));
-                } else {
-                    return 0;
-                }
-            }
-            $this->id = $front->id;
-            return 1;
-        } catch (ModelNotFoundException $ex){
-            throw new UserNotFoundException($ex->getMessage(),$ex->getCode(),$ex);
-        }
-    }
-
-    public function getActiveFrontId(): ?int {
-        return $this->id;
+        $frontRepo = $this->factory->getFrontRepository();
+        
+        $front = new Front([
+            "user_id" => $this->id,
+            "course_id" => $courseId
+        ]);
+        $front = $frontRepo->save($front);
+        return isset($front) ? true : false;
     }
 
     public function deleteActiveFront(): int {
@@ -68,7 +49,8 @@ class UserFrontManagerImpl implements UserFrontManager{
     }
 
     public function getFrontId(): ?int {
-        
+        $front = $this->factory->getFrontRepository()->getFromUser($this->id);
+        return isset($front)? $front->id : null; 
     }
 
     public function getFrontInfoManager(): ?FrontInfoManager {

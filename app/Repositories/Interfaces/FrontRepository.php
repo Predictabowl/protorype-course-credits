@@ -23,10 +23,12 @@ interface FrontRepository {
 
     /**
      * Create a new Front if not present.
+     * If there's already the same user_id present then the front can't
+     * be saved.
      * 
      * @param type $courseId
      * @param type $userId
-     * @return Front|null the saved Front
+     * @return Front|null the saved Front, null if can't be saved
      */
     public function save(Front $front): ?Front;
     

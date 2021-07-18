@@ -15,7 +15,6 @@ use App\Models\Course;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
- * Description of FrontRepositoryImpl
  *
  * @author piero
  */

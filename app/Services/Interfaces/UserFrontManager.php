@@ -2,7 +2,6 @@
 
 namespace App\Services\Interfaces;
 
-use Illuminate\Support\Collection;
 use App\Services\Interfaces\FrontInfoManager;
 
 interface UserFrontManager {
@@ -12,13 +11,12 @@ interface UserFrontManager {
      * Create a new front.
      * If the front already exist it won't create a new one, but will use
      * the existing one changing the course.
-     * If $courseId is not specified will create one without an associated
-     * course.
+     * If the course is not found it will fail.
      * 
      * @param type $courseId
-     * @return int the id of the front
+     * @return bool false if it fails
      */
-    public function createFront($courseId): int;
+    public function createFront($courseId): bool;
 
     public function deleteActiveFront(): int;
 
