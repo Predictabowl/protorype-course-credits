@@ -16,11 +16,11 @@ class LearningTest extends TestCase{
     
     use RefreshDatabase;
     
-//    public function test_example() {
-//        $var = 1;
-//        echo sprintf("%02d",$var);
-//    }
+    public function test_example() {
+        dd(route("frontIndex"));
+    }
     
+    /*
     public function test_generateSSD() {
 //        GenerateSSD::arrayCreate([
 //            "ius" => 10,
@@ -31,5 +31,5 @@ class LearningTest extends TestCase{
         
         Ssd::all()->each(fn($ssd) => var_dump($ssd->code));
         
-    }
+    }*/
 }

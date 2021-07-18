@@ -4,6 +4,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\TakenExamController;
 use App\Http\Controllers\FrontController;
 use App\Models\Course;
+use App\Http\Controllers\StudyPlanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,11 +19,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    /*
-    $s1 = "Diritto Amministrativo";
-    $s2 = "DIritto Amministrativo II";
-    $l = levenshtein(strtolower($s1), strtolower($s2));
-    ddd($l);*/
     return view('welcome');
 });
 
@@ -36,7 +32,11 @@ require __DIR__.'/auth.php';
 
 Route::get("/exams",[ExamController::class,"index"]); //only for testing purposes
 
-Route::get("/front",[FrontController::class,"index"])->middleware("auth");
+Route::get("/front",[FrontController::class,"index"])->middleware("auth")
+        ->name("frontIndex");
+
+Route::get("/front/options",[FrontController::class,"getOptions"])->middleware("auth")
+        ->name("courseOptions");
 
 Route::post("/front/row",[TakenExamController::class,"create"])->middleware("auth");
 
@@ -44,11 +44,12 @@ Route::delete("/front/row",[TakenExamController::class,"delete"])->middleware("a
 
 Route::get("/tests", function(){
     $course  = Course::first()->with("examBlocks.examBlockOptions.examApproved")->get();
-    // $result = $course ->first()->examBlocks->map(fn ($block) => $block->examBlockOptions
-    //     ->map(fn ($option) => $option->examApproved))->flatten();
     $result = $course ->first()->examBlocks->map(fn($block) => $block->examBlockOptions)
         ->flatten()->filter(fn ($option) => $option->examApproved->getAttribute("ssd_id") == 7);
     ddd($result);
 
     return $result;
 });
+
+Route::get("/studyplan",[StudyPlanController::class,"index"])->middleware("auth")
+        ->name("studyPlan");

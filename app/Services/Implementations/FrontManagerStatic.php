@@ -7,7 +7,6 @@ use App\Domain\TakenExamDTO;
 use App\Services\Interfaces\FrontManager;
 use App\Factories\Interfaces\RepositoriesFactory;
 use Illuminate\Support\Collection;
-use App\Exceptions\Custom\FrontNotFoundException;
 use App\Exceptions\Custom\UserNotFoundException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -26,15 +25,16 @@ class FrontManagerStatic implements FrontManager{
         $this->repositoriesFactory = $repositoriesFactory;
     }
 
-    public function setFront(int $id): FrontManager{
-        $front = $this->repositoriesFactory->getFrontRepository()->get($id);
-         if (!isset($front)){
-            throw new FrontNotFoundException("Could not find Front with id: ".$id);
-        }
-        $this->id = $id;
+    public function setFront(int $id): int{
         $this->blocks = null;
         $this->takenExams = null;
-        return $this;
+        $front = $this->repositoriesFactory->getFrontRepository()->get($id);
+        if (!isset($front)){
+             $this->id = null;
+            return 0;
+        }
+        $this->id = $id;
+        return 1;
     }
 
     public function getExamBlocks(): Collection {
@@ -76,16 +76,24 @@ class FrontManagerStatic implements FrontManager{
         $this->takenExams = null;
     }
 
-    public function delete($id): int {
-        
+    public function deleteActiveFront(): int {
+        throw new Exception("Method deleteActiveFront not implemented yet");
     }
 
     public function changeCourse($courseId): int {
-        
+        $front = $this->repositoriesFactory->getFrontRepository()
+                ->updateCourse($this->id, $courseId);
+        return isset($front) ? 1 : 0;
     }
 
     public function createFront($courseId, $userId): int {
-        
+        $front = $this->repositoriesFactory->getFrontRepository()
+                ->save($courseId, $userId);
+        if (!isset($front)){
+            return 0;
+        }
+        $this->id = $front->id;
+        return 1;
     }
 
     public function setFromUser(int $userId): int{
@@ -96,10 +104,15 @@ class FrontManagerStatic implements FrontManager{
             if (!isset($front)){
                 return 0;
             }
+            $this->id = $front->id;
         } catch (ModelNotFoundException $ex){
             throw new UserNotFoundException($ex->getMessage(),$ex->getCode(),$ex);
         }
         return 1;
+    }
+
+    public function getActiveFrontId(): ?int {
+        return $this->id;
     }
 
 }

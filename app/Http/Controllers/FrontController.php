@@ -15,6 +15,13 @@ class FrontController extends Controller
         ]);
     }
     
+    public function getOptions() {
+        return view("front.showoptions",[
+            "options" => $this->getFrontManager()->getExamOptions()
+        ]);
+        
+    }
+    
 //    public function create() {
 //        $attributes = request()->validate([
 //            "name" => ["required", "max:255"],

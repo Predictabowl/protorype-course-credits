@@ -11,10 +11,13 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     You're logged in!
                     <p class="hover:underline text-blue-500">
-                        <a href="/exams">Lista Esami</a>
+                        <a href="{{ route("courseOptions") }}">Lista Esami</a>
                     </p>
                     <p class="hover:underline text-blue-500">
-                        <a href="/front">Compila Prospetto</a>
+                        <a href="{{ route("frontIndex") }}">Compila Prospetto</a>
+                    </p>
+                    <p class="hover:underline text-blue-500">
+                        <a href=" {{ route("studyPlan") }}">Vedi tabella integrazione</a>
                     </p>
                 </div>
             </div>

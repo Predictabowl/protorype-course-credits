@@ -18,21 +18,22 @@
                 @enderror
             </div> --}}
             <div class="mt-4">
-                <input type="text" class="text-sm focus:outline-none focus:ring" name="name" placeholder="Nome insegnamento.">
+                <input type="text" class="text-sm focus:outline-none focus:ring" name="name" placeholder="Nome insegnamento."
+                    value="{{old("name")}}">
 
                 @error("name")
                 <span class="text-xs text-red-500">{{ $message }}</span>
                 @enderror
             </div>
             <div class="mt-4">
-                <input type="number" name="cfu" placeholder="cfu">
+                <input type="number" name="cfu" placeholder="cfu" value="{{old("cfu")}}">
 
                 @error("cfu")
                 <span class="text-xs text-red-500">{{ $message }}</span>
                 @enderror
             </div>
             <div class="mt-4">
-                <input type="text" class="text-sm focus:outline-none focus:ring" name="ssd" placeholder="SSD">
+                <input type="text" class="text-sm focus:outline-none focus:ring" name="ssd" placeholder="SSD" value="{{old("ssd")}}">
 
                 @error("ssd")
                 <span class="text-xs text-red-500">{{ $message }}</span>

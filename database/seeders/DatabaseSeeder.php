@@ -11,7 +11,7 @@ use App\Models\Front;
 use App\Models\Ssd;
 use App\Models\TakenExam;
 use App\Models\User;
-use App\Seeders\GenerateSSD;
+use Database\Seeders\Generators\GenerateSSD;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 

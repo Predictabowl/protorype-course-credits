@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\Ssd;
-use App\Seeders\GenerateSSD;
+use Database\Seeders\Generators\GenerateSSD;
 
 class DatabaseSeederReal extends Seeder
 {
