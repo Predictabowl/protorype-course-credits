@@ -17,9 +17,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  */
 class ExamBlockRepositoryImpl implements ExamBlockRepository{
     
-    public function get($id): ?ExamBlockDTO {
-        $block = ExamBlock::with("examBlockOptions.exam.ssd")->find($id);
-        return $this->mapExamBlock($block);
+    public function get($id): ?ExamBlock {
+        return ExamBlock::with("examBlockOptions.exam.ssd")->find($id);
     }
 
     public function getFromFront($frontId): Collection {
@@ -30,22 +29,6 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         if (!isset($front->course)){
             return collect([]);
         }
-        return $front->course->examBlocks->map(fn($block) => $this->mapExamBlock($block));
-    }
-    
-    public function mapExamBlock(?ExamBlock $block): ?ExamBlockDTO {
-        if (!isset($block)){
-            return null;
-        }
-        $newBlock = new ExamBlockDTO($block->id, $block->max_exams);
-        $block ->examBlockOptions->map(fn($option) =>  
-                $this->mapExamOption($option, $newBlock));
-        return $newBlock;
-    }
-
-    private function mapExamOption(ExamBlockOption $option, ExamBlockDTO $block): ExamOptionDTO {
-        $newOption = new ExamOptionDTO($option->id, $option->exam->name, $block, $option->exam->cfu, $option->exam->ssd->code);
-        $option->ssds->each(fn($ssd) => $newOption->addCompatibleOption($ssd->code));
-        return $newOption;
+        return $front->course->examBlocks;
     }
 }

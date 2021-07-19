@@ -8,7 +8,8 @@ use App\Domain\ExamOptionDTO;
 use App\Domain\StudyPlan;
 use App\Domain\ExamBlockLinker;
 use App\Services\Interfaces\ExamDistance;
-use App\Services\Interfaces\FrontInfoManager;
+use App\Services\Interfaces\FrontManager;
+use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\StudyPlanBuilder;
 use Illuminate\Support\Collection;
 
@@ -18,43 +19,46 @@ use Illuminate\Support\Collection;
 class StudyPlanBuilderImpl implements StudyPlanBuilder {
 
     private $frontManager;
+    private $courseManager;
     private $studyPlan;
     private $eDistance;
     private $declaredExams;
     private $examOptions;
     private $blockLinkers; //keep tracks of wich options in a block are linked
 
-    function __construct(FrontInfoManager $frontManager, ExamDistance $eDistance) {
+    function __construct(FrontManager $frontManager, CourseManager $courseManager) {
         $this->frontManager = $frontManager;
-        $this->eDistance = $eDistance;
+        $this->courseManager = $courseManager;
+        $this->eDistance = app()->make(ExamDistance::class);
         $this->examOptions = [];
         $this->blockLinkers = [];
     }
 
     public function getStudyPlan(): StudyPlan {
+        $this->refreshStudyPlan();
         if (!isset($this->studyPlan)){
             $this->buildStudyPlan();
         }
         return $this->studyPlan;
     }
 
-    public function setFront(int $id): StudyPlanBuilder {
-        $this->frontManager->setFront($id);
-        $this->refreshStudyPlan();
-        return $this;
-    }
+//    public function setFront(int $id): StudyPlanBuilder {
+//        $this->frontManager->setFront($id);
+//        $this->refreshStudyPlan();
+//        return $this;
+//    }
     
     public function getApprovedExams() {
         return $this->examOptions;
     }
     
     public function refreshStudyPlan(): StudyPlanBuilder {
-        $this->blockLinkers = $this->frontManager->getExamBlocks()
+        $this->blockLinkers = $this->courseManager->getExamBlocks()
             ->mapWithKeys(fn ($block)=>
                 [$block->getId() => new ExamBlockLinker($block)]);
         $this->declaredExams = $this->frontManager->getTakenExams()
                 ->map(fn ($taken)=> new LinkedTakenExam($taken));
-        $this->examOptions = $this->frontManager->getExamOptions();
+        $this->examOptions = $this->courseManager->getExamOptions();
         $this->studyPlan = null;
         
         return $this;

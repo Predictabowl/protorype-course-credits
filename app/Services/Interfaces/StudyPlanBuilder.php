@@ -9,9 +9,13 @@ interface StudyPlanBuilder {
 
     public function getStudyPlan(): StudyPlan;
 
+    /**
+     * It returns the declared exams with unused leftover credits
+     * 
+     * @return Collection
+     */
     public function getTakenExams(): Collection;
 
-    public function refreshStudyPlan(): StudyPlanBuilder;
+//    public function refreshStudyPlan(): StudyPlanBuilder;
 
-    public function setFront(int $id): StudyPlanBuilder;
 }

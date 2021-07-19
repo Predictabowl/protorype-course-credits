@@ -23,15 +23,15 @@ class TakenExamMapperImpl implements TakenExamMapper{
         if (!isset($ssd)){
             return null;
         }
-        $front = Front::find($frontId);
-        if (!isset($front)){
-            return null;
-        }
+//        $front = Front::find($frontId);
+//        if (!isset($front)){
+//            return null;
+//        }
         return TakenExam::make([
             "name" => $dto->getExamName(),
             "cfu" => $dto->getCfu(),
-            "ssd_id" => $ssd,
-            "front_id" => $front
+            "ssd_id" => $ssd->id,
+            "front_id" => $frontId
         ]);
     }
     

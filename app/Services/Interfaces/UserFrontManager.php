@@ -3,6 +3,7 @@
 namespace App\Services\Interfaces;
 
 use App\Services\Interfaces\FrontInfoManager;
+use App\Services\Interfaces\StudyPlanBuilder;
 use App\Models\Front;
 
 interface UserFrontManager {
@@ -11,7 +12,8 @@ interface UserFrontManager {
     /**
      * Create a new front.
      * If the front already exist it won't create a new one, but will use
-     * the existing one changing the course.
+     * the existing.
+     * If the course is specified it will be associated 
      * If the course is not found it will fail.
      * 
      * @param type $courseId
@@ -23,7 +25,16 @@ interface UserFrontManager {
 
     public function getFront(): ?Front;
     
-//    public function setCourse($courseId): bool;
+    /**
+     * Will retrieve the Front and change the course associated with it.
+     * It creates a new Front if doesn't exists.
+     * The difference with createFront is that it cannot create a Front
+     * without a course associated.
+     * 
+     * @param type $courseId
+     * @return bool
+     */
+    //public function setCourse($courseId): bool;
     
     /**
      * Return a managing instance to extract info from the Front of the 
@@ -33,5 +44,8 @@ interface UserFrontManager {
      * @param bool $createFront if true will create a Front
      * @return FrontInfoManager|null
      */
-    public function getFrontInfoManager(): ?FrontInfoManager;
+    public function getFrontManager(): ?FrontManager;
+    
+    public function getStudyPlanBuilder(): ?StudyPlanBuilder;
+
 }

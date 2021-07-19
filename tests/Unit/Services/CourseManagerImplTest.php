@@ -8,12 +8,13 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\TakenExam;
-use App\Domain\TakenExamDTO;
+use App\Domain\ExamBlockDTO;
+use App\Domain\ExamOptionDTO;
+use App\Models\ExamBlock;
 use App\Factories\Interfaces\RepositoriesFactory;
-use App\Repositories\Interfaces\TakenExamRepository;
-use App\Services\Implementations\FrontManagerImpl;
-use App\Mappers\Interfaces\TakenExamMapper;
+use App\Repositories\Interfaces\ExamBlockRepository;
+use App\Services\Implementations\CourseManagerImpl;
+use App\Mappers\Interfaces\ExamBlockMapper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,9 +24,9 @@ use PHPUnit\Framework\TestCase;
  */
 class CourseManagerImplTest extends TestCase{
 
-    private const FIXTURE_FRONT_ID = 7;    
+    private const FIXTURE_COURSE_ID = 7;    
     
-    private $takenRepo;
+    private $blockRepo;
     private $manager;
     private $mapper;
 
@@ -34,33 +35,40 @@ class CourseManagerImplTest extends TestCase{
     {
         parent::setUp();
         $factory = $this->createMock(RepositoriesFactory::class);
-        $this->takenRepo = $this->createMock(TakenExamRepository::class);
-        $this->mapper = $this->createMock(TakenExamMapper::class);
+        $this->blockRepo = $this->createMock(ExamBlockRepository::class);
+        $this->mapper = $this->createMock(ExamBlockMapper::class);
         
-        $factory->method("getTakenExamRepository")
-                ->willReturn($this->takenRepo);      
+        $factory->method("getExamBlockRepository")
+                ->willReturn($this->blockRepo);      
         
         app()->instance(RepositoriesFactory::class,$factory);
-        app()->instance(TakenExamMapper::class, $this->mapper);
-        $this->manager = new FrontManagerImpl(self::FIXTURE_FRONT_ID);
+        app()->instance(ExamBlockMapper::class, $this->mapper);
+        $this->manager = new CourseManagerImpl(self::FIXTURE_COURSE_ID);
     }
   
     
     public function test_getExamBlocks() {
+        $models = collect([
+            new ExamBlock(["id" => 1]), 
+            new ExamBlock(["id" => 2])]);
         $blocks = collect([new ExamBlockDTO(1, 2), new ExamBlockDTO(1, 1)]);
-        $this->blockRepo->expects($this->once())->method("getFromFront")
-                ->willReturn($blocks);
-        $this->setManagerInstance();
+        $this->blockRepo->expects($this->once())
+                ->method("getFromFront")
+                ->with(self::FIXTURE_COURSE_ID)
+                ->willReturn($models);
+        $this->mapper->expects($this->exactly(2))
+                ->method("toDTO")
+                ->withConsecutive([$models[0]], [$models[1]])
+                ->willReturnOnConsecutiveCalls($blocks[0],$blocks[1]);
         
         $sut = $this->manager->getExamBlocks();
         
-        $this->assertSame($blocks, $sut);
+        $this->assertEquals($blocks, $sut);
     }
     
     public function test_getExamBlocks_when_course_not_set() {
         $this->blockRepo->expects($this->once())->method("getFromFront")
                 ->willReturn(collect([]));
-        $this->setManagerInstance(null);
         
         $sut = $this->manager->getExamBlocks();
         
@@ -74,14 +82,22 @@ class CourseManagerImplTest extends TestCase{
         $option1 = new ExamOptionDTO(1, "name 1", $block1, 12, "ssd1");
         $option2 = new ExamOptionDTO(2, "name 2", $block1, 12, "ssd2");
         $option3 = new ExamOptionDTO(3, "name 3", $block2, 12, "ssd3");
-        $this->blockRepo->expects($this->once())->method("getFromFront")
-                ->willReturn(collect([$block1,$block2]));
-        $this->setManagerInstance();
+        $models = collect([
+            new ExamBlock(["name" => "test"]),
+            new ExamBlock(["name" => "name"])]);
         
-        $exams = $this->manager->getExamOptions();
+        $this->blockRepo->expects($this->once())
+                ->method("getFromFront")
+                ->with(self::FIXTURE_COURSE_ID)
+                ->willReturn($models);
+        $this->mapper->expects($this->exactly(2))
+                ->method("toDTO")
+                ->withConsecutive([$models[0]], [$models[1]])
+                ->willReturnOnConsecutiveCalls($block1,$block2);
         
-        $this->assertSame([$option1,$option2,$option3],
-                [$exams[0],$exams[1],$exams[2]]);
+        $result = $this->manager->getExamOptions();
+        
+        $this->assertEquals(collect([$option1,$option2,$option3]), $result);
         
     }
     

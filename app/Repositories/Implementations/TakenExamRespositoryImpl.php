@@ -33,7 +33,9 @@ class TakenExamRespositoryImpl implements TakenExamRepository{
     }
     
     public function save(TakenExam $exam): bool {
+        //ddd($exam->attributesToArray());
         return $exam->save();
+        //return TakenExam::create($exam->attributesToArray());
     }
     
     public function delete($id): bool {

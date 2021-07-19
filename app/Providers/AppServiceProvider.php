@@ -17,6 +17,14 @@ use App\Factories\Interfaces\FrontInfoManagerFactory;
 use App\Factories\Implementations\FrontInfoManagerFactoryImpl;
 use App\Mappers\Interfaces\TakenExamMapper;
 use App\Mappers\Implementations\TakenExamMapperImpl;
+use App\Mappers\Interfaces\ExamBlockMapper;
+use App\Mappers\Implementations\ExamBlockMapperImpl;
+use App\Mappers\Interfaces\ExamOptionMapper;
+use App\Mappers\Implementations\ExamOptionMapperImpl;
+use App\Factories\Interfaces\ManagersFactory;
+use App\Factories\Implementations\ManagersFactoryImpl;
+use App\Factories\Interfaces\StudyPlanBuilderFactory;
+use App\Factories\Implementations\StudyPlanBuilderFactoryImpl;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,7 +41,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserFrontManager::class, UserFrontManagerImpl::class);
         $this->app->bind(FrontInfoManagerFactory::class, FrontInfoManagerFactoryImpl::class);
         $this->app->bind(TakenExamMapper::class, TakenExamMapperImpl::class);
-        $this->app->bind(TakenExamMapper::class, TakenExamMapperImpl::class);
+        $this->app->bind(ExamBlockMapper::class, ExamBlockMapperImpl::class);
+        $this->app->bind(ExamOptionMapper::class, ExamOptionMapperImpl::class);
+        $this->app->bind(ManagersFactory::class, ManagersFactoryImpl::class);
+        $this->app->bind(StudyPlanBuilderFactory::class, StudyPlanBuilderFactoryImpl::class);
         
     }
 

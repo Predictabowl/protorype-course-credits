@@ -5,20 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Services\Interfaces\UserFrontManager;
-use App\Services\Interfaces\FrontInfoManager;
+use App\Services\Interfaces\FrontManager;
+use App\Factories\Interfaces\ManagersFactory;
+use App\Services\Implementations\FrontManagerImpl;
 
 class FrontController extends Controller
 {
     public function index()
     {   
         return view("front.index",[
-            "exams" => $this->getFrontInfoManager()->getTakenExams()
+            "exams" => $this->getFrontManager()->getTakenExams()
         ]);
     }
     
     public function getOptions() {
         return view("front.showoptions",[
-            "options" => $this->getFrontInfoManager()->getExamOptions()
+            "options" => $this->getFrontManager()->getExamOptions()
         ]);
         
     }
@@ -42,8 +44,10 @@ class FrontController extends Controller
 //    }
     
     
-    private function getFrontInfoManager(): FrontInfoManager {
-        $userManager = app()->make(UserFrontManager::class);
-        return $userManager->getFrontInfoManager();
+    private function getFrontManager(): FrontManager {
+        //$userManager = app()->make(UserFrontManager::class);
+        //return $userManager->getFrontManager();
+        $factory = app()->make(ManagersFactory::class);
+        return $factory->getFrontManager(auth()->user()->front->id);
     }
 }

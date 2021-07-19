@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\TakenExamDTO;
 use App\Services\Interfaces\UserFrontManager;
-use App\Services\Interfaces\FrontInfoManager;
-use App\Factories\Interfaces\RepositoriesFactory;
-use App\Repositories\Interfaces\TakenExamRepository;
+use App\Services\Interfaces\FrontManager;
+use App\Factories\Interfaces\ManagersFactory;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
@@ -21,7 +20,7 @@ class TakenExamController extends Controller
         ]);
         
         $exam = new TakenExamDTO(0, $attributes["name"], $attributes["ssd"], $attributes["cfu"]);
-        $this->getFrontInfoManager()->saveTakenExam($exam);
+        $this->getFrontManager()->saveTakenExam($exam);
         
         return back();
     }
@@ -31,15 +30,17 @@ class TakenExamController extends Controller
             "id" => ["numeric", Rule::exists("taken_exams","id")]
         ]);
         
-        $this->getFrontInfoManager()->deleteTakenExam($attributes["id"]);
+        $this->getFrontManager()->deleteTakenExam($attributes["id"]);
         
         return back();
     }
     
     
-    private function getFrontInfoManager(): FrontInfoManager {
-        $userManager = app()->make(UserFrontManager::class);
-        return $userManager->getFrontInfoManager();
+    private function getFrontManager(): FrontManager {
+        //$userManager = app()->make(UserFrontManager::class);
+        //return $userManager->getFrontInfoManager();
+        $factory = app()->make(ManagersFactory::class);
+        return $factory->getFrontManager(auth()->user()->front->id);
     }
     
 }

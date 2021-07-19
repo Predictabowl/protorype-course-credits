@@ -7,7 +7,8 @@ use App\Domain\ExamBlockDTO;
 use App\Domain\TakenExamDTO;
 use App\Services\Implementations\StudyPlanBuilderImpl;
 use App\Services\Interfaces\ExamDistance;
-use App\Services\Interfaces\FrontInfoManager;
+use App\Services\Interfaces\FrontManager;
+use App\Services\Interfaces\CourseManager;
 use PHPUnit\Framework\TestCase;
 
 class StudyPlanBuilderImplTest extends TestCase
@@ -21,11 +22,13 @@ class StudyPlanBuilderImplTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->frontManager = $this->createMock(FrontInfoManager::class);
+        $this->frontManager = $this->createMock(FrontManager::class);
+        $this->courseManager = $this->createMock(CourseManager::class);
         $this->examDistance = $this->createMock(ExamDistance::class);
         $this->setupData();
         
-        $this->planBuilder = new StudyPlanBuilderImpl($this->frontManager, $this->examDistance);
+        app()->instance(ExamDistance::class, $this->examDistance);
+        $this->planBuilder = new StudyPlanBuilderImpl($this->frontManager, $this->courseManager);
     }
     
     
@@ -33,10 +36,10 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->frontManager->expects($this->any())
                 ->method("getTakenExams")->willReturn($this->takenExams);
         
-        $this->frontManager->expects($this->any())
+        $this->courseManager->expects($this->any())
                 ->method("getExamOptions")->willReturn($this->options);
 
-        $this->frontManager->expects($this->any())
+        $this->courseManager->expects($this->any())
                 ->method("getExamBlocks")->willReturn(collect($this->blocks));
     }
 
@@ -52,7 +55,7 @@ class StudyPlanBuilderImplTest extends TestCase
                 ->will($this->onConsecutiveCalls(7,9,3));
         $this->setupMocks();
         
-        $this->planBuilder->setFront(1);
+        $this->planBuilder->refreshStudyPlan();
         
         $orederedOptions = $this->planBuilder->getOptionsBySsd($takenExam);
         
@@ -76,7 +79,7 @@ class StudyPlanBuilderImplTest extends TestCase
                 ->will($this->onConsecutiveCalls(7,5));
         $this->setupMocks();
         
-        $this->planBuilder->setFront(1);
+        $this->planBuilder->refreshStudyPlan();
         
         $orederedOptions = $this->planBuilder->getOptionsByCompatibility($takenExam);
         
@@ -92,8 +95,7 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->examDistance->expects($this->exactly(10))                
                 ->method("calculateDistance")->willReturn(1);
         
-        $studyPlan = $this->planBuilder->setFront(1)
-                ->getStudyPlan();
+        $studyPlan = $this->planBuilder->getStudyPlan();
         
         $this->assertEquals(3, $studyPlan->getExam(1)->getIntegrationValue());
         $this->assertEquals(6, $studyPlan->getExam(2)->getIntegrationValue());
