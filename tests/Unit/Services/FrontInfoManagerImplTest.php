@@ -11,7 +11,6 @@ use App\Factories\Interfaces\RepositoriesFactory;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\FrontRepository;
-use App\Exceptions\Custom\FrontNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class FrontInfoManagerImplTest extends TestCase
@@ -42,8 +41,8 @@ class FrontInfoManagerImplTest extends TestCase
                 ->willReturn($this->frontRepo);
     }
     
-    private function setManagerInstance(){
-        $this->front = new Front(["course_id" => self::FIXTURE_COURSE_ID]);
+    private function setManagerInstance($courseId = self::FIXTURE_COURSE_ID){
+        $this->front = new Front(["course_id" => $courseId]);
         $this->front->id = self::FIXTURE_FRONT_ID;
         
         $this->frontRepo->method("get")->willReturn($this->front);
@@ -51,18 +50,6 @@ class FrontInfoManagerImplTest extends TestCase
         $this->manager = new FrontInfoManagerImpl($this->factory, self::FIXTURE_FRONT_ID);
     }
     
-    public function test_Construct_will_fail_if_front_is_not_found(){
-        
-//        $this->frontRepo->method("get")->will($this->
-//                throwException(new ModelNotFoundException("message")));
-        $this->frontRepo->method("get")->willReturn(null);
-        
-        $this->expectException(FrontNotFoundException::class);
-        
-        new FrontInfoManagerImpl($this->factory,1);
-    }
-    
-
     public function test_getExamBlocks() {
         $blocks = collect([new ExamBlockDTO(1, 2), new ExamBlockDTO(1, 1)]);
         $this->blockRepo->expects($this->once())->method("getFromFront")
@@ -72,6 +59,16 @@ class FrontInfoManagerImplTest extends TestCase
         $sut = $this->manager->getExamBlocks();
         
         $this->assertSame($blocks, $sut);
+    }
+    
+    public function test_getExamBlocks_when_course_not_set() {
+        $this->blockRepo->expects($this->once())->method("getFromFront")
+                ->willReturn(collect([]));
+        $this->setManagerInstance(null);
+        
+        $sut = $this->manager->getExamBlocks();
+        
+        $this->assertEmpty($sut);
     }
 
 

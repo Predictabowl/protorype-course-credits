@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use App\Domain\TakenExamDTO;
 
 interface FrontInfoManager {
-        
+       
     /**
      * Set the course of the current front.
      * If a course is already set it will be changed.
@@ -15,6 +15,10 @@ interface FrontInfoManager {
      * @return int 0 if the front doesn't exists
      */
     public function setCourse($courseId): int;
+    
+    /**
+     * Returns null if the course is not set
+     */
 
     public function getActiveFrontId(): ?int;
 
@@ -24,9 +28,9 @@ interface FrontInfoManager {
 
     public function getExamOptions(): Collection;
 
-    public function saveTakenExam(TakenExamDTO $exam);
+    //public function saveTakenExam(TakenExamDTO $exam);
 
-    public function deleteTakenExam($examId);
+    //public function deleteTakenExam($examId);
     
     /**
      * Wipe all attached TakenExams from the front

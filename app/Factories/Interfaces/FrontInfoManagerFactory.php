@@ -6,19 +6,16 @@
  * and open the template in the editor.
  */
 
-namespace App\Repositories\Interfaces;
+namespace App\Factories\Interfaces;
 
-use App\Models\User;
+use App\Services\Interfaces\FrontInfoManager;
+use App\Models\Front;
 
 /**
  *
  * @author piero
  */
-interface UserRepository {
+interface FrontInfoManagerFactory {
     
-    public function get($id): ?User;
-    
-    public function save(User $user): bool;
-    
-    public function delete($id): bool;
+    public function getInstance($frontId): FrontInfoManager;
 }

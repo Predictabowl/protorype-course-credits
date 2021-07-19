@@ -36,12 +36,10 @@ class FrontRepositoryImplTest extends TestCase
             "course_id" => 2
         ]);
         
-        $saved = $this->repository->save($front);
+        $result = $this->repository->save($front);
         
-        $this->assertInstanceOf(Front::class, $saved);
+        $this->assertTrue($result);
         
-        $this->assertEquals([1,2,3],
-                [$saved["id"], $saved["course_id"], $saved["user_id"]]);
         $this->assertDatabaseHas("fronts", [
             "id" => 1,
             "course_id" => 2,
@@ -57,8 +55,22 @@ class FrontRepositoryImplTest extends TestCase
         $new->id = 3;
         $this->expectException(\InvalidArgumentException::class);
         
-        $front = $this->repository->save($new);
+        $result = $this->repository->save($new);
         
+        $this->assertFalse($result);
+        $this->assertDatabaseCount("fronts", 0);
+    }
+    
+    public function test_save_when_course_not_exists()
+    {
+        $new = new Front([
+            "user_id" => 2,
+            "course_id" => self::FIXTURE_COURSE_NUM+1
+        ]);
+        
+        $result = $this->repository->save($new);
+        
+        $this->assertFalse($result);
         $this->assertDatabaseCount("fronts", 0);
     }
 
@@ -75,9 +87,9 @@ class FrontRepositoryImplTest extends TestCase
             "user_id" => 2
         ]);
         
-        $front = $this->repository->save($new);
+        $result = $this->repository->save($new);
         
-        $this->assertNull($front);
+        $this->assertFalse($result);
         
         $this->assertDatabaseCount("fronts", 1);
         $this->assertDatabaseMissing("fronts", [
@@ -168,6 +180,7 @@ class FrontRepositoryImplTest extends TestCase
         $sut = $this->repository->updateCourse(1,1);
         
         $this->assertNull($sut);
+        $this->assertDatabaseCount("fronts", 0);
     }
     
     public function test_updateCourse_when_Course_not_present(){
@@ -178,23 +191,28 @@ class FrontRepositoryImplTest extends TestCase
         ];
         Front::factory()->create($frontArray);
         
-        $this->expectException(ModelNotFoundException::class);
+        $result = $this->repository->updateCourse(1,self::FIXTURE_COURSE_NUM+1);
         
-        $this->repository->updateCourse(1,self::FIXTURE_COURSE_NUM+1);
+        $this->assertNull($result);
+        $this->assertDatabaseMissing("fronts", ["course_id" => self::FIXTURE_COURSE_NUM+1]);
     }
     
     public function test_updateCourse_succesful(){
-        $frontArray = [
+        $changedFront = [
             "id" => 1,
-            "course_id" => 3,
+            "course_id" => 2,
             "user_id" => 3
         ];
-        Front::factory()->create($frontArray);
+        Front::factory()->create([
+            "course_id" => 3,
+            "user_id" => 3
+        ]);
         
         $sut = $this->repository->updateCourse(1,2);
         
         $this->assertInstanceOf(Front::class,$sut);
         $this->assertEquals([1,2,3],
                 [$sut["id"],$sut["course_id"],$sut["user_id"]]);
+        $this->assertDatabaseHas("fronts", $changedFront);
     }
 }

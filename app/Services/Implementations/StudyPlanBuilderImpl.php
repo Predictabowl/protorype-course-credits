@@ -8,7 +8,7 @@ use App\Domain\ExamOptionDTO;
 use App\Domain\StudyPlan;
 use App\Domain\ExamBlockLinker;
 use App\Services\Interfaces\ExamDistance;
-use App\Services\Interfaces\FrontManager;
+use App\Services\Interfaces\FrontInfoManager;
 use App\Services\Interfaces\StudyPlanBuilder;
 use Illuminate\Support\Collection;
 
@@ -24,7 +24,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
     private $examOptions;
     private $blockLinkers; //keep tracks of wich options in a block are linked
 
-    function __construct(FrontManager $frontManager, ExamDistance $eDistance) {
+    function __construct(FrontInfoManager $frontManager, ExamDistance $eDistance) {
         $this->frontManager = $frontManager;
         $this->eDistance = $eDistance;
         $this->examOptions = [];

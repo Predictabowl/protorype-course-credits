@@ -6,19 +6,17 @@
  * and open the template in the editor.
  */
 
-namespace App\Repositories\Interfaces;
+namespace App\Services\Interfaces;
 
-use App\Models\User;
+use Illuminate\Support\Collection;
 
 /**
  *
  * @author piero
  */
-interface UserRepository {
-    
-    public function get($id): ?User;
-    
-    public function save(User $user): bool;
-    
-    public function delete($id): bool;
+interface CourseManager {
+ 
+    public function getExamBlocks(): Collection;
+
+    public function getExamOptions(): Collection;
 }

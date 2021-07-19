@@ -18,7 +18,7 @@ use App\Models\User;
  */
 class UserRepositoryImpl implements UserRepository {
 
-    public function delete($id): int {
+    public function delete($id): bool {
         return User::destroy($id);
     }
 
@@ -26,14 +26,11 @@ class UserRepositoryImpl implements UserRepository {
         return User::find($id);
     }
 
-    public function save(User $user): ?User {
+    public function save(User $user): bool {
         if (isset($user->id)){
             throw new \InvalidArgumentException("User ID should be null while saving");
         }
-        if (!$user->save()){
-            return null;
-        }
-        return $user;
+        return $user->save();
     }
 
 }

@@ -96,6 +96,17 @@ class ExamBlockRepositoryImplTest extends TestCase
         
         $this->assertEmpty($sut);
     }
+    
+    public function test_getFromFront_when_course_is_not_set() {
+        Front::factory()->create([
+            "course_id" => null,
+           "user_id" => User::factory()->create()
+        ]);
+        
+        $sut = $this->repository->getFromFront(1);
+        
+        $this->assertEmpty($sut);
+    }
 
 
     public function test_getFromFront_without_options(){

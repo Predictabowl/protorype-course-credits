@@ -9,7 +9,8 @@ class Ssd extends Model
 {
     use HasFactory;
     
-    protected $fillable = ["code"];
+    //protected $fillable = ["code"];
+    protected $guarded = [];
 
     public function exams()
     {

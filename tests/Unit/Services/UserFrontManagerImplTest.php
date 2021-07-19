@@ -6,48 +6,50 @@ use App\Models\Front;
 use App\Models\User;
 use App\Models\Course;
 use App\Services\Implementations\UserFrontManagerImpl;
+use App\Services\Interfaces\FrontInfoManager;
+use App\Factories\Interfaces\FrontInfoManagerFactory;
 use App\Repositories\Interfaces\UserRepository;
 use App\Repositories\Interfaces\CourseRepository;
-use Mockery\MockInterface;
 use App\Factories\Interfaces\RepositoriesFactory;
-use App\Repositories\Interfaces\TakenExamRepository;
-use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\FrontRepository;
-use App\Exceptions\Custom\UserNotFoundException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use PHPUnit\Framework\TestCase;
-//use Tests\TestCase;
+use Tests\TestCase;
 
 class UserFrontManagerImplTest extends TestCase
 {
     private const FIXTURE_USER_ID = 2;
+    private const FIXTURE_FRONT_ID = 27;
     
     private $frontRepo;
     private $userRepo;
     private $courseRepo;
     private $manager;
+    private $repoFactory;
+    private $authUser;
     
 
     protected function setUp():void
     {
         parent::setUp();
         
-        $factory = $this->createMock(RepositoriesFactory::class);
+        $this->repoFactory = $this->createMock(RepositoriesFactory::class);
         $this->frontRepo = $this->createMock(FrontRepository::class);
         $this->userRepo = $this->createMock(UserRepository::class);
         $this->courseRepo = $this->createMock(CourseRepository::class);
         
-        $factory->method("getUserRepository")
+        $this->repoFactory->method("getUserRepository")
                 ->willReturn($this->userRepo);
-        $factory->method("getFrontRepository")
+        $this->repoFactory->method("getFrontRepository")
                 ->willReturn($this->frontRepo);
-        $factory->method("getCourseRepository")
+        $this->repoFactory->method("getCourseRepository")
                 ->willReturn($this->courseRepo);
         
-        $user = new User();
-        $this->userRepo->method("get")->willReturn($user);
-        $this->manager = new UserFrontManagerImpl(self::FIXTURE_USER_ID,$factory);
+        $infoFactory = $this->createMock(FrontInfoManagerFactory::class);
         
+        $this->authUser = new User();
+        $this->authUser->id = self::FIXTURE_USER_ID;
+        $this->userRepo->method("get")->willReturn($this->authUser);
+        $this->actingAs($this->authUser);
+        $this->manager = new UserFrontManagerImpl($this->repoFactory, $infoFactory);
     }
 
     public function test_createFront_when_Front_not_present(){
@@ -55,12 +57,10 @@ class UserFrontManagerImplTest extends TestCase
             "user_id" => 2,
             "course_id" => 3
         ]);
-        $saved = new Front();
-        $saved->id = 7;
         $this->frontRepo->expects($this->once())
                 ->method("save")
                 ->with($toSave)
-                ->willReturn($saved);
+                ->willReturn(true);
         $course = new Course();
         $course->id = 3;
         $this->courseRepo->expects($this->once())
@@ -94,7 +94,7 @@ class UserFrontManagerImplTest extends TestCase
         $this->frontRepo->expects($this->once())
                 ->method("save")
                 ->with($toSave)
-                ->willReturn(null);
+                ->willReturn(false);
         $course = new Course();
         $course->id = 3;
         $this->courseRepo->expects($this->once())
@@ -131,21 +131,88 @@ class UserFrontManagerImplTest extends TestCase
         $this->assertNull($result);
     }
     
-    
-    // Mocking example with binding. 
-    // Work but not very practical with complex argument data
-    // needs Tests\TestCase
-/*    
-    public function test_createFront_failure(){
+    public function test_getFrontInfoManager_success(){
+        $front = new Front();
+        $front->id = self::FIXTURE_FRONT_ID;
         $this->frontRepo->expects($this->once())
-                ->method("save")
-                ->with(3,4)
-                ->willReturn(null);
+                ->method("getFromUser")
+                ->with(self::FIXTURE_USER_ID)
+                ->willReturn($front);
+        $infoManager = $this->createMock(FrontInfoManager::class);
+        $infoFactory = $this->createMock(FrontInfoManagerFactory::class);
+        $infoFactory->expects($this->once())
+                ->method("getInstance")
+                ->with(self::FIXTURE_FRONT_ID)
+                ->willReturn($infoManager);
+        $localManager = new UserFrontManagerImpl($this->repoFactory, $infoFactory);
         
-        $sut = $this->manager->createFront(3,4);
-        $this->assertEquals(0,$sut);
-        $this->assertNull($this->manager->getActiveFrontId());
-    }*/
-   
+        $result = $localManager->getFrontInfoManager();
+        
+        $this->assertSame($infoManager, $result);
+    }
+    
+    public function test_getFrontInfoManager_failure(){
+        $front = new Front();
+        $front->id = self::FIXTURE_FRONT_ID;
+        $this->frontRepo->expects($this->once())
+                ->method("getFromUser")
+                ->with(self::FIXTURE_USER_ID)
+                ->willReturn(null);
+        $infoFactory = $this->createMock(FrontInfoManagerFactory::class);
+        $infoFactory->expects($this->never())
+                ->method("getInstance");
+        $localManager = new UserFrontManagerImpl($this->repoFactory, $infoFactory);
+
+        $result = $localManager->getFrontInfoManager();
+        
+        $this->assertNull($result);
+    }
+    
+    public function test_deleteFront_when_not_present() {
+        $this->frontRepo->expects($this->once())
+            ->method("getFromUser")
+            ->with(self::FIXTURE_USER_ID)
+            ->willReturn(null);
+        
+        $result = $this->manager->deleteFront();
+        
+        $this->assertFalse($result);
+    }
+    
+    public function test_deleteFront_success() {
+        $front = new Front();
+        $front->id = self::FIXTURE_FRONT_ID;
+        $this->frontRepo->expects($this->once())
+            ->method("getFromUser")
+            ->with(self::FIXTURE_USER_ID)
+            ->willReturn($front);
+        $this->frontRepo->expects($this->once())
+            ->method("delete")
+            ->with(self::FIXTURE_FRONT_ID)
+            ->willReturn(1);
+        
+        $result = $this->manager->deleteFront();
+        
+        $this->assertTrue($result);
+        
+    }
+    
+    public function test_deleteFront_failure() {
+        $front = new Front();
+        $front->id = self::FIXTURE_FRONT_ID;
+        $this->frontRepo->expects($this->once())
+            ->method("getFromUser")
+            ->with(self::FIXTURE_USER_ID)
+            ->willReturn($front);
+        $this->frontRepo->expects($this->once())
+            ->method("delete")
+            ->with(self::FIXTURE_FRONT_ID)
+            ->willReturn(0);
+        
+        $result = $this->manager->deleteFront();
+        
+        $this->assertFalse($result);
+        
+    }
 
 }

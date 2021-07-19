@@ -6,19 +6,16 @@
  * and open the template in the editor.
  */
 
-namespace App\Repositories\Interfaces;
+namespace App\Mappers\Interfaces;
 
-use App\Models\User;
+use App\Domain\ExamBlockDTO;
+use App\Models\ExamBlock;
 
 /**
  *
  * @author piero
  */
-interface UserRepository {
-    
-    public function get($id): ?User;
-    
-    public function save(User $user): bool;
-    
-    public function delete($id): bool;
+interface ExamBlockMapper {
+
+    public function toDTO(ExamBlock $model): ExamBlockDTO;
 }

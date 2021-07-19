@@ -46,11 +46,10 @@ class UserRepositoryImplTest extends TestCase {
         ];
         $user = new User($attributes);
 
-        $found = $this->repository->save($user);
+        $result = $this->repository->save($user);
         
         $this->assertDatabaseHas("users", $attributes);
-        $this->assertEquals("nome",$found->name);
-        $this->assertEquals("posta",$found->email);
+        $this->assertTrue($result);
     }
 
     public function test_save_with_id_not_null() {

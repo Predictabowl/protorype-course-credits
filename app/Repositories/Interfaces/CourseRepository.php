@@ -18,7 +18,7 @@ interface CourseRepository {
     
     public function get($id): ?Course;
     
-    public function save(Course $course): ?Course;
+    public function save(Course $course): bool;
     
-    public function delete($id): int;
+    public function delete($id): bool;
 }

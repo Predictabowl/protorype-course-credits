@@ -3,6 +3,7 @@
 namespace App\Services\Interfaces;
 
 use App\Services\Interfaces\FrontInfoManager;
+use App\Models\Front;
 
 interface UserFrontManager {
 
@@ -16,17 +17,20 @@ interface UserFrontManager {
      * @param type $courseId
      * @return bool false if it fails
      */
-    public function createFront($courseId): bool;
+    public function createFront($courseId = null): ?Front;
+    
+    public function deleteFront(): bool;
 
-    public function deleteActiveFront(): int;
-
-    public function getFrontId(): ?int;
+    public function getFront(): ?Front;
+    
+//    public function setCourse($courseId): bool;
     
     /**
      * Return a managing instance to extract info from the Front of the 
      * current user.
      * Return null if the Front doesn't exists.
      * 
+     * @param bool $createFront if true will create a Front
      * @return FrontInfoManager|null
      */
     public function getFrontInfoManager(): ?FrontInfoManager;

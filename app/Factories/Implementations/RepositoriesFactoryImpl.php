@@ -11,6 +11,8 @@ use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Implementations\FrontRepositoryImpl;
 use \App\Repositories\Interfaces\UserRepository;
 use App\Repositories\Implementations\UserRepositoryImpl;
+use App\Repositories\Interfaces\CourseRepository;
+use App\Repositories\Implementations\CourseRepositoryImpl;
 
 /**
  * Description of RepositoriesFactoryImpl
@@ -35,8 +37,8 @@ class RepositoriesFactoryImpl implements RepositoriesFactory{
         return new UserRepositoryImpl();
     }
 
-    public function getCourseRepository(): \App\Factories\Interfaces\CourseRepository {
-        throw new Exception("method not implemented yet");
+    public function getCourseRepository(): CourseRepository {
+        return new CourseRepositoryImpl();
     }
 
 }

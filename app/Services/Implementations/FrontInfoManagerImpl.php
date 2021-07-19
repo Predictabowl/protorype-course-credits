@@ -7,7 +7,6 @@ use App\Domain\TakenExamDTO;
 use App\Factories\Interfaces\RepositoriesFactory;
 use Illuminate\Support\Collection;
 use App\Services\Interfaces\FrontInfoManager;
-use App\Exceptions\Custom\FrontNotFoundException;
 
 /**
  * It caches the results and always return the cached ones until
@@ -16,26 +15,21 @@ use App\Exceptions\Custom\FrontNotFoundException;
 class FrontInfoManagerImpl implements FrontInfoManager{
 
     private $repositoriesFactory;
-    private $id;
+    private $frontId;
 
-    function __construct(RepositoriesFactory $repositoriesFactory, $id) {
+    function __construct(RepositoriesFactory $repositoriesFactory, $frontId) {
         $this->repositoriesFactory = $repositoriesFactory;
-
-        $front = $this->repositoriesFactory->getFrontRepository()->get($id);
-        if (!isset($front)){
-            throw new FrontNotFoundException("Front not found with id: ".$id);
-        }
-        $this->id = $id;
+        $this->frontId = $frontId;
     }
 
     public function getExamBlocks(): Collection {
         return $this->repositoriesFactory->getExamBlockRepository()
-                ->getFromFront($this->id);
+                ->getFromFront($this->frontId);
     }
 
     public function getTakenExams(): Collection {
         return $this->repositoriesFactory->getTakenExamRepository()
-                ->getFromFront($this->id);
+                ->getFromFront($this->frontId);
     }
 
     public function getExamOptions(): Collection {
@@ -51,24 +45,22 @@ class FrontInfoManagerImpl implements FrontInfoManager{
 
     public function saveTakenExam(TakenExamDTO $exam) {
         $this->repositoriesFactory->getTakenExamRepository()
-                ->save($exam, $this->id);
-        $this->takenExams = null;
+                ->save($exam, $this->frontId);
     }
 
     public function deleteTakenExam($examId) {
         $this->repositoriesFactory->getTakenExamRepository()
                 ->delete($examId);
-        $this->takenExams = null;
     }
 
     public function setCourse($courseId): int {
         $front = $this->repositoriesFactory->getFrontRepository()
-                ->updateCourse($this->id, $courseId);
+                ->updateCourse($this->frontId, $courseId);
         return isset($front) ? 1 : 0;
     }
 
     public function getActiveFrontId(): ?int {
-        return $this->id;
+        return $this->frontId;
     }
 
 }

@@ -7,7 +7,7 @@ use App\Domain\ExamBlockDTO;
 use App\Domain\TakenExamDTO;
 use App\Services\Implementations\StudyPlanBuilderImpl;
 use App\Services\Interfaces\ExamDistance;
-use App\Services\Interfaces\FrontManager;
+use App\Services\Interfaces\FrontInfoManager;
 use PHPUnit\Framework\TestCase;
 
 class StudyPlanBuilderImplTest extends TestCase
@@ -21,7 +21,7 @@ class StudyPlanBuilderImplTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->frontManager = $this->createMock(FrontManager::class);
+        $this->frontManager = $this->createMock(FrontInfoManager::class);
         $this->examDistance = $this->createMock(ExamDistance::class);
         $this->setupData();
         

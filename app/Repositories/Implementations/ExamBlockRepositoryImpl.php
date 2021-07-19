@@ -27,6 +27,9 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         if (!isset($front)){
             throw new ModelNotFoundException("Could not find Front with id: ".$frontId);
         }
+        if (!isset($front->course)){
+            return collect([]);
+        }
         return $front->course->examBlocks->map(fn($block) => $this->mapExamBlock($block));
     }
     

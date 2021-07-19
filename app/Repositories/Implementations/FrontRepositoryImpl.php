@@ -13,6 +13,8 @@ use App\Models\Front;
 use App\Models\User;
 use App\Models\Course;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 /**
  *
@@ -20,22 +22,21 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  */
 class FrontRepositoryImpl implements FrontRepository{
 
-    public function delete($id): int {
+    public function delete($id): bool {
         return Front::destroy($id);
     }
 
-    public function save(Front $front): ?Front {
+    public function save(Front $front): bool {
         if (isset($front->id)){
             throw new \InvalidArgumentException("The id of a new Front must be null");
         }
         
-        $found = Front::where("user_id", $front->user_id)->first();
-        
-        if (isset($found)){
-            return null;
+        try {
+            return $front->save();
+        } catch(QueryException $exc){
+            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
+            return false;
         }
-        
-        return $front->save() ? $front : null;
     }
 
     public function updateCourse($id, $courseId): ?Front {
@@ -43,11 +44,13 @@ class FrontRepositoryImpl implements FrontRepository{
         if (!isset($front)){
             return null;
         }
-        $course = Course::find($courseId);
-        if (!isset($course)){
-            throw new ModelNotFoundException("Could not find a Course with id: ".$courseId);
+        $front->course_id = $courseId;
+        try{
+            $front->save();
+        } catch (QueryException $exc){
+            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
+            return null;
         }
-        $front->course()->associate($course);
         return $front;
     }
 
