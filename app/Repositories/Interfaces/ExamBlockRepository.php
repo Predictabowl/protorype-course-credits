@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Interfaces;
 
-use App\Domain\ExamBlockDTO;
+use App\Models\ExamBlock;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,6 +11,6 @@ use Illuminate\Support\Collection;
  */
 interface ExamBlockRepository {
     
-    public function get($id): ExamBlockDTO;
+    public function get($id): ?ExamBlock;
     public function getFromFront($frontId): Collection;
 }

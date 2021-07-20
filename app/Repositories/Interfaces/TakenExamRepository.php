@@ -8,7 +8,7 @@
 
 namespace App\Repositories\Interfaces;
 
-use App\Domain\TakenExamDTO;
+use App\Models\TakenExam;
 use Illuminate\Support\Collection;
 
 /**
@@ -17,7 +17,12 @@ use Illuminate\Support\Collection;
  */
 interface TakenExamRepository {
     
-    public function get($id): TakenExamDTO;
+    public function get($id): ?TakenExam;
     
     public function getFromFront($frontId): Collection;
+    
+    public function save(TakenExam $exam): bool;
+    
+    public function delete($id): bool;
+    
 }

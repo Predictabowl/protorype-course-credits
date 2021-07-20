@@ -1,52 +1,63 @@
 <?php
 
-namespace App\Services\Implementations;
-
-use App\Domain\ExamBlockDTO;
-use App\Services\Interfaces\FrontManager;
-use App\Factories\Interfaces\RepositoriesFactory;
-use Illuminate\Support\Collection;
-//use Illuminate\Database\Eloquent\ModelNotFoundException;
-
-/**
- * On every call it uses the repositories to make new queries,
- * so care must be used if used on static content as will make a lot
- * of useless queries.
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
+namespace App\Services\Implementations;
+
+use App\Services\Interfaces\FrontManager;
+use App\Models\TakenExam;
+use App\Domain\TakenExamDTO;
+use Illuminate\Support\Collection;
+use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Interfaces\TakenExamRepository;
+use App\Mappers\Interfaces\TakenExamMapper;
+
+/**
+ * Description of FrontManagerImpl
+ *
+ * @author piero
+ */
 class FrontManagerImpl implements FrontManager{
-
-    private $repositoriesFactory;
+    
     private $frontId;
+    private $mapper;
 
-    function __construct(RepositoriesFactory $repositoriesFactory, int $frontId = 0) {
-        $this->repositoriesFactory = $repositoriesFactory;
+    function __construct($frontId) {
+        $this->mapper = app()->make(TakenExamMapper::class);
         $this->frontId = $frontId;
     }
 
-    public function setFront(int $id): FrontManager {
-        $this->frontId = $id;
-        return $this;
-    }
-
-    public function getExamBlocks(): Collection {
-        return  $this->repositoriesFactory->getExamBlockRepository()
-                ->getFromFront($this->frontId);
-    }
-
     public function getTakenExams(): Collection {
-        return $this->repositoriesFactory->getTakenExamRepository()
+        $exams = $this->getExamRepository()
                 ->getFromFront($this->frontId);
+        return $exams->map(
+                fn($exam) => $this->mapper->toDTO($exam));
+    }
+    
+    public function saveTakenExam(TakenExamDTO $exam) {
+        $this->getExamRepository()
+                ->save($this->mapper->toModel($exam, $this->frontId));
     }
 
-    public function getExamOptions(): Collection {
-        $options = $this->getExamBlocks()->map(fn(ExamBlockDTO $block) => 
-                $block->getExamOptions());
-        if (isset($options)){
-            $options = $options->flatten()->unique();
-        } else {
-            $options = collect([]);
-        }
-        return $options;
+    public function deleteTakenExam($examId) {
+        $this->getExamRepository()->delete($examId);
     }
+
+    public function setCourse($courseId): bool {
+        $front = $this->getFrontRepository()->updateCourse($this->frontId, $courseId);
+        return isset($front) ? true : false;
+    }
+    
+    private function getExamRepository(): TakenExamRepository{
+        return app()->make(TakenExamRepository::class);
+    }
+    
+    private function getFrontRepository(): FrontRepository{
+        return app()->make(FrontRepository::class);
+    }
+
 }

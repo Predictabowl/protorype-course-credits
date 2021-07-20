@@ -26,7 +26,7 @@ class TakenExamDTO implements ExamDTO{
         $this->id = $id;
         $this->examName = $examName;
         $this->cfu = $maxCfu;
-        $this->ssd = $ssd;
+        $this->ssd = strtoupper($ssd);
     }
     
     public function getExamName(): string {

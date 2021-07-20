@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Ssd extends Model
 {
     use HasFactory;
+    
+    //protected $fillable = ["code"];
+    protected $guarded = [];
 
     public function exams()
     {

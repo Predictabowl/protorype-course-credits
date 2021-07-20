@@ -1,87 +1,123 @@
 <?php
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 namespace Tests\Unit\Services;
 
-use App\Domain\ExamBlockDTO;
+use App\Models\TakenExam;
+use App\Models\Front;
 use App\Domain\TakenExamDTO;
-use App\Domain\ExamOptionDTO;
-use App\Services\Implementations\FrontManagerImpl;
-use App\Factories\Interfaces\RepositoriesFactory;
 use App\Repositories\Interfaces\TakenExamRepository;
-use App\Repositories\Interfaces\ExamBlockRepository;
+use App\Repositories\Interfaces\FrontRepository;
+use App\Services\Implementations\FrontManagerImpl;
+use App\Mappers\Interfaces\TakenExamMapper;
 use PHPUnit\Framework\TestCase;
 
-class FrontManagerImplTest extends TestCase
-{
-    private $front;
-    private $factory;
-    private $takenRepo;
-    private $blockRepo;
-    
+/**
+ * Description of FrontManagerImplTest
+ *
+ * @author piero
+ */
+class FrontManagerImplTest extends TestCase{
 
+    private const FIXTURE_FRONT_ID = 7;    
+    
+    private $takenRepo;
+    private $frontRepo;
+    private $manager;
+    private $mapper;
+
+    
     protected function setUp():void
     {
-        $this->factory = $this->createMock(RepositoriesFactory::class);
+        parent::setUp();
         $this->takenRepo = $this->createMock(TakenExamRepository::class);
-        $this->blockRepo = $this->createMock(ExamBlockRepository::class);
+        $this->frontRepo = $this->createMock(FrontRepository::class);
+        $this->mapper = $this->createMock(TakenExamMapper::class);
         
-        $this->factory->method("getTakenExamRepository")
-                ->willReturn($this->takenRepo);
-        $this->factory->method("getExamBlockRepository")
-                ->willReturn($this->blockRepo);
-        
-        $this->front = new FrontManagerImpl($this->factory,1);
+        app()->instance(TakenExamRepository::class, $this->takenRepo);
+        app()->instance(TakenExamMapper::class, $this->mapper);
+        app()->instance(FrontRepository::class, $this->frontRepo);
+        $this->manager = new FrontManagerImpl(self::FIXTURE_FRONT_ID);
     }
-    
-    public function test_getExamBlocks() {
-        $blocks = collect([new ExamBlockDTO(1, 2), new ExamBlockDTO(1, 1)]);
-        $this->blockRepo->expects($this->once())->method("getFromFront")
-                ->willReturn($blocks);
-        
-        $sut = $this->front->getExamBlocks();
-        
-        $this->assertSame($blocks, $sut);
-    }
+  
     
     public function test_getTakenExams() {
-        $exams = collect([new TakenExamDTO(1, "name", "ssd1", 6),
-                new TakenExamDTO(2, "name 2", "ssd2", 9)]);
-        $this->takenRepo->expects($this->once())->method("getFromFront")
+        $returned= [new TakenExamDTO(1, "name", "ssd1", 6),
+                new TakenExamDTO(2, "name 2", "ssd2", 9)];
+        
+        $exams = collect([$this->makeTakenExam(1),$this->makeTakenExam(2)]);
+        $this->mapper->expects($this->exactly(2))
+                ->method("toDTO")
+                ->withConsecutive([$exams[0]],[$exams[1]])
+                ->willReturnOnConsecutiveCalls($returned[0],$returned[1]);
+
+        $this->takenRepo->expects($this->once())
+                ->method("getFromFront")
                 ->willReturn($exams);
         
-        $sut = $this->front->getTakenExams();
+        $sut = $this->manager->getTakenExams();
         
-        $this->assertSame($exams, $sut);
-        
-    }
-    
-    
-    public function test_getExamOptions() {
-        $block1 = new ExamBlockDTO(1, 2);
-        $block2 = new ExamBlockDTO(1, 1);
-        $option1 = new ExamOptionDTO(1, "name 1", $block1, 12, "ssd1");
-        $option2 = new ExamOptionDTO(2, "name 2", $block1, 12, "ssd2");
-        $option3 = new ExamOptionDTO(3, "name 3", $block2, 12, "ssd3");
-        $this->blockRepo->expects($this->once())->method("getFromFront")
-                ->willReturn(collect([$block1,$block2]));
-        
-        $exams = $this->front->getExamOptions();
-        
-        $this->assertSame([$option1,$option2,$option3],
-                [$exams[0],$exams[1],$exams[2]]);
+        $this->assertEquals($returned, $sut->toArray());
         
     }
-    
-    public function test_repos_are_called_everytime() {
-        $this->blockRepo->expects($this->exactly(4))->method("getFromFront");
-        $this->takenRepo->expects($this->exactly(2))->method("getFromFront");
+
+    public function test_save_takenExam() {
+        $dto = new TakenExamDTO(3, "nome", "ssd2", 9);
+        $model = $this->makeTakenExam(13);
+        $this->mapper->expects($this->once())
+                ->method("toModel")
+                ->with($dto)
+                ->willReturn($model);
+        $this->takenRepo->expects($this->once())
+                ->method("save")
+                ->with($model);
         
-        $this->front->getExamBlocks();
-        $this->front->getTakenExams();
-        $this->front->getExamOptions();
-        $this->front->getExamBlocks();
-        $this->front->getTakenExams();
-        $this->front->getExamOptions();
+        $this->manager->saveTakenExam($dto);
+    }
+
+    public function test_delete_takenExam() {
+        $this->takenRepo->expects($this->once())
+                ->method("delete")
+                ->with(1);
+        
+        $this->manager->deleteTakenExam(1);
+    }
+    
+    public function test_setCourse_success() {
+        $courseId = 3;
+        $this->frontRepo->expects($this->once())
+                ->method("updateCourse")
+                ->with(self::FIXTURE_FRONT_ID,$courseId)
+                ->willReturn(new Front());
+        
+        $result = $this->manager->setCourse($courseId);
+        
+        $this->assertTrue($result);
+    }
+    
+    public function test_setCourse_failure() {
+        $courseId = 7;
+        $this->frontRepo->expects($this->once())
+                ->method("updateCourse")
+                ->with(self::FIXTURE_FRONT_ID,$courseId)
+                ->willReturn(null);
+        
+        $result = $this->manager->setCourse($courseId);
+        
+        $this->assertFalse($result);
+    }
+    
+     
+    
+    private function makeTakenExam($id =1): TakenExam{            
+        $mock = new TakenExam();
+        $mock->id = $id;
+        return $mock;
     }
 
 }

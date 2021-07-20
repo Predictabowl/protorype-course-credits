@@ -9,6 +9,7 @@ use App\Models\ExamBlock;
 use App\Models\Front;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 /**
  * Description of ExamBlockRepositoryImpl
  *
@@ -16,26 +17,18 @@ use Illuminate\Support\Collection;
  */
 class ExamBlockRepositoryImpl implements ExamBlockRepository{
     
-    public function get($id): ExamBlockDTO {
-        $block = ExamBlock::with("examBlockOptions.exam.ssd")->find($id);
-        return $this->mapExamBlock($block);
+    public function get($id): ?ExamBlock {
+        return ExamBlock::with("examBlockOptions.exam.ssd")->find($id);
     }
 
     public function getFromFront($frontId): Collection {
         $front = Front::with("course.examBlocks.examBlockOptions.exam.ssd")->find($frontId);
-        return $front->course->examBlocks->map(fn($block) => $this->mapExamBlock($block));
-    }
-    
-    public function mapExamBlock(ExamBlock $block): ExamBlockDTO {
-        $newBlock = new ExamBlockDTO($block->id, $block->max_exams);
-        $block ->examBlockOptions->map(fn($option) =>  
-                $this->mapExamOption($option, $newBlock));
-        return $newBlock;
-    }
-
-    private function mapExamOption(ExamBlockOption $option, ExamBlockDTO $block): ExamOptionDTO {
-        $newOption = new ExamOptionDTO($option->id, $option->exam->name, $block, $option->exam->cfu, $option->exam->ssd->code);
-        $option->ssds->each(fn($ssd) => $newOption->addCompatibleOption($ssd->code));
-        return $newOption;
+        if (!isset($front)){
+            throw new ModelNotFoundException("Could not find Front with id: ".$frontId);
+        }
+        if (!isset($front->course)){
+            return collect([]);
+        }
+        return $front->course->examBlocks;
     }
 }

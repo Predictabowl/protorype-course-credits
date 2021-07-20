@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class ExamBlock extends Model
 {
     use HasFactory;
+    
+    protected $guarded = [];
 
     public function examBlockOptions()
     {

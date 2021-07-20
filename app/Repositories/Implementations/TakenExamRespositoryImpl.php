@@ -9,9 +9,10 @@
 namespace App\Repositories\Implementations;
 
 use App\Repositories\Interfaces\TakenExamRepository;
-use App\Domain\TakenExamDTO;
 use App\Models\TakenExam;
 use App\Models\Front;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
 
 /**
@@ -21,18 +22,33 @@ use Illuminate\Support\Collection;
  */
 class TakenExamRespositoryImpl implements TakenExamRepository{
     
-    public function get($id): TakenExamDTO {
-        $exam = TakenExam::with("ssd")->find($id);
-        return $this->mapTakenExam($exam);
+    public function get($id): ?TakenExam {
+        return TakenExam::with("ssd")->find($id);
     }
 
     public function getFromFront($frontId): Collection {
-        return Front::with("takenExams.ssd")->find($frontId)->takenExams->map(
-                fn($exam) => $this->mapTakenExam($exam));
+        $front = Front::with("takenExams.ssd")->find($frontId);
+        if (!isset($front)){
+            return collect([]);
+        }
+        return $front->takenExams;
     }
     
-    public function mapTakenExam(TakenExam $exam): TakenExamDTO {
-        return new TakenExamDTO($exam->id, $exam->name, $exam->ssd->code, $exam->cfu);
+    public function save(TakenExam $exam): bool {
+        if (isset($exam->id)){
+            throw new \InvalidArgumentException("The id of a new TakenExam must be null");
+        }
+        
+        try {
+            return $exam->save();
+        } catch(QueryException $exc){
+            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
+            return false;
+        }
     }
-
+    
+    public function delete($id): bool {
+        return TakenExam::destroy($id);
+    }
+    
 }
