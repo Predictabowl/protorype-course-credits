@@ -8,10 +8,11 @@ use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
 use App\Models\ExamBlockOptionSsd;
 use App\Models\Front;
-use App\Models\Ssd;
+use App\Models\Role;
 use App\Models\TakenExam;
+use App\Models\RoleUser;
 use App\Models\User;
-use Database\Seeders\Generators\GenerateSSD;
+use App\Support\Seeders\GenerateSSD;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,20 +25,39 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        GenerateSSD::createAll();
+        
+        Role::create([
+            "id" => 1,
+            "name" => "admin"
+        ]);
+        Role::create([
+            "id" => 2,
+            "name" => "supervisor"
+        ]);
         // \App\Models\User::factory(10)->create();
+        User::factory()->create([
+            "id" => 1,
+            "email" => "admin",
+            "password" => Hash::make("admin")
+        ]);
         $user1 = User::factory()->create();
         $user2 = User::factory()->create([
             "email" => "mario@email.com",
             "password" => Hash::make("password")
         ]);
-        GenerateSSD::createAll();
+        
+        RoleUser::create([
+            "user_id" => 1,
+            "role_id" => 1
+        ]);
         
         Course::factory()->create();
 
         $front1 = Front::factory()->create(["user_id" => 1]);
         $front2 = Front::factory()->create(["user_id" => 2]);
-        $user1->front()->associate($front1);
-        $user2->front()->associate($front2);
+        //$user1->front()->associate($front1);
+        //$user2->front()->associate($front2);
         
 
         Exam::factory(20)->create();

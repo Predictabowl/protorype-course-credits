@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Generators;
+namespace App\Support\Seeders;
 
 use App\Models\Ssd;
 /**

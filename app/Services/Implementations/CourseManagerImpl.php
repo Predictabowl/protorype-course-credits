@@ -4,10 +4,10 @@ namespace App\Services\Implementations;
 
 use App\Domain\ExamBlockDTO;
 use App\Services\Interfaces\CourseManager;
-use App\Factories\Interfaces\RepositoriesFactory;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Mappers\Interfaces\ExamBlockMapper;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * Description of CourseManagerImpl
@@ -43,6 +43,14 @@ class CourseManagerImpl implements CourseManager {
     
     private function getBlockRepository(): ExamBlockRepository {
         return app()->make(ExamBlockRepository::class);
+    }
+
+    public function delExamBlock($id) {
+        if (Gate::allows("edit-courses")){
+            ddd("Method not implemented yet: admin");
+        } else {
+            ddd("Method not implemented yet: normal user");
+        }
     }
 
 }

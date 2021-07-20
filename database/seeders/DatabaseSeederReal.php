@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\Ssd;
-use Database\Seeders\Generators\GenerateSSD;
+use App\Support\Seeders\GenerateSSD;
 
 class DatabaseSeederReal extends Seeder
 {
@@ -19,9 +19,23 @@ class DatabaseSeederReal extends Seeder
     {
         User::factory()->create([
             "name" => "admin",
-            "email" => "admin@email.com",
-            "role" => "admin",
+            "email" => "admin",
             "password" => Hash::make("password")
+        ]);
+        
+        Role::create([
+            "id" => 1,
+            "name" => "admin"
+        ]);
+        
+        Role::create([
+            "id" => 2,
+            "name" => "supervisor"
+        ]);
+        
+        RoleUser::create([
+            "user_id" => 1,
+            "role_id" => 1
         ]);
         
         $course = Course::factory()->create([
