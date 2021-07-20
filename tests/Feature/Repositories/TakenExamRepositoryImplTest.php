@@ -105,14 +105,52 @@ class TakenExamRepositoryImplTest extends TestCase {
             "front_id" => $front->id
         ]);
 
-        $this->repository->save($exam);
+        $result = $this->repository->save($exam);
 
+        $this->assertTrue($result);
         $this->assertDatabaseHas("taken_exams", [
             "front_id" => $front->id,
             "ssd_id" => $ssd->id,
             "name" => "test name",
             "cfu" => 6
         ]);
+    }
+    
+    public function test_save_when_id_not_null_should_throw() {
+        $ssd = Ssd::factory()->create();
+        $front = Front::factory()->create([
+            "user_id" => User::factory()->create(),
+            "course_id" => Course::factory()->create()
+        ]);
+        $exam = new TakenExam([
+            "name" => "test name",
+            "ssd_id" => $ssd->id,
+            "cfu" => 6,
+            "front_id" => $front->id
+        ]);
+        $exam->id = 5;
+
+        $this->expectException(\InvalidArgumentException::class);
+        
+        $result = $this->repository->save($exam);
+
+        $this->assertFalse($result);
+        $this->assertDatabaseCount("taken_exams", 0);
+    }
+    
+    public function test_save_failure_due_to_integrity_violation() {
+        $ssd = Ssd::factory()->create();
+        $exam = new TakenExam([
+            "name" => "test name",
+            "ssd_id" => $ssd->id,
+            "cfu" => 6,
+            "front_id" => 2
+        ]);
+
+        $result = $this->repository->save($exam);
+
+        $this->assertFalse($result);
+        $this->assertDatabaseCount("taken_exams", 0);
     }
 
     public function test_delete_success() {
@@ -133,10 +171,25 @@ class TakenExamRepositoryImplTest extends TestCase {
 
         $this->assertDatabaseHas("taken_exams", $taken);
 
-        $this->repository->delete(5);
+        $result = $this->repository->delete(5);
 
+        $this->assertTrue($result);
         $this->assertDatabaseCount("taken_exams", 2);
         $this->assertDatabaseMissing("taken_exams", $taken);
+    }
+    
+    public function test_delete_failure() {
+        $ssd = Ssd::factory()->create();
+        $front = Front::factory()->create([
+            "user_id" => User::factory()->create(),
+            "course_id" => Course::factory()->create()
+        ]);
+        TakenExam::factory(2)->create();
+
+        $result = $this->repository->delete(5);
+
+        $this->assertFalse($result);
+        $this->assertDatabaseCount("taken_exams", 2);
     }
 
 }

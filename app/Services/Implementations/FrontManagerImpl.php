@@ -12,7 +12,8 @@ use App\Services\Interfaces\FrontManager;
 use App\Models\TakenExam;
 use App\Domain\TakenExamDTO;
 use Illuminate\Support\Collection;
-use App\Factories\Interfaces\RepositoriesFactory;
+use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Interfaces\TakenExamRepository;
 use App\Mappers\Interfaces\TakenExamMapper;
 
 /**
@@ -22,32 +23,41 @@ use App\Mappers\Interfaces\TakenExamMapper;
  */
 class FrontManagerImpl implements FrontManager{
     
-    private $repositoriesFactory;
     private $frontId;
     private $mapper;
 
     function __construct($frontId) {
-        $this->repositoriesFactory = app()->make(RepositoriesFactory::class);
         $this->mapper = app()->make(TakenExamMapper::class);
         $this->frontId = $frontId;
     }
 
     public function getTakenExams(): Collection {
-        $exams = $this->repositoriesFactory->getTakenExamRepository()
+        $exams = $this->getExamRepository()
                 ->getFromFront($this->frontId);
         return $exams->map(
                 fn($exam) => $this->mapper->toDTO($exam));
     }
     
     public function saveTakenExam(TakenExamDTO $exam) {
-        $this->repositoriesFactory->getTakenExamRepository()
+        $this->getExamRepository()
                 ->save($this->mapper->toModel($exam, $this->frontId));
     }
 
     public function deleteTakenExam($examId) {
-        $this->repositoriesFactory->getTakenExamRepository()
-                ->delete($examId);
+        $this->getExamRepository()->delete($examId);
     }
 
+    public function setCourse($courseId): bool {
+        $front = $this->getFrontRepository()->updateCourse($this->frontId, $courseId);
+        return isset($front) ? true : false;
+    }
+    
+    private function getExamRepository(): TakenExamRepository{
+        return app()->make(TakenExamRepository::class);
+    }
+    
+    private function getFrontRepository(): FrontRepository{
+        return app()->make(FrontRepository::class);
+    }
 
 }

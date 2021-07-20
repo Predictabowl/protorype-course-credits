@@ -215,4 +215,5 @@ class UserFrontManagerImplTest extends TestCase
         
     }
 
+
 }

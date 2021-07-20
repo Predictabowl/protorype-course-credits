@@ -13,6 +13,8 @@ interface FrontManager {
 
     public function deleteTakenExam($examId);
     
+    public function setCourse($courseId): bool;
+    
     /**
      * Wipe all attached TakenExams from the front
      */

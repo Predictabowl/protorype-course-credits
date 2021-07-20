@@ -25,7 +25,7 @@ class TakenExamMapperImplTest extends TestCase
         $this->mapper = new TakenExamMapperImpl();
     }
     
-    public function test_toDTO(){
+    public function test_to_dto(){
         $ssd = Ssd::factory()->create();
         $model = TakenExam::factory()->make([
             "name" => "test name",
@@ -39,17 +39,6 @@ class TakenExamMapperImplTest extends TestCase
         $dto = $this->mapper->toDTO($model);
         
         $this->assertEquals($exam, $dto);
-    }
-    
-    public function test_toModel_with_no_front() {
-        $ssd = Ssd::factory()->create([
-            "code" => "IUS/07"
-        ]);
-        $dto = new TakenExamDTO(13, "test name", "IUS/07", 5);
-        
-        $result = $this->mapper->toModel($dto,1);
-        
-        $this->assertNull($result);
     }
     
     public function test_toModel_with_no_Ssd() {
@@ -75,10 +64,15 @@ class TakenExamMapperImplTest extends TestCase
         
         $dto = new TakenExamDTO(13, "test name", "IUS/07", 5);
         
-        $result = $this->mapper->toModel($dto,3);
+        $this->mapper->toModel($dto,3)->save();
         
-        $this->assertEquals([null,"test name",5,1],
-                [$result["id"], $result["name"], $result["cfu"], $result["ssd_id"]->id]);
+        $this->assertDatabaseHas("taken_exams", [
+            "id" => 1,
+            "front_id" => 3,
+            "name" => "test name",
+            "cfu" => 5,
+            "ssd_id" => 1
+        ]);
     }
  
 }

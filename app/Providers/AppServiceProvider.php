@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Implementations\FrontRepositoryImpl;
+use App\Repositories\Interfaces\TakenExamRepository;
+use App\Repositories\Implementations\TakenExamRespositoryImpl;
+use App\Repositories\Interfaces\ExamBlockRepository;
+use App\Repositories\Implementations\ExamBlockRepositoryImpl;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Implementations\ExamDistanceByName;
 use App\Services\Interfaces\StudyPlanBuilder;
@@ -35,16 +41,26 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(ExamDistance::class, ExamDistanceByName::class);
-        $this->app->bind(StudyPlanBuilder::class, StudyPlanBuilderImpl::class);
-        $this->app->bind(RepositoriesFactory::class, RepositoriesFactoryImpl::class);
-        $this->app->bind(UserFrontManager::class, UserFrontManagerImpl::class);
+        //---- Factories
         $this->app->bind(FrontInfoManagerFactory::class, FrontInfoManagerFactoryImpl::class);
-        $this->app->bind(TakenExamMapper::class, TakenExamMapperImpl::class);
+        $this->app->bind(RepositoriesFactory::class, RepositoriesFactoryImpl::class);
+        $this->app->bind(StudyPlanBuilderFactory::class, StudyPlanBuilderFactoryImpl::class);
+        
+        //---- Mappers
         $this->app->bind(ExamBlockMapper::class, ExamBlockMapperImpl::class);
         $this->app->bind(ExamOptionMapper::class, ExamOptionMapperImpl::class);
+        $this->app->bind(TakenExamMapper::class, TakenExamMapperImpl::class);
+        
+        //---- Repositories
+        $this->app->bind(ExamBlockRepository::class, ExamBlockRepositoryImpl::class);
+        $this->app->bind(FrontRepository::class, FrontRepositoryImpl::class);
+        $this->app->bind(TakenExamRepository::class, TakenExamRespositoryImpl::class);
+    
+        //---- Services
+        $this->app->bind(ExamDistance::class, ExamDistanceByName::class);
+        $this->app->bind(StudyPlanBuilder::class, StudyPlanBuilderImpl::class);
+        $this->app->bind(UserFrontManager::class, UserFrontManagerImpl::class);
         $this->app->bind(ManagersFactory::class, ManagersFactoryImpl::class);
-        $this->app->bind(StudyPlanBuilderFactory::class, StudyPlanBuilderFactoryImpl::class);
         
     }
 

@@ -11,7 +11,6 @@ namespace Tests\Unit\Services;
 use App\Domain\ExamBlockDTO;
 use App\Domain\ExamOptionDTO;
 use App\Models\ExamBlock;
-use App\Factories\Interfaces\RepositoriesFactory;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Services\Implementations\CourseManagerImpl;
 use App\Mappers\Interfaces\ExamBlockMapper;
@@ -34,14 +33,10 @@ class CourseManagerImplTest extends TestCase{
     protected function setUp():void
     {
         parent::setUp();
-        $factory = $this->createMock(RepositoriesFactory::class);
         $this->blockRepo = $this->createMock(ExamBlockRepository::class);
         $this->mapper = $this->createMock(ExamBlockMapper::class);
         
-        $factory->method("getExamBlockRepository")
-                ->willReturn($this->blockRepo);      
-        
-        app()->instance(RepositoriesFactory::class,$factory);
+        app()->instance(ExamBlockRepository::class, $this->blockRepo);
         app()->instance(ExamBlockMapper::class, $this->mapper);
         $this->manager = new CourseManagerImpl(self::FIXTURE_COURSE_ID);
     }

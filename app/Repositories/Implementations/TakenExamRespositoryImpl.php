@@ -11,6 +11,8 @@ namespace App\Repositories\Implementations;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Models\TakenExam;
 use App\Models\Front;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
 
 /**
@@ -33,9 +35,16 @@ class TakenExamRespositoryImpl implements TakenExamRepository{
     }
     
     public function save(TakenExam $exam): bool {
-        //ddd($exam->attributesToArray());
-        return $exam->save();
-        //return TakenExam::create($exam->attributesToArray());
+        if (isset($exam->id)){
+            throw new \InvalidArgumentException("The id of a new TakenExam must be null");
+        }
+        
+        try {
+            return $exam->save();
+        } catch(QueryException $exc){
+            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
+            return false;
+        }
     }
     
     public function delete($id): bool {

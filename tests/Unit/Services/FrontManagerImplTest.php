@@ -9,9 +9,10 @@
 namespace Tests\Unit\Services;
 
 use App\Models\TakenExam;
+use App\Models\Front;
 use App\Domain\TakenExamDTO;
-use App\Factories\Interfaces\RepositoriesFactory;
 use App\Repositories\Interfaces\TakenExamRepository;
+use App\Repositories\Interfaces\FrontRepository;
 use App\Services\Implementations\FrontManagerImpl;
 use App\Mappers\Interfaces\TakenExamMapper;
 use PHPUnit\Framework\TestCase;
@@ -26,6 +27,7 @@ class FrontManagerImplTest extends TestCase{
     private const FIXTURE_FRONT_ID = 7;    
     
     private $takenRepo;
+    private $frontRepo;
     private $manager;
     private $mapper;
 
@@ -33,15 +35,13 @@ class FrontManagerImplTest extends TestCase{
     protected function setUp():void
     {
         parent::setUp();
-        $factory = $this->createMock(RepositoriesFactory::class);
         $this->takenRepo = $this->createMock(TakenExamRepository::class);
+        $this->frontRepo = $this->createMock(FrontRepository::class);
         $this->mapper = $this->createMock(TakenExamMapper::class);
         
-        $factory->method("getTakenExamRepository")
-                ->willReturn($this->takenRepo);      
-        
-        app()->instance(RepositoriesFactory::class,$factory);
+        app()->instance(TakenExamRepository::class, $this->takenRepo);
         app()->instance(TakenExamMapper::class, $this->mapper);
+        app()->instance(FrontRepository::class, $this->frontRepo);
         $this->manager = new FrontManagerImpl(self::FIXTURE_FRONT_ID);
     }
   
@@ -86,7 +86,31 @@ class FrontManagerImplTest extends TestCase{
                 ->with(1);
         
         $this->manager->deleteTakenExam(1);
-    }  
+    }
+    
+    public function test_setCourse_success() {
+        $courseId = 3;
+        $this->frontRepo->expects($this->once())
+                ->method("updateCourse")
+                ->with(self::FIXTURE_FRONT_ID,$courseId)
+                ->willReturn(new Front());
+        
+        $result = $this->manager->setCourse($courseId);
+        
+        $this->assertTrue($result);
+    }
+    
+    public function test_setCourse_failure() {
+        $courseId = 7;
+        $this->frontRepo->expects($this->once())
+                ->method("updateCourse")
+                ->with(self::FIXTURE_FRONT_ID,$courseId)
+                ->willReturn(null);
+        
+        $result = $this->manager->setCourse($courseId);
+        
+        $this->assertFalse($result);
+    }
     
      
     

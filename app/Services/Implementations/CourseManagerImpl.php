@@ -5,6 +5,7 @@ namespace App\Services\Implementations;
 use App\Domain\ExamBlockDTO;
 use App\Services\Interfaces\CourseManager;
 use App\Factories\Interfaces\RepositoriesFactory;
+use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Mappers\Interfaces\ExamBlockMapper;
 use Illuminate\Support\Collection;
 
@@ -15,18 +16,16 @@ use Illuminate\Support\Collection;
  */
 class CourseManagerImpl implements CourseManager {
     
-    private $repositoriesFactory;
     private $blockMapper;
     private $id;
     
     public function __construct($courseId) {
         $this->id = $courseId;
-        $this->repositoriesFactory = app()->make(RepositoriesFactory::class);
         $this->blockMapper = app()->make(ExamBlockMapper::class);
     }
 
     public function getExamBlocks(): Collection {
-        return $this->repositoriesFactory->getExamBlockRepository()
+        return $this->getBlockRepository()
                 ->getFromFront($this->id)
                 ->map(fn($block) => $this->blockMapper->toDTO($block));
     }
@@ -40,6 +39,10 @@ class CourseManagerImpl implements CourseManager {
             $options = collect([]);
         }
         return $options;
+    }
+    
+    private function getBlockRepository(): ExamBlockRepository {
+        return app()->make(ExamBlockRepository::class);
     }
 
 }
