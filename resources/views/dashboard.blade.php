@@ -18,7 +18,7 @@
                         <a href="{{ route("courseOptions") }}">Lista Esami</a>
                     </p>
                     <p class="hover:underline text-blue-500">
-                        <a href="{{ route("frontIndex") }}">Compila Prospetto</a>
+                        <a href="{{ route("frontPersonal") }}">Compila Prospetto</a>
                     </p>
                     <p class="hover:underline text-blue-500">
                         <a href=" {{ route("studyPlan") }}">Vedi tabella integrazione</a>

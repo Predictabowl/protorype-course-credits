@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
+    const ADMIN = "admin";
+    const SUPERVISOR = "supervisor";
+    
     use HasFactory;
+    
+    protected $guarded = [];
     
     public function users(){
         return $this->belongsToMany(User::class);

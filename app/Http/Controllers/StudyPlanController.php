@@ -8,6 +8,11 @@ use App\Factories\Interfaces\StudyPlanBuilderFactory;
 
 class StudyPlanController extends Controller
 {
+    
+    public function __construct() {
+        $this->middleware(["auth","verified"]);
+    }
+
     public function index(){
         return view("studyplan.showplan",[
             "studyPlan" => $this->getStudyPlanBuilder()->getStudyPlan()

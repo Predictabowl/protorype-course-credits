@@ -12,6 +12,11 @@ use Illuminate\Http\Request;
 class TakenExamController extends Controller
 {
     
+    public function __construct() {
+        $this->middleware(["auth","verified"]);
+    }
+
+    
     public function create() {
         $attributes = request()->validate([
             "name" => ["required", "max:255"],

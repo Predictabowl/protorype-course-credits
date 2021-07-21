@@ -10,42 +10,38 @@ interface UserFrontManager {
 
     
     /**
-     * Create a new front.
+     * Will create a new front.
      * If the front already exist it won't create a new one, but will use
-     * the existing.
-     * If the course is specified it will be associated 
-     * If the course is not found it will fail.
+     * the existing one.
+     * If the course is specified it ill be set in the front if exists.
+     * If the course is not found it will fail and return null.
      * 
      * @param type $courseId
      * @return bool false if it fails
      */
-    public function createFront($courseId = null): ?Front;
+    public function getOrCreateFront($courseId = null): ?Front;
     
-    public function deleteFront(): bool;
-
     public function getFront(): ?Front;
-    
-    /**
-     * Will retrieve the Front and change the course associated with it.
-     * It creates a new Front if doesn't exists.
-     * The difference with createFront is that it cannot create a Front
-     * without a course associated.
-     * 
-     * @param type $courseId
-     * @return bool
-     */
-    //public function setCourse($courseId): bool;
+
+    public function setUserId($id);
     
     /**
      * Return a managing instance to extract info from the Front of the 
      * current user.
-     * Return null if the Front doesn't exists.
+     * If the front doesn't exist will create one without a course.
      * 
      * @param bool $createFront if true will create a Front
-     * @return FrontInfoManager|null
+     * @return FrontManager
      */
     public function getFrontManager(): ?FrontManager;
     
+    /**
+     * It will fail and return null if the front is not associated to
+     * a Course.
+     * Use the FrontManager to set the Course.
+     * 
+     * @return StudyPlanBuilder|null
+     */
     public function getStudyPlanBuilder(): ?StudyPlanBuilder;
 
 }

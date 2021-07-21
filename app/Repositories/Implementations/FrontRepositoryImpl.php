@@ -26,16 +26,16 @@ class FrontRepositoryImpl implements FrontRepository{
         return Front::destroy($id);
     }
 
-    public function save(Front $front): bool {
+    public function save(Front $front): ?Front{
         if (isset($front->id)){
             throw new \InvalidArgumentException("The id of a new Front must be null");
         }
         
         try {
-            return $front->save();
+            return $front->save() ? $front : null;
         } catch(QueryException $exc){
             Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -64,6 +64,10 @@ class FrontRepositoryImpl implements FrontRepository{
             throw new ModelNotFoundException("Could not find User with id: ".$id);
         }
         return $user->front;
+    }
+
+    public function getAll() {
+        return Front::all();
     }
 
 }

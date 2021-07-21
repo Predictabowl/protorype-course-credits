@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Models\Front;
+use App\Models\Role;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -30,5 +32,8 @@ class AuthServiceProvider extends ServiceProvider
         //Gate::before(fn($user, $ability) => $user->isAdmin()); //before will disable following checks
         //Gate::define("edit-courses", fn($user) => $user->isSupervisor() || $user->isAdmin());
         //Gate::after(fn($user) => $user->isAdmin());
+        Gate::define("view-front", fn(User $user, Front $front) => 
+                $user->hasAtLeastOneRole(Role::ADMIN, Role::SUPERVISOR) ||
+                auth()->user()->id === $user->id);
     }
 }

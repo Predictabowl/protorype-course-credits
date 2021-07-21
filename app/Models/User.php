@@ -59,11 +59,11 @@ class User extends Authenticatable implements MustVerifyEmail
     
     
     //---------- Defined Roles
-    // Do not use with multi role guard or policy
+    // 
     
     // And admin can modify everything and change other users roles
     public function isAdmin(): bool{
-        return $this->roles()->get()->contains("name","admin");
+        return $this->roles()->get()->contains("name",Role::ADMIN);
     }
     
     /*
@@ -73,6 +73,25 @@ class User extends Authenticatable implements MustVerifyEmail
      *  - Edit Courses, r-w
      */
     public function isSupervisor(): bool{
-        return $this->roles()->get()->contains("name","supervisor");
+        return $this->roles()->get()->contains("name",Role::SUPERVISOR);
+    }
+    
+    public function isStudent(): bool{
+        return $this->roles()->get()->isEmpty();
+    }
+    
+    
+    /* $roles can be empty, while $roleNames is never empty.
+     * So it makes sense to iterate over $roles to avoid useless cycles.
+     */
+    public function hasAtLeastOneRole(...$roleNames): bool{
+        $roles = $this->roles()->get();
+        $names = collect($roleNames);
+        foreach ($roles as $role) {
+            if ($names->contains($role->name)){
+                return true;
+            }
+        }
+        return false;
     }
 }

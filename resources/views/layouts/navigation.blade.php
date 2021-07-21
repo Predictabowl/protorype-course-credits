@@ -25,7 +25,7 @@
                     </div>
                 @endif
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('frontIndex')" :active="request()->routeIs('frontIndex')">
+                    <x-nav-link href="{{route('frontPersonal')}}" :active="request()->routeIs('front')">
                         Prospetto
                     </x-nav-link>
                 </div>

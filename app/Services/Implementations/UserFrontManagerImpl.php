@@ -3,58 +3,75 @@
 namespace App\Services\Implementations;
 
 use \App\Models\Front;
-use App\Factories\Interfaces\RepositoriesFactory;
+use App\Factories\Interfaces\ManagersFactory;
+use App\Repositories\Interfaces\FrontRepository;
 use \App\Services\Interfaces\UserFrontManager;
-use App\Services\Interfaces\FrontInfoManager;
-use App\Factories\Interfaces\FrontInfoManagerFactory;
+use App\Services\Interfaces\FrontManager;
+use App\Services\Interfaces\StudyPlanBuilder;
+use App\Factories\Interfaces\StudyPlanBuilderFactory;
 
 
 class UserFrontManagerImpl implements UserFrontManager{
 
-    private $user;
-    private $repoFactory;
-    private $infoFactory;
+    private $userId;
 
-    function __construct(RepositoriesFactory $repoFactory,
-            FrontInfoManagerFactory $infoFactory) {
-        $this->repoFactory = $repoFactory;
-        $this->infoFactory = $infoFactory;
-        $this->user = auth()->user();
+    function __construct($userId = null) {
+        if (isset($userId)){
+            $this->userId = $userId;
+        } else {
+            $this->userId = auth()->user()->id;
+        }
     }
 
-    public function createFront($courseId = null): ?Front{
-        $courseRepo = $this->repoFactory->getCourseRepository();
-        $course = $courseRepo->get($courseId);
-        if (!isset($course)){
-            return false;
+    public function getOrCreateFront($courseId = null): ?Front{
+        $frontRepo = $this->getFrontRepository();
+        $front = $frontRepo->getFromUser($this->userId);
+        if (isset($front)){
+            if (isset($courseId) && $front->course_id != $courseId){
+                $front = $frontRepo->updateCourse($front->id, $courseId);
+            }
+            return $front;
         }
-        
-        $frontRepo = $this->repoFactory->getFrontRepository();
         
         $front = new Front([
-            "user_id" => $this->user->id,
+            "user_id" => $this->userId,
             "course_id" => $courseId
-        ]);
+        ]);       
+        
         $front = $frontRepo->save($front);
-        return isset($front) ? true : false;
-    }
-
-    public function deleteFront(): bool {
-        $repo = $this->repoFactory->getFrontRepository();
-        $front = $repo->getFromUser($this->user->id);
-        if (!isset($front)){
-            return false;
-        }
-        return ($repo->delete($front->id) == 0) ? false : true;
+        return isset($front) ? $front : null;
     }
 
     public function getFront(): ?Front {
-        return $this->repoFactory->getFrontRepository()->getFromUser($this->user->id);
+        return $this->getFrontRepository()->getFromUser($this->userId);
     }
 
-    public function getFrontInfoManager(): ?FrontInfoManager {
-        $front = $this->repoFactory->getFrontRepository()->getFromUser($this->user->id);
-        return isset($front) ? $this->infoFactory->getInstance($front->id) : null;
+    public function getFrontManager(): ?FrontManager {
+        $front = $this->getOrCreateFront();
+        if(!isset($front)){
+            return null;
+        }
+        return app()->make(ManagersFactory::class)->getFrontManager($front->id);
     }
+
+    public function getStudyPlanBuilder(): ?StudyPlanBuilder {
+        $front = $this->getOrCreateFront();
+        if (!isset($front) || !isset($front->course_id)){
+            return null;
+        }
+        return app()->make(StudyPlanBuilderFactory::class)
+                ->getStudyPlanBuilder($front->id,$front->course_id);
+    }
+
+    public function setUserId($id) {
+        $this->userId = $id;
+    }
+
+    
+    
+    private function getFrontRepository(): FrontRepository{
+        return app()->make(FrontRepository::class);
+    }
+
 
 }
