@@ -49,25 +49,33 @@
                 <table class="min-w-full rounded-lg">
                     <thead>
                         <tr class="bg-gray-100">
+                            <th>Compatibilità</th>
                             <th>ssd</th>
                             <th>Nome</th>
+                            <th>Esami Riconosciuti</th>
                             <th>CFU</th>
-                            <th>Compatibilità</th>
+                            <th>Integrazione</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($examBlocks as $examBlock)
+                        @foreach($studyPlan->getexamBlocks() as $examBlock)
                         <tr class = "border-t border-black"/>
-                            @foreach($examBlock->getExamOptions() as $examOption)
+                            @foreach($examBlock->getApprovedExams() as $examOption)
                                 <tr class="hover:bg-blue-100">
-                                    <td>{{ $examOption->getSsd() }}</td>
-                                    <td>{{ $examOption->getExamName() }}</td>
-                                    <td class="text-center">{{ $examOption->getCfu() }}</td>
                                     <td>
-                                        @foreach($examOption->getCompatibleOptions() as $option)
+                                        @foreach($examOption->getExamOption()->getCompatibleOptions() as $option)
                                             {{$option}},
                                         @endforeach
                                     </td>
+                                    <td>{{ $examOption->getExamOption()->getSsd() }}</td>
+                                    <td>{{ $examOption->getExamOption()->getExamName() }}</td>
+                                    <td>
+                                        @foreach(($examOption->getTakenExams() as $taken)
+                                            {{$taken->getTakenExam()->getSsd()}}: {{ $taken->getActualCfu()}}/{{$taken->getTakenExam()->getCfu()}}, 
+                                        @endforeach
+                                    </td>
+                                    <td class="text-center">{{ $examOption->gtExamOption()->getCfu() }}</td>
+                                    <td>{{ $exam->getIntegrationValue()}}</td>
                                 </tr>
                             @endforeach
                         @endforeach

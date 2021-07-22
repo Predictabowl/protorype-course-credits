@@ -96,7 +96,7 @@ class StudyPlanBuilderImplTest extends TestCase
                 ->method("calculateDistance")->willReturn(1);
         
         $studyPlan = $this->planBuilder->getStudyPlan();
-        
+
         $this->assertEquals(3, $studyPlan->getExam(1)->getIntegrationValue());
         $this->assertEquals(6, $studyPlan->getExam(2)->getIntegrationValue());
         $this->assertEquals(7, $studyPlan->getExam(3)->getIntegrationValue());

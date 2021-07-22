@@ -8,6 +8,8 @@
 
 namespace App\Domain;
 
+use App\Domain\ApprovedExam;
+
 /**
  * Description of ExamBlockDTO
  *
@@ -16,12 +18,12 @@ namespace App\Domain;
 class ExamBlockDTO{
     
     private $id;
-    private $examOptions;
+    private $approvedExams;
     private $numExams;
     
     public function __construct($id, int $numExams) {
         $this->id = $id;
-        $this->examOptions = [];
+        $this->approvedExams = collect([]);
         $this->numExams = $numExams;
     }
     
@@ -30,12 +32,12 @@ class ExamBlockDTO{
     }
 
     public function addOption(ExamOptionDTO $option) {
-        $this->examOptions[$option->getId()] = $option;
+        $this->approvedExams[$option->getId()] = new ApprovedExam($option);
         return $this;
     }
     
     public function removeOption(ExamOptionDTO $option) {
-        unset($this->examOptions[$option->getId()]);
+        unset($this->approvedExams[$option->getId()]);
         return $this;
     }
 
@@ -44,10 +46,24 @@ class ExamBlockDTO{
     }
 
     public function getExamOptions() {
-        return $this->examOptions;
+        return $this->approvedExams->map(fn(ApprovedExam $option) =>
+                $option->getExamOption());
     }
     
     public function getExamOption($id) {
-        return $this->examOptions[$id];
+        return $this->approvedExams[$id]->getExamOption();
+    }
+    
+    public function setApprovedExam(ApprovedExam $exam) {
+        $this->approvedExams[$exam->getExamOption()->getId()] = $exam;
+        return $this;
+    }
+    
+    public function getApprovedExams() {
+        return $this->approvedExams;
+    }
+    
+    public function getApprovedExam($id){
+        return $this->approvedExams->get($id);
     }
 }
