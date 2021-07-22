@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Seeders\GenerateSSD;
+use App\Models\User;
+use App\Models\Front;
 use App\Models\Ssd;
 use Tests\TestCase;
 
@@ -17,7 +19,14 @@ class LearningTest extends TestCase{
     use RefreshDatabase;
     
     public function test_example() {
-        dd(route("frontIndex"));
+//        $authUser = new User();
+//        $authUser->id = 1;
+//        $this->actingAs($authUser);
+        $front = Front::factory()->create([
+            "user_id" => User::factory()->create(),
+            "course_id" => null
+        ]);
+        dd(route("frontView",[$front]));
     }
     
     /*

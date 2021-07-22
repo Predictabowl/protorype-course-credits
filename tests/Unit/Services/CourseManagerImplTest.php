@@ -48,7 +48,7 @@ class CourseManagerImplTest extends TestCase{
             new ExamBlock(["id" => 2])]);
         $blocks = collect([new ExamBlockDTO(1, 2), new ExamBlockDTO(1, 1)]);
         $this->blockRepo->expects($this->once())
-                ->method("getFromFront")
+                ->method("getFilteredByCourse")
                 ->with(self::FIXTURE_COURSE_ID)
                 ->willReturn($models);
         $this->mapper->expects($this->exactly(2))
@@ -62,7 +62,8 @@ class CourseManagerImplTest extends TestCase{
     }
     
     public function test_getExamBlocks_when_course_not_set() {
-        $this->blockRepo->expects($this->once())->method("getFromFront")
+        $this->blockRepo->expects($this->once())
+                ->method("getFilteredByCourse")
                 ->willReturn(collect([]));
         
         $sut = $this->manager->getExamBlocks();
@@ -82,7 +83,7 @@ class CourseManagerImplTest extends TestCase{
             new ExamBlock(["name" => "name"])]);
         
         $this->blockRepo->expects($this->once())
-                ->method("getFromFront")
+                ->method("getFilteredByCourse")
                 ->with(self::FIXTURE_COURSE_ID)
                 ->willReturn($models);
         $this->mapper->expects($this->exactly(2))

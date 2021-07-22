@@ -60,7 +60,6 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
                 ->map(fn ($taken)=> new LinkedTakenExam($taken));
         $this->examOptions = $this->courseManager->getExamOptions();
         $this->studyPlan = null;
-        
         return $this;
     }
     

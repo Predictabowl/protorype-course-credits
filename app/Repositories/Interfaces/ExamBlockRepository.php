@@ -12,5 +12,5 @@ use Illuminate\Support\Collection;
 interface ExamBlockRepository {
     
     public function get($id): ?ExamBlock;
-    public function getFromFront($frontId): Collection;
+    public function getFilteredByCourse($courseId): Collection;
 }

@@ -5,26 +5,51 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Services\Interfaces\UserFrontManager;
-use App\Services\Interfaces\FrontManager;
+use App\Repositories\Interfaces\CourseRepository;
 use App\Factories\Interfaces\ManagersFactory;
-use App\Services\Implementations\FrontManagerImpl;
+use App\Models\Front;
+use Illuminate\Support\Facades\Gate;
 
 class FrontController extends Controller
 {
-    public function index()
-    {   
-        return view("front.index",[
-            "exams" => $this->getFrontManager()->getTakenExams()
-        ]);
-    }
     
-    public function getOptions() {
-        return view("front.showoptions",[
-            "options" => $this->getFrontManager()->getExamOptions()
-        ]);
+    public function __construct() {
         
+        $this->middleware(["auth","verified"]);
+        // This auto biding policy makes viewAny fails... this is a Laravel bug
+        // It's better to use the $this->authorize() method
+        //$this->middleware("can:view,front");
+        //$this->middleware("can:viewAny,App/Front");
     }
     
+    public function index(){
+        $this->authorize("viewAny", Front::class);
+        return "Hello World!";
+    }
+    
+    public function show(Front $front)
+    {   
+        $this->authorize("view",$front);
+        $manager = app()->make(ManagersFactory::class)->getFrontManager($front->id);
+        $courseRepo = app()->make(CourseRepository::class);
+        return view("front.show",[
+            "exams" => $manager->getTakenExams(),
+            "front" => $manager->getFront(),
+            "courses" => $courseRepo->getAll()
+        ]);
+    }
+    
+    public function put(Front $front)
+    {   
+        $this->authorize("update",$front);
+        //no validation to be done because is not user input
+        $manager = app()->make(ManagersFactory::class)->getFrontManager($front->id);
+        $manager->setCourse(request()->get("courseId"));
+        return back();
+    }
+    
+
+       
 //    public function create() {
 //        $attributes = request()->validate([
 //            "name" => ["required", "max:255"],
@@ -43,11 +68,4 @@ class FrontController extends Controller
 //        return back();
 //    }
     
-    
-    private function getFrontManager(): FrontManager {
-        //$userManager = app()->make(UserFrontManager::class);
-        //return $userManager->getFrontManager();
-        $factory = app()->make(ManagersFactory::class);
-        return $factory->getFrontManager(auth()->user()->front->id);
-    }
 }

@@ -19,4 +19,6 @@ interface CourseManager {
     public function getExamBlocks(): Collection;
 
     public function getExamOptions(): Collection;
+    
+    public function delExamBlock($id);
 }

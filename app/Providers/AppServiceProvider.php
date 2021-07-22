@@ -8,6 +8,8 @@ use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Implementations\TakenExamRespositoryImpl;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Implementations\ExamBlockRepositoryImpl;
+use App\Repositories\Interfaces\CourseRepository;
+use App\Repositories\Implementations\CourseRepositoryImpl;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Implementations\ExamDistanceByName;
 use App\Services\Interfaces\StudyPlanBuilder;
@@ -55,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ExamBlockRepository::class, ExamBlockRepositoryImpl::class);
         $this->app->bind(FrontRepository::class, FrontRepositoryImpl::class);
         $this->app->bind(TakenExamRepository::class, TakenExamRespositoryImpl::class);
+        $this->app->bind(CourseRepository::class, CourseRepositoryImpl::class);
     
         //---- Services
         $this->app->bind(ExamDistance::class, ExamDistanceByName::class);

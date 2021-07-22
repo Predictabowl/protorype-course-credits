@@ -81,9 +81,26 @@ class FrontManagerImplTest extends TestCase{
     }
 
     public function test_delete_takenExam() {
+        $exam = new TakenExam(["front_id" => self::FIXTURE_FRONT_ID]);
+        $this->takenRepo->expects($this->once())
+                ->method("get")
+                ->with(1)
+                ->willReturn($exam);
         $this->takenRepo->expects($this->once())
                 ->method("delete")
                 ->with(1);
+        
+        $this->manager->deleteTakenExam(1);
+    }
+    
+    public function test_delete_takenExam_of_a_differet_front_should_not_work() {
+        $exam = new TakenExam(["front_id" => self::FIXTURE_FRONT_ID+1]);
+        $this->takenRepo->expects($this->once())
+                ->method("get")
+                ->with(1)
+                ->willReturn($exam);
+        $this->takenRepo->expects($this->never())
+                ->method("delete");
         
         $this->manager->deleteTakenExam(1);
     }

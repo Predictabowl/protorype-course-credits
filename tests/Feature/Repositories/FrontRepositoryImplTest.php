@@ -38,7 +38,8 @@ class FrontRepositoryImplTest extends TestCase
         
         $result = $this->repository->save($front);
         
-        $this->assertTrue($result);
+        $this->assertInstanceOf(Front::class, $result);
+        $this->assertEquals(1, $result->id);
         
         $this->assertDatabaseHas("fronts", [
             "id" => 1,
@@ -70,7 +71,7 @@ class FrontRepositoryImplTest extends TestCase
         
         $result = $this->repository->save($new);
         
-        $this->assertFalse($result);
+        $this->assertNull($result);
         $this->assertDatabaseCount("fronts", 0);
     }
 
@@ -89,7 +90,7 @@ class FrontRepositoryImplTest extends TestCase
         
         $result = $this->repository->save($new);
         
-        $this->assertFalse($result);
+        $this->assertNull($result);
         
         $this->assertDatabaseCount("fronts", 1);
         $this->assertDatabaseMissing("fronts", [

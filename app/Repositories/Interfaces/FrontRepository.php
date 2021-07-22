@@ -20,6 +20,8 @@ interface FrontRepository {
     public function get($id): ?Front;
     
     public function getFromUser($id): ?Front;
+    
+    public function getAll();
 
     /**
      * Create a new Front if not present.
@@ -31,7 +33,7 @@ interface FrontRepository {
      * @param type $userId
      * @return Front|null the saved Front, null if can't be saved
      */
-    public function save(Front $front): bool;
+    public function save(Front $front): ?Front;
     
     /**
      * Update the course of an existing front.

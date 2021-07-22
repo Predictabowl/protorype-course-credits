@@ -10,14 +10,15 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     You're logged in!
+                    <p>
+                        Amministratore: {{ auth()->user()->isAdmin()? "true" : "false" }} <br>
+                        Supervisore: {{auth()->user()->isSupervisor()? "true" : "false"}}
+                    </p>
                     <p class="hover:underline text-blue-500">
                         <a href="{{ route("courseOptions") }}">Lista Esami</a>
                     </p>
                     <p class="hover:underline text-blue-500">
-                        <a href="{{ route("frontIndex") }}">Compila Prospetto</a>
-                    </p>
-                    <p class="hover:underline text-blue-500">
-                        <a href=" {{ route("studyPlan") }}">Vedi tabella integrazione</a>
+                        <a href="{{ route("frontPersonal") }}">Compila Prospetto</a>
                     </p>
                 </div>
             </div>

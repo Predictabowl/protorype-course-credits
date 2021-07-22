@@ -16,9 +16,17 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
+                {{-- @if(Gate::allows("edit-courses")) --}}
+                @if(auth()->user()->isAdmin())
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            Amministratore
+                        </x-nav-link>
+                    </div>
+                @endif
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('frontIndex')" :active="request()->routeIs('frontIndex')">
-                        {{ __('Prospetto') }}
+                    <x-nav-link href="{{route('frontPersonal')}}" :active="request()->routeIs('front')">
+                        Prospetto
                     </x-nav-link>
                 </div>
             </div>

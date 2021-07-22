@@ -58,63 +58,37 @@ class ExamBlockRepositoryImplTest extends TestCase
         $this->assertEquals($block->attributesToArray(), $sut->attributesToArray());
     }
     
-    public function test_getFromFront_when_front_not_present() {
+    public function test_getFilteredByCourse_when_course_not_present() {
         $this->expectException(ModelNotFoundException::class);
         
-        $this->repository->getFromFront(3);
-    }
-
-    public function test_getFromFront_when_front_is_empty() {
-        Front::factory()->create([
-           "course_id" => Course::factory()->create(),
-           "user_id" => User::factory()->create()
-        ]);
-        
-        $sut = $this->repository->getFromFront(1);
-        
-        $this->assertEmpty($sut);
-    }
-    
-    public function test_getFromFront_when_course_is_not_set() {
-        Front::factory()->create([
-            "course_id" => null,
-           "user_id" => User::factory()->create()
-        ]);
-        
-        $result = $this->repository->getFromFront(1);
-        
-        $this->assertEmpty($result);
+        $this->repository->getFilteredByCourse(3);
     }
 
 
-    public function test_getFromFront_without_options(){
+    public function test_getFilteredByCrouse_without_options(){
         $course = Course::factory()->create();
-        User::factory()->create();
-        $front = Front::factory()->create([
-            "course_id" => $course
-        ]);
         
         ExamBlock::factory(3)->create([
             "course_id" => $course
         ]);
         
-        $result = $this->repository->getFromFront($front->id);
+        $result = $this->repository->getFilteredByCourse($course->id);
         
         $this->assertCount(3,$result);
         $this->assertContainsOnlyInstancesOf(ExamBlock::class, $result);
         // this test was cut short to save time
     }
     
-    public function test_getFromFront_with_options(){
+    public function test_getFilteredByCourse_with_options(){
         $course = Course::factory()->create();
-        User::factory()->create();
-        $front = Front::factory()->create([
-            "course_id" => $course
-        ]);
         Ssd::factory(4)->create();
         
         $blocks = ExamBlock::factory(3)->create([
             "course_id" => $course
+        ]);
+        
+        ExamBlock::factory(3)->create([
+            "course_id" => Course::factory()->create()
         ]);
         
         ExamBlockOption::factory(3)->create([
@@ -132,14 +106,17 @@ class ExamBlockRepositoryImplTest extends TestCase
             "exam_block_id" => $blocks[2]
         ]);
         
-        $result = $this->repository->getFromFront($front->id);
+        $result = $this->repository->getFilteredByCourse($course->id);
         
         $this->assertCount(3,$result);
         $this->assertContainsOnlyInstancesOf(ExamBlock::class, $result);
-        //$this->assertCount(2,$result[1]->getExamOptions());
-        //$this->assertCount(1,$result[2]->getExamOptions());
-        
-        //This test was cut short as well
+        $this->assertEquals(ExamBlock::find(1)->attributesToArray(),
+                $result[0]->attributesToArray());
+        $this->assertEquals(ExamBlock::find(2)->attributesToArray(),
+                $result[1]->attributesToArray());
+        $this->assertEquals(ExamBlock::find(3)->attributesToArray(),
+                $result[2]->attributesToArray());
+        // incomplete test
     }
 
 }
