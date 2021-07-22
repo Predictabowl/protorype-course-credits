@@ -20,9 +20,6 @@
                     <p class="hover:underline text-blue-500">
                         <a href="{{ route("frontPersonal") }}">Compila Prospetto</a>
                     </p>
-                    <p class="hover:underline text-blue-500">
-                        <a href=" {{ route("studyPlan") }}">Vedi tabella integrazione</a>
-                    </p>
                 </div>
             </div>
         </div>

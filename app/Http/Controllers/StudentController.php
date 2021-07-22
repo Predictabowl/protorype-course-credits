@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+//use App\Repositories\Interfaces\CourseRepository;
 use App\Services\Interfaces\UserFrontManager;
 
 class StudentController extends Controller
@@ -11,16 +13,18 @@ class StudentController extends Controller
         $this->middleware(["auth","verified"]);
     }
     
-    public function show()
+    public function showFront()
     {   
-        $manager = $this->getUserFrontManager();
-            return view("front.show",[
-                "exams" => $manager->getFrontManager()->getTakenExams()
-            ]);
+        $frontManager = app()->make(UserFrontManager::class)->getFrontManager();
+        return redirect()->route("frontView", [$frontManager->getFront()]);
 
     }
     
-    private function getUserFrontManager(): UserFrontManager {
-        return app()->make(UserFrontManager::class);
-    }
+//    private function getStudyPlanBuilder(): StudyPlanBuilder{
+//        $factory = app()->make(StudyPlanBuilderFactory::class);
+//        //$builder = app()->make(StudyPlanBuilder::class);
+//        $front = auth()->user()->front;
+//        $builder = $factory->getStudyPlanBuilder($front->id, $front->course->id);
+//        return $builder;
+//    }
 }

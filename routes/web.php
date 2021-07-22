@@ -30,6 +30,12 @@ Route::get('/dashboard', function () {
 })->middleware(['auth',"verified"])->name('dashboard');
 
 
+Route::get("/testpage",function(){
+        $course = Course::with("examBlocks.examBlockOptions.exam.ssd",
+                "examBlocks.examBlockOptions.ssds")->find(1);
+        return view("testpage");
+    }); //only for tests
+
 require __DIR__.'/auth.php';
 
 //------------------
@@ -44,7 +50,7 @@ Route::get("/front",[FrontController::class,"index"])->name("frontIndex");
 
 Route::get("/front/{front}",[FrontController::class,"show"])->name("frontView");
 
-Route::get("/student/front",[StudentController::class,"show"])->name("frontPersonal");
+Route::put("/front/{front}",[FrontController::class,"put"]); //change course for the post
 
 Route::get("/front/options",[FrontController::class,"getOptions"]) //test round
         ->name("courseOptions");
@@ -62,4 +68,8 @@ Route::get("/tests", function(){
     return $result;
 });
 
-Route::get("/studyplan",[StudyPlanController::class,"index"])->name("studyPlan");
+Route::get("/studyplan/{front}",[StudyPlanController::class,"show"])->name("studyPlan");
+
+Route::get("/student/front",[StudentController::class,"showFront"])->name("frontPersonal");
+
+Route::get("/student/studyplan",[StudentController::class,"showStudyPlan"])->name("studyPlanPersonal");

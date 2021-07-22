@@ -299,5 +299,4 @@ class UserFrontManagerImplTest extends TestCase
         $this->assertNull($result);
     }
 
-
 }

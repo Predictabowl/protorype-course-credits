@@ -8,8 +8,9 @@
 
 namespace App\Services\Implementations;
 
+use App\Models\Course;
+use App\Models\Front;
 use App\Services\Interfaces\FrontManager;
-use App\Models\TakenExam;
 use App\Domain\TakenExamDTO;
 use Illuminate\Support\Collection;
 use App\Repositories\Interfaces\FrontRepository;
@@ -44,7 +45,11 @@ class FrontManagerImpl implements FrontManager{
     }
 
     public function deleteTakenExam($examId) {
-        $this->getExamRepository()->delete($examId);
+        $repo = $this->getExamRepository();
+        $takenExam = $repo->get($examId);
+        if ($takenExam->front_id === $this->frontId){ //extra check, not strictly needed
+                $repo->delete($examId);
+        }
     }
 
     public function setCourse($courseId): bool {
@@ -58,6 +63,10 @@ class FrontManagerImpl implements FrontManager{
     
     private function getFrontRepository(): FrontRepository{
         return app()->make(FrontRepository::class);
+    }
+
+    public function getFront(): Front {
+        return $this->getFrontRepository()->get($this->frontId);
     }
 
 }

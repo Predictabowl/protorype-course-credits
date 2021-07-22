@@ -72,7 +72,7 @@ class FrontPolicy
      */
     public function update(User $user, Front $front)
     {
-        //
+        return ($user->id === $front->user_id);
     }
 
     /**

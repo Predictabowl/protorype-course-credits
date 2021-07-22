@@ -6,6 +6,7 @@ use \App\Models\Front;
 use App\Factories\Interfaces\ManagersFactory;
 use App\Repositories\Interfaces\FrontRepository;
 use \App\Services\Interfaces\UserFrontManager;
+use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
@@ -45,7 +46,7 @@ class UserFrontManagerImpl implements UserFrontManager{
     public function getFront(): ?Front {
         return $this->getFrontRepository()->getFromUser($this->userId);
     }
-
+    
     public function getFrontManager(): ?FrontManager {
         $front = $this->getOrCreateFront();
         if(!isset($front)){
@@ -63,8 +64,9 @@ class UserFrontManagerImpl implements UserFrontManager{
                 ->getStudyPlanBuilder($front->id,$front->course_id);
     }
 
-    public function setUserId($id) {
+    public function setUserId($id): UserFrontManager {
         $this->userId = $id;
+        return $this;
     }
 
     
@@ -72,6 +74,5 @@ class UserFrontManagerImpl implements UserFrontManager{
     private function getFrontRepository(): FrontRepository{
         return app()->make(FrontRepository::class);
     }
-
 
 }

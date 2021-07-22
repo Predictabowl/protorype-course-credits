@@ -26,7 +26,7 @@ class CourseManagerImpl implements CourseManager {
 
     public function getExamBlocks(): Collection {
         return $this->getBlockRepository()
-                ->getFromFront($this->id)
+                ->getFilteredByCourse($this->id)
                 ->map(fn($block) => $this->blockMapper->toDTO($block));
     }
 
@@ -40,10 +40,6 @@ class CourseManagerImpl implements CourseManager {
         }
         return $options;
     }
-    
-    private function getBlockRepository(): ExamBlockRepository {
-        return app()->make(ExamBlockRepository::class);
-    }
 
     public function delExamBlock($id) {
         if (Gate::allows("edit-courses")){
@@ -53,4 +49,8 @@ class CourseManagerImpl implements CourseManager {
         }
     }
 
+    
+    private function getBlockRepository(): ExamBlockRepository {
+        return app()->make(ExamBlockRepository::class);
+    }
 }

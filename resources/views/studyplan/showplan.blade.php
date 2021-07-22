@@ -37,8 +37,39 @@
                                 @endforeach
                             </td>
                             <td>{{ $exam->getIntegrationValue()}}</td>
-
                         </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </x-panel>
+        <x-panel>
+            <h1>Corso</h1>
+            <div class="place-content-center">
+                <table class="min-w-full rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th>ssd</th>
+                            <th>Nome</th>
+                            <th>CFU</th>
+                            <th>Compatibilità</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($examBlocks as $examBlock)
+                        <tr class = "border-t border-black"/>
+                            @foreach($examBlock->getExamOptions() as $examOption)
+                                <tr class="hover:bg-blue-100">
+                                    <td>{{ $examOption->getSsd() }}</td>
+                                    <td>{{ $examOption->getExamName() }}</td>
+                                    <td class="text-center">{{ $examOption->getCfu() }}</td>
+                                    <td>
+                                        @foreach($examOption->getCompatibleOptions() as $option)
+                                            {{$option}},
+                                        @endforeach
+                                    </td>
+                                </tr>
+                            @endforeach
                         @endforeach
                     </tbody>
                 </table>

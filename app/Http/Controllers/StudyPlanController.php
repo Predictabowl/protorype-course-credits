@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Interfaces\StudyPlanBuilder;
+use App\Services\Interfaces\UserFrontManager;
+use App\Factories\Interfaces\ManagersFactory;
+use App\Models\Front;
 use Illuminate\Http\Request;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 
@@ -13,17 +15,23 @@ class StudyPlanController extends Controller
         $this->middleware(["auth","verified"]);
     }
 
-    public function index(){
+    public function show(Front $front){
+        $builder = app()->make(UserFrontManager::class)
+                ->setUserId($front->user_id)
+                ->getStudyPlanBuilder();
+        // missing the check on course, the builder will be null if the course is not set
         return view("studyplan.showplan",[
-            "studyPlan" => $this->getStudyPlanBuilder()->getStudyPlan()
+            "studyPlan" => $builder->getStudyPlan(),
+            "examBlocks" => $this->getExamBlocks($front)
         ]);
     }
     
-    private function getStudyPlanBuilder(): StudyPlanBuilder{
-        $factory = app()->make(StudyPlanBuilderFactory::class);
-        //$builder = app()->make(StudyPlanBuilder::class);
-        $front = auth()->user()->front;
-        $builder = $factory->getStudyPlanBuilder($front->id, $front->course->id);
-        return $builder;
+    private function getExamBlocks(Front $front){
+        if (!($front->course_id)){
+            return null;
+        }
+        return app()->make(ManagersFactory::class)
+                ->getCourseManager($front->course_id)
+                ->getExamBlocks();
     }
 }

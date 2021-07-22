@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\CourseRepository;
 use App\Models\Course;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
 
 /**
  * Description of CourseRepositoryImpl
@@ -39,6 +40,10 @@ class CourseRepositoryImpl implements CourseRepository {
             Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
             return false;
         }
+    }
+
+    public function getAll(): Collection {
+        return Course::all();
     }
 
 }

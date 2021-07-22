@@ -2,11 +2,8 @@
 
 namespace App\Repositories\Implementations;
 
-use App\Domain\ExamBlockDTO;
-use App\Domain\ExamOptionDTO;
-use App\Models\ExamBlockOption;
 use App\Models\ExamBlock;
-use App\Models\Front;
+use App\Models\Course;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -18,17 +15,17 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ExamBlockRepositoryImpl implements ExamBlockRepository{
     
     public function get($id): ?ExamBlock {
-        return ExamBlock::with("examBlockOptions.exam.ssd")->find($id);
+        return ExamBlock::with("examBlockOptions.exam.ssd",
+                "examBlockOptions.ssds")->find($id);
     }
 
-    public function getFromFront($frontId): Collection {
-        $front = Front::with("course.examBlocks.examBlockOptions.exam.ssd")->find($frontId);
-        if (!isset($front)){
-            throw new ModelNotFoundException("Could not find Front with id: ".$frontId);
+    public function getFilteredByCourse($courseId): Collection {
+        $course = Course::with("examBlocks.examBlockOptions.exam.ssd",
+                "examBlocks.examBlockOptions.ssds")->find($courseId);
+        if (!isset($course)){
+            throw new ModelNotFoundException("Could not find Course with id: ".$courseId);
         }
-        if (!isset($front->course)){
-            return collect([]);
-        }
-        return $front->course->examBlocks;
+        return $course->examBlocks;
     }
+
 }

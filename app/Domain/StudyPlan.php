@@ -16,8 +16,9 @@ class StudyPlan {
 
     public function addExamLink(ExamOptionDTO $option, LinkedTakenExam $taken): LinkedTakenExam {
         $id = $option->getId();
-        $appExam = (isset($this->approvedExams[$id])) ?
-                $this->approvedExams[$id] : new ApprovedExam($option);
+        $appExam = (isset($this->approvedExams[$id]))
+                ? $this->approvedExams[$id]
+                : new ApprovedExam($option);
         $linkInserted = $appExam->addTakenExam($taken);
         $this->approvedExams[$id] = $appExam;
         return $linkInserted;

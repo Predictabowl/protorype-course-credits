@@ -55,7 +55,7 @@ class FrontRepositoryImpl implements FrontRepository{
     }
 
     public function get($id): ?Front {
-        return Front::find($id);
+        return Front::with("course")->find($id);
     }
 
     public function getFromUser($id): ?Front {
