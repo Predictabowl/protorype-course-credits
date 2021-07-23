@@ -51,6 +51,37 @@ class ExamBlockDTO{
         return $this->approvedExams[$id];
     }
     
+    public function getIntegrationValue(): int{
+        
+        return $this->getCfu() - 
+               $this->approvedExams->map(fn(ExamOptionDTO $exam) => 
+                    $exam->getTakenExams()->map(fn(TakenExamDTO $taken)=> 
+                        $taken->getActualCfu()
+                    )
+                )->flatten()->sum();
+        }
+    
+    // Is supposed that every exam in the block have the same cfu value
+    public function getCfu(): int {
+        $exam = $this->approvedExams->first();
+        if (!isset($exam)){
+            return 0;
+        }
+        return $exam->getCfu() * $this->numExams;
+    }
+    
+    /**
+     * Return the number of exams that can actually be used,
+     * which is the maximum number of options minus the ones already taken,
+     * even if the taken options are not completely integrated
+     */
+    public function getNumSlotsAvailable(): int{
+        return $this->getNumExams() - 
+                $this->approvedExams->map(fn(ExamOptionDTO $exam) =>
+                        $exam->getTakenExams()->isEmpty() ? 0 : 1)
+                ->sum();
+    }
+    
 //    public function setApprovedExam(ExamOptionDTO $exam) {
 //        $this->approvedExams[$exam->getId()] = $exam;
 //        return $this;

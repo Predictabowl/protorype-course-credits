@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Services\Interfaces\UserFrontManager;
+use App\Services\Interfaces\FrontManager;
 use App\Repositories\Interfaces\CourseRepository;
-use App\Factories\Interfaces\ManagersFactory;
+use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Front;
 use Illuminate\Support\Facades\Gate;
 
@@ -30,7 +31,7 @@ class FrontController extends Controller
     public function show(Front $front)
     {   
         $this->authorize("view",$front);
-        $manager = app()->make(ManagersFactory::class)->getFrontManager($front->id);
+        $manager = $this->makeFrontManager($front->id);
         $courseRepo = app()->make(CourseRepository::class);
         return view("front.show",[
             "exams" => $manager->getTakenExams(),
@@ -43,9 +44,13 @@ class FrontController extends Controller
     {   
         $this->authorize("update",$front);
         //no validation to be done because is not user input
-        $manager = app()->make(ManagersFactory::class)->getFrontManager($front->id);
+        $manager = $this->makeFrontManager($front->id);
         $manager->setCourse(request()->get("courseId"));
         return back();
+    }
+    
+    private function makeFrontManager($id): FrontManager{
+        return app()->make(FrontManagerFactory::class)->getFrontManager($id);
     }
     
 

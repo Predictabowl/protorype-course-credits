@@ -35,7 +35,7 @@ class ExamOptionDTO implements ExamDTO{
         $this->ssd = $ssd;
         $this->compatibleOptions = collect([]);
         $block->setOption($this);
-        $this->linkedTakenExams = [];
+        $this->linkedTakenExams = collect([]);
         $this->calculateIntegrationValue();
     }
     
@@ -74,7 +74,7 @@ class ExamOptionDTO implements ExamDTO{
         /**
      * @return mixed
      */
-    public function getTakenExams()
+    public function getTakenExams(): Collection
     {
         return $this->linkedTakenExams;
     }
@@ -112,6 +112,12 @@ class ExamOptionDTO implements ExamDTO{
         if (($this->getIntegrationValue() < 1) || ($exam->getActualCfu() < 1)){
             return false;
         }
+        
+        if ($this->linkedTakenExams->isEmpty() && 
+                $this->block->getNumSlotsAvailable() < 1){
+            return false;
+        }
+        
         return true;
     }
 

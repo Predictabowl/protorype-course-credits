@@ -6,7 +6,6 @@ use App\Http\Controllers\FrontController;
 use App\Http\Controllers\StudentController;
 use App\Models\Course;
 use App\Http\Controllers\StudyPlanController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 

@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Seeders\GenerateSSD;
+use App\Support\Seeders\GenerateSSD;
 use App\Models\User;
 use App\Models\Front;
 use App\Domain\TakenExamDTO;
@@ -20,15 +20,13 @@ class LearningTest extends TestCase{
     use RefreshDatabase;
     
     public function test_example() {
-//        $authUser = new User();
-//        $authUser->id = 1;
-//        $this->actingAs($authUser);
-        $obj = new TakenExamDTO(1, "test", "SSD1", 8);
-        $newObj = $obj->split(4);
+        $ssd = "INF/01";
         
-        $this->assertNotSame($obj, $newObj);
-        $this->assertEquals($obj,$newObj);
+        $id = GenerateSSD::getSSDId($ssd);
+        
+        $this->assertEquals(10, $id);
     }
+   
     
     /*
     public function test_generateSSD() {

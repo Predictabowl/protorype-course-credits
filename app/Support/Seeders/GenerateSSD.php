@@ -27,7 +27,11 @@ class GenerateSSD {
     
     public static function createAll(){
     
-        GenerateSSD::arrayCreate([
+        GenerateSSD::arrayCreate(self::getGeneratorArray());
+    }
+    
+    public static function getGeneratorArray(){
+        return [
             "MAT" => 9,
             "INF" => 1,
             "FIS" => 8,
@@ -56,11 +60,22 @@ class GenerateSSD {
             "SECS-P" => 13,
             "SECS-S" => 6,
             "SPS" => 14
-        ]);
+        ];
     }
     
     public static function truncateAndCreateAll() {
         Ssd::truncate();
         GenerateSSD::createAll();
+    }
+    
+    public static function getSSDId(string $ssd): int{
+        $array = self::getGeneratorArray();
+        $i = 0;
+        foreach ($array as $key => $value) {
+            if (str_starts_with($ssd, $key)){
+                return $i + intval(substr($ssd, strlen($key)+1)); //it also counts the slash
+            }
+            $i += $value;
+        }
     }
 }

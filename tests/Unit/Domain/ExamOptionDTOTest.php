@@ -52,7 +52,24 @@ class ExamOptionDTOTest extends TestCase
         $takenExam = $option->addTakenExam($this->createTakenExam(12,"name",0));
 
         $this->assertEquals(12,$option->getIntegrationValue());
-        $this->assertCount(0,$option->getTakenExams());
+        $this->assertEmpty($option->getTakenExams());
+    }
+    
+    public function test_addTakenExam_is_not_added_if_block_is_full(){
+        $block = new ExamBlockDTO(1,2);
+        $option1 = new ExamOptionDTO(1, "name 1", $block, 12, "ssd1");
+        $option2 = new ExamOptionDTO(2, "name 2", $block, 12, "ssd2");
+        $option3 = new ExamOptionDTO(3, "name 3", $block, 12, "ssd3");
+        
+        $takenExam1 = $option1->addTakenExam($this->createTakenExam(9,"name 1"));
+        $takenExam2 = $option2->addTakenExam($this->createTakenExam(9,"name 2"));
+        $takenExam3 = $this->createTakenExam(9,"name 3");
+        
+        $result = $option3->isTakenExamAddable($takenExam3);
+        $result2 =  $option3->addTakenExam($takenExam3);
+
+        $this->assertFalse($result);
+        $this->assertEmpty($option3->getTakenExams());
     }
 
 

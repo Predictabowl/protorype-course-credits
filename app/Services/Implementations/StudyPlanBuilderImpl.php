@@ -5,16 +5,45 @@ namespace App\Services\Implementations;
 use App\Domain\TakenExamDTO;
 use App\Domain\ExamOptionDTO;
 use App\Domain\StudyPlan;
-use App\Domain\ExamBlockLinker;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\StudyPlanBuilder;
 use Illuminate\Support\Collection;
 
-/**
- * 
- */
+    /**
+     *  The problem in the current building process is that it doesn't 
+     * distinguish between Obligatory blocks and multiple choices blocks, so
+     * it can happen a situation similar to priority inversion deadlock.
+     * 
+     * An exam could take a slot in a multi choice block ignoring a single 
+     * option block, this will disable that block and further exams cannot 
+     * be assigned to it, let's make a practical example:
+     * 
+     * Let's say we want integrate 2 exams with SSD IUS/01 and IUS/02
+     * 1) Exam1 IUS/01
+     * 2 Exam2 ISU/02
+     *               
+     * The study plan have the following blocks       
+     * |Block1 | obligatory | IUS/01 | 
+     * -------------------------------
+     * |Block2 | option1    | IUS/01 |
+     * |1 exam | option2    | IUS/02 |
+     * -------------------------------
+     * 
+     * Exam1 is assigned to Block2-option2
+     * Now Exam2 cannot be assigned because Block2 is full, and so exam2 is lost.
+     * If we decided to take the block 1, both exam1 and exam2 would have been
+     * integrated.
+     * 
+     * Problem is not this simple, here some critical points:
+     * - The name of the exam matter, shouldn't be better to choose the closest 
+     *   name regardless?
+     * - Study Plans are not a random list of exams with random SSD, most 
+     *   are made specifically to avoid these weird situations
+     * - Every exam have a list of compatibility options that it seem to be
+     *   meant to address this problem by design.
+     */
 class StudyPlanBuilderImpl implements StudyPlanBuilder {
 
     private $frontManager;
@@ -23,14 +52,12 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
     private $eDistance;
     private $declaredExams;
     private $examOptions;
-    private $blockLinkers; //keep tracks of wich options in a block are linked
 
     function __construct(FrontManager $frontManager, CourseManager $courseManager) {
         $this->frontManager = $frontManager;
         $this->courseManager = $courseManager;
         $this->eDistance = app()->make(ExamDistance::class);
         $this->examOptions = [];
-        $this->blockLinkers = [];
     }
 
     public function getStudyPlan(): StudyPlan {
@@ -45,10 +72,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
     
     public function refreshStudyPlan(): StudyPlanBuilder {
         $examBlocks = $this->courseManager->getExamBlocks();
-        $this->blockLinkers = $examBlocks->mapWithKeys(fn ($block)=>
-                [$block->getId() => new ExamBlockLinker($block)]);
         $this->declaredExams = $this->frontManager->getTakenExams();
-                //->map(fn ($taken)=> new LinkedTakenExam($taken));
         $this->examOptions = $this->courseManager->getExamOptions();
         $this->studyPlan = new StudyPlan($examBlocks);
         return $this;
@@ -58,6 +82,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         return $this->declaredExams;
     }
 
+    
     private function buildStudyPlan() {
         $leftover = $this->declaredExams->map(fn($linkedExam) =>
             $this->linkExam($this->getOptionsBySsd($linkedExam)
@@ -97,9 +122,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
     
     private function linkExam($options, TakenExamDTO $linkedExam): int{
         foreach ($options as $option) {
-            if ($this->blockLinkers[$option->getBlock()->getId()]->linkExam($option->getId())){
-                $this->studyPlan->addExamLink($option, $linkedExam);
-            }
+            $this->studyPlan->addExamLink($option, $linkedExam);
             if ($linkedExam->getActualCfu() === 0){
                 break;
             }

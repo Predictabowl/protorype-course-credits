@@ -14,7 +14,6 @@ use App\Services\Interfaces\ExamDistance;
 use App\Services\Implementations\ExamDistanceByName;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Implementations\StudyPlanBuilderImpl;
-use Illuminate\Support\ServiceProvider;
 use App\Services\Interfaces\UserFrontManager;
 use App\Services\Implementations\UserFrontManagerImpl;
 use App\Mappers\Interfaces\TakenExamMapper;
@@ -29,6 +28,7 @@ use App\Factories\Interfaces\CourseManagerFactory;
 use App\Factories\Implementations\CourseManagerFactoryImpl;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Factories\Implementations\StudyPlanBuilderFactoryImpl;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {

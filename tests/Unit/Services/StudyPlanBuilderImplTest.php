@@ -92,7 +92,7 @@ class StudyPlanBuilderImplTest extends TestCase
     public function test_getStudyPlan() {
         
         $this->setupMocks();
-        $this->examDistance->expects($this->exactly(10))                
+        $this->examDistance->expects($this->exactly(12))                
                 ->method("calculateDistance")->willReturn(1);
         
         $studyPlan = $this->planBuilder->getStudyPlan();
@@ -109,9 +109,17 @@ class StudyPlanBuilderImplTest extends TestCase
         
         $this->assertCount(1,$studyPlan->getExam(13)->getTakenExams());
         $this->assertEquals(0,$studyPlan->getExam(13)->getIntegrationValue());
+        
+        $this->assertCount(0, $studyPlan->getExam(14)->getTakenExams());
+        $this->assertEquals(2,$studyPlan->getExam(14)->getIntegrationValue());
     }
     
     private function setupData() {
+        /* This data is highly skewed as it doesnt adhere to the 
+         * pre-conditions, but it was crafted knowing that won't generate
+         * inconsistencies and will test few boundary cases.
+         * 
+         */
         $this->takenExams = collect([
             new TakenExamDTO(1,"Diritto Privato","IUS/01",9),
             new TakenExamDTO(2,"Istituzione di diritto","IUS/09",6),
@@ -138,6 +146,7 @@ class StudyPlanBuilderImplTest extends TestCase
             new ExamOptionDTO(5,"Istituzione generica", $block3, 6, "IUS/07"),
             new ExamOptionDTO(12,"Storia di qualcosa", $block4, 6, "STO/19"),
             new ExamOptionDTO(13,"Altro esame IUS/09", $block5, 9, "IUS/12"),
+            new ExamOptionDTO(14,"Altro esame IUS/07", $block3, 2, "IUS/07"),
         ]);
         
         $this->options[5]->addCompatibleOption("IUS/03");

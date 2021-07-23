@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Domain\TakenExamDTO;
 use App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\FrontManager;
-use App\Factories\Interfaces\ManagersFactory;
+use App\Factories\Interfaces\FrontManagerFactory;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
@@ -44,7 +44,7 @@ class TakenExamController extends Controller
     private function getFrontManager(): FrontManager {
         //$userManager = app()->make(UserFrontManager::class);
         //return $userManager->getFrontInfoManager();
-        $factory = app()->make(ManagersFactory::class);
+        $factory = app()->make(FrontManagerFactory::class);
         return $factory->getFrontManager(auth()->user()->front->id);
     }
     
