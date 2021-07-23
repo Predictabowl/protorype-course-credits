@@ -32,8 +32,8 @@ class AuthServiceProvider extends ServiceProvider
         //Gate::before(fn($user, $ability) => $user->isAdmin()); //before will disable following checks
         //Gate::define("edit-courses", fn($user) => $user->isSupervisor() || $user->isAdmin());
         //Gate::after(fn($user) => $user->isAdmin());
-        Gate::define("view-front", fn(User $user, Front $front) => 
-                $user->hasAtLeastOneRole(Role::ADMIN, Role::SUPERVISOR) ||
-                auth()->user()->id === $user->id);
+        Gate::define("view-studyPlan", fn(User $user, Front $front) => 
+                $user->isSupervisor() ||
+                $front->user_id === $user->id);
     }
 }

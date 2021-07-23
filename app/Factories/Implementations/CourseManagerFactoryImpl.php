@@ -8,25 +8,18 @@
 
 namespace App\Factories\Implementations;
 
-use App\Factories\Interfaces\ManagersFactory;
+use App\Factories\Interfaces\CourseManagerFactory;
 use App\Services\Interfaces\CourseManager;
 use App\Services\Implementations\CourseManagerImpl;
-use App\Services\Interfaces\FrontManager;
-use App\Services\Implementations\FrontManagerImpl;
 
 /**
  * Description of ManagersFactoryImpl
  *
  * @author piero
  */
-class ManagersFactoryImpl implements ManagersFactory{
+class CourseManagerFactoryImpl implements CourseManagerFactory{
     
     public function getCourseManager($courseId): CourseManager {
         return new CourseManagerImpl($courseId);
     }
-
-    public function getFrontManager($frontId): FrontManager {
-        return new FrontManagerImpl($frontId);
-    }
-
 }

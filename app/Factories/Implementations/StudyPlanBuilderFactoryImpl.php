@@ -11,7 +11,8 @@ namespace App\Factories\Implementations;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Implementations\StudyPlanBuilderImpl;
-use App\Factories\Interfaces\ManagersFactory;
+use App\Factories\Interfaces\FrontManagerFactory;
+use App\Factories\Interfaces\CourseManagerFactory;
 
 /**
  * Description of StudyPlanBuilderFactoryImpl
@@ -20,15 +21,17 @@ use App\Factories\Interfaces\ManagersFactory;
  */
 class StudyPlanBuilderFactoryImpl implements StudyPlanBuilderFactory {
 
-    private $managersFactory;
+    private $frontFactory;
+    private $courseFactory;
     
     public function __construct() {
-        $this->managersFactory = app()->make(ManagersFactory::class);
+        $this->frontFactory = app()->make(FrontManagerFactory::class);
+        $this->courseFactory = app()->make(CourseManagerFactory::class);
     }
     
     public function getStudyPlanBuilder($frontId, $courseId): StudyPlanBuilder {
-        $frontManager = $this->managersFactory->getFrontManager($frontId);
-        $courseManager = $this->managersFactory->getCourseManager($courseId);
+        $frontManager = $this->frontFactory->getFrontManager($frontId);
+        $courseManager = $this->courseFactory->getCourseManager($courseId);
         return new StudyPlanBuilderImpl($frontManager, $courseManager);
     }
 

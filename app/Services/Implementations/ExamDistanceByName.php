@@ -6,7 +6,7 @@ use App\Services\Interfaces\ExamDistance;
 use App\Domain\Interfaces\ExamDTO;
 
 /**
- * Only consider the name of the exams
+ * Only considers the name of the exams
  * Low precision - high performance (n*m) implementation
  */
 

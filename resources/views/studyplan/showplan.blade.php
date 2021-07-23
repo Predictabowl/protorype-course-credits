@@ -23,17 +23,17 @@
                     <tbody>
                         @foreach($studyPlan->getExams() as $exam)
                         <tr class="hover:bg-blue-100">
-                            <td>{{ $exam->getExamOption()->getSsd() }}</td>
-                            <td>{{ $exam->getExamOption()->getExamName() }}</td>
-                            <td class="text-center">{{ $exam->getExamOption()->getCfu() }}</td>
+                            <td>{{ $exam->getSsd() }}</td>
+                            <td>{{ $exam->getExamName() }}</td>
+                            <td class="text-center">{{ $exam->getCfu() }}</td>
                             <td>
-                                @foreach($exam->getExamOption()->getCompatibleOptions() as $option)
+                                @foreach($exam->getCompatibleOptions() as $option)
                                     {{$option}},
                                 @endforeach
                             </td>
                             <td>
                                 @foreach($exam->getTakenExams() as $taken)
-                                    {{$taken->getTakenExam()->getSsd()}}: {{ $taken->getActualCfu()}}/{{$taken->getTakenExam()->getCfu()}}, 
+                                    {{$taken->getSsd()}}: {{ $taken->getActualCfu()}}/{{$taken->getCfu()}}, 
                                 @endforeach
                             </td>
                             <td>{{ $exam->getIntegrationValue()}}</td>
@@ -49,25 +49,34 @@
                 <table class="min-w-full rounded-lg">
                     <thead>
                         <tr class="bg-gray-100">
+                            <th>Compatibilità</th>
                             <th>ssd</th>
                             <th>Nome</th>
+                            <th>Esami Riconosciuti</th>
                             <th>CFU</th>
-                            <th>Compatibilità</th>
+                            <th>Integrazione</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($examBlocks as $examBlock)
-                        <tr class = "border-t border-black"/>
-                            @foreach($examBlock->getExamOptions() as $examOption)
-                                <tr class="hover:bg-blue-100">
-                                    <td>{{ $examOption->getSsd() }}</td>
-                                    <td>{{ $examOption->getExamName() }}</td>
-                                    <td class="text-center">{{ $examOption->getCfu() }}</td>
+                        @foreach($studyPlan->getexamBlocks() as $examBlock)
+                        <tr class = "border-t-2 border-black"/>
+                            @foreach($examBlock->getExamOptions() as $option)
+                                <tr class="hover:bg-blue-100 border-t border-gray-400">
                                     <td>
-                                        @foreach($examOption->getCompatibleOptions() as $option)
-                                            {{$option}},
+                                        @foreach($option->getCompatibleOptions() as $compatibleOption)
+                                            {{$compatibleOption}},
                                         @endforeach
                                     </td>
+                                    <td>{{ $option->getSsd() }}</td>
+                                    <td>{{ $option->getExamName() }}</td>
+                                    <td>
+
+                                        @foreach($option->getTakenExams() as $taken)
+                                            {{$taken->getSsd()}}: {{ $taken->getActualCfu()}}/{{$taken->getCfu()}}, 
+                                        @endforeach
+                                    </td>
+                                    <td class="text-center">{{ $option->getCfu() }}</td>
+                                    <td class="text-center">{{ $option->getIntegrationValue()}}</td>
                                 </tr>
                             @endforeach
                         @endforeach

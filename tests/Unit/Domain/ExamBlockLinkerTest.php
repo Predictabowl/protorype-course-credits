@@ -28,9 +28,9 @@ class ExamBlockLinkerTest extends TestCase{
         $this->exams[0] = new ExamOptionDTO(1,"first", $block, 12, "ssd1");
         $this->exams[1] = new ExamOptionDTO(2,"second", $block, 9, "ssd2");
         $this->exams[2] = new ExamOptionDTO(3,"third", $block, 10, "ssd3");
-        $block->addOption($this->exams[0]);
-        $block->addOption($this->exams[1]);
-        $block->addOption($this->exams[2]);
+        $block->setOption($this->exams[0]);
+        $block->setOption($this->exams[1]);
+        $block->setOption($this->exams[2]);
         $this->blockLinker = new ExamBlockLinker($block);
     }
     

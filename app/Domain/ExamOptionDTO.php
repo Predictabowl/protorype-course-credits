@@ -24,6 +24,8 @@ class ExamOptionDTO implements ExamDTO{
     private $cfu;
     private $ssd;
     private $compatibleOptions;
+    private $linkedTakenExams;
+    private $integrationValue;
 
     public function __construct($id, string $examName, ExamBlockDTO $block, int $cfu, string $ssd) {
         $this->id = $id;
@@ -32,7 +34,9 @@ class ExamOptionDTO implements ExamDTO{
         $this->cfu = $cfu;
         $this->ssd = $ssd;
         $this->compatibleOptions = collect([]);
-        $block->addOption($this);
+        $block->setOption($this);
+        $this->linkedTakenExams = [];
+        $this->calculateIntegrationValue();
     }
     
     public function getExamName(): string {
@@ -65,5 +69,63 @@ class ExamOptionDTO implements ExamDTO{
     
     public function setCompatibleOptions(Collection $ssds){
         $this->compatibleOptions = $ssds;
+    }
+    
+        /**
+     * @return mixed
+     */
+    public function getTakenExams()
+    {
+        return $this->linkedTakenExams;
+    }
+    
+    public function getTakenExam($id): TakenExamDTO{
+        return $this->linkedTakenExams[$id];
+    }
+    
+     /**
+     * The object will be added only if there's no decifit in the
+     * Integration value.
+     * 
+     * @param DeclaredExam $declaredExams
+     *
+     * @return Integration Value decifit.
+     */
+    public function addTakenExam(TakenExamDTO $exam): TakenExamDTO
+    {
+        if (!$this->isTakenExamAddable($exam)){
+            return $exam;
+        }
+
+        $value = $this->getIntegrationValue();
+        if ($value > $exam->getActualCfu()){
+            $value = $exam->getActualCfu();
+        }
+
+        $this->linkedTakenExams[$exam->getId()] = $exam->split($value);
+        $this->calculateIntegrationValue();
+        return $exam;
+    }
+    
+    public function isTakenExamAddable(TakenExamDTO $exam): bool
+    {
+        if (($this->getIntegrationValue() < 1) || ($exam->getActualCfu() < 1)){
+            return false;
+        }
+        return true;
+    }
+
+    
+    public function getIntegrationValue(): int
+    {
+        return $this->integrationValue;
+    }
+    
+    
+    private function calculateIntegrationValue(){
+        $this->integrationValue = $this->getCfu() -
+            collect($this->linkedTakenExams)
+            ->map(fn ($item) => $item->getActualCfu())
+            ->sum();
     }
 }

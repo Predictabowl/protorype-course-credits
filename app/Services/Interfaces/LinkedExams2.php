@@ -7,7 +7,7 @@ use App\Models\ExamBlockOption;
 use App\Models\TakenExam;
 use Illuminate\Support\Collection;
 
-interface LinkedExams {
+interface LinkedExams2 {
 
     public function addTakenExam(TakenExam $exam, int $cfuValue = 0): int;
 
