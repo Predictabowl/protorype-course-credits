@@ -2,8 +2,6 @@
 
 namespace App\Services\Implementations;
 
-use App\Domain\ApprovedExam;
-use App\Domain\LinkedTakenExam;
 use App\Domain\TakenExamDTO;
 use App\Domain\ExamOptionDTO;
 use App\Domain\StudyPlan;
@@ -55,8 +53,8 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         $examBlocks = $this->courseManager->getExamBlocks();
         $this->blockLinkers = $examBlocks->mapWithKeys(fn ($block)=>
                 [$block->getId() => new ExamBlockLinker($block)]);
-        $this->declaredExams = $this->frontManager->getTakenExams()
-                ->map(fn ($taken)=> new LinkedTakenExam($taken));
+        $this->declaredExams = $this->frontManager->getTakenExams();
+                //->map(fn ($taken)=> new LinkedTakenExam($taken));
         $this->examOptions = $this->courseManager->getExamOptions();
         $this->studyPlan = new StudyPlan($examBlocks);
         return $this;
@@ -68,19 +66,14 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
 
     private function buildStudyPlan() {
         $leftover = $this->declaredExams->map(fn($linkedExam) =>
-            $this->linkExam(
-                 $this->getOptionsBySsd(
-                         $linkedExam->getTakenExam())
-                        ,$linkedExam)
+            $this->linkExam($this->getOptionsBySsd($linkedExam)
+                    ,$linkedExam)
         )->sum();
         
         if($leftover > 0){
             $this->declaredExams->map(fn($linkedExam) =>
-                $this->linkExam(
-                    $this->getOptionsByCompatibility(
-                            $linkedExam->getTakenExam())
-                            ,$linkedExam)
-            );
+                $this->linkExam($this->getOptionsByCompatibility($linkedExam)
+                            ,$linkedExam));
         }
     }
     
@@ -116,10 +109,10 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
      * @return int leftover cfu from takenExam
      */
     
-    private function linkExam($options, LinkedTakenExam $linkedExam): int{
+    private function linkExam($options, TakenExamDTO $linkedExam): int{
         foreach ($options as $option) {
             if ($this->blockLinkers[$option->getBlock()->getId()]->linkExam($option->getId())){
-                $this->addExamLink($option, $linkedExam);
+                $this->studyPlan->addExamLink($option, $linkedExam);
             }
             if ($linkedExam->getActualCfu() === 0){
                 break;
@@ -144,11 +137,4 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
             ->map(fn($item) => $item["object"]);
     }
     
-    private function addExamLink(ExamOptionDTO $option, LinkedTakenExam $taken): LinkedTakenExam {
-        $id = $option->getId();
-        $appExam = $this->studyPlan->getExam($id);
-        $linkInserted = $appExam->addTakenExam($taken);
-        $this->studyPlan->setExam($appExam);
-        return $linkInserted;
-    }
 }

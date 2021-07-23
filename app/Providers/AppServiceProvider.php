@@ -45,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
     {
         //---- Factories
         $this->app->bind(FrontInfoManagerFactory::class, FrontInfoManagerFactoryImpl::class);
-        $this->app->bind(RepositoriesFactory::class, RepositoriesFactoryImpl::class);
+        //$this->app->bind(RepositoriesFactory::class, RepositoriesFactoryImpl::class); //to remove
         $this->app->bind(StudyPlanBuilderFactory::class, StudyPlanBuilderFactoryImpl::class);
         
         //---- Mappers

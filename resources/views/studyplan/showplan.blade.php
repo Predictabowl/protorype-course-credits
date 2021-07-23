@@ -60,21 +60,22 @@
                     <tbody>
                         @foreach($studyPlan->getexamBlocks() as $examBlock)
                         <tr class = "border-t border-black"/>
-                            @foreach($examBlock->getApprovedExams() as $examOption)
+                            @foreach($examBlock->getApprovedExams() as $approvedExam)
                                 <tr class="hover:bg-blue-100">
                                     <td>
-                                        @foreach($examOption->getExamOption()->getCompatibleOptions() as $option)
+                                        @foreach($approvedExam->getExamOption()->getCompatibleOptions() as $option)
                                             {{$option}},
                                         @endforeach
                                     </td>
-                                    <td>{{ $examOption->getExamOption()->getSsd() }}</td>
-                                    <td>{{ $examOption->getExamOption()->getExamName() }}</td>
+                                    <td>{{ $approvedExam->getExamOption()->getSsd() }}</td>
+                                    <td>{{ $approvedExam->getExamOption()->getExamName() }}</td>
                                     <td>
-                                        @foreach(($examOption->getTakenExams() as $taken)
+
+                                        @foreach($approvedExam->getTakenExams() as $taken)
                                             {{$taken->getTakenExam()->getSsd()}}: {{ $taken->getActualCfu()}}/{{$taken->getTakenExam()->getCfu()}}, 
                                         @endforeach
                                     </td>
-                                    <td class="text-center">{{ $examOption->gtExamOption()->getCfu() }}</td>
+                                    <td class="text-center">{{ $approvedExam->getExamOption()->getCfu() }}</td>
                                     <td>{{ $exam->getIntegrationValue()}}</td>
                                 </tr>
                             @endforeach

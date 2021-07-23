@@ -4,7 +4,6 @@ namespace App\Domain;
 
 use Illuminate\Support\Collection;
 
-use App\Domain\ApprovedExam;
 use App\Domain\ExamBlockDTO;
 use App\Domain\ExamOptionDTO;
 
@@ -40,22 +39,33 @@ class StudyPlan {
 //        return $linkInserted;
 //    }
 
-    public function getExam($id): ?ApprovedExam {
-        
-        return $this->getExams()->first(fn(ApprovedExam $exam) =>
-                $exam->getExamOption()->getId() === $id);
+    public function addExamLink(ExamOptionDTO $option, TakenExamDTO $taken): TakenExamDTO {
+        $id = $option->getId();
+        $appExam = $this->getExam($id);
+        if (!isset($appExam)){
+            throw new \InvalidArgumentException(__METHOD__.": could not find exam option with id :".$id);
+        }
+        $linkInserted = $appExam->addTakenExam($taken);
+        $this->setExam($appExam);
+        return $linkInserted;
     }
     
-    public function setExam(ApprovedExam $exam){
-        $id = $exam->getExamOption()->getBlock()->getId();
-        $this->examBlocks[$id]->setApprovedExam($exam);
+    public function getExam($id): ?ExamOptionDTO{
+        
+        return $this->getExams()->first(fn(ExamOptionDTO $exam) =>
+                $exam->getId() === $id);
+    }
+    
+    public function setExam(ExamOptionDTO $exam){
+        $id = $exam->getBlock()->getId();
+        $this->examBlocks[$id]->setOption($exam);
 //        $id = $exam->getExamOption()->getId();
 //        $this->approvedExams[$id] = $exam;
     }
 
     public function getExams() {
         return $this->examBlocks->map(fn(ExamBlockDTO $block) =>
-                $block->getApprovedExams())->flatten();
+                $block->getExamOptions())->flatten();
 //        return $this->approvedExams;
     }
     
@@ -65,7 +75,7 @@ class StudyPlan {
     
     public function getIntegrationValue(): int {
         return $this->examBlocks->map(fn(ExamBlockDTO $block) =>
-                $block->getApprovedExams()->map(fn(ApprovedExam $exam) =>
+                $block->getExamOptions()->map(fn(ExamOptionDTO $exam) =>
                     $exam->getIntegrationValue()))->flatten()->sum();
 //        return collect($this->approvedExams)->map(fn(ApprovedExam $exam) =>
 //                $exam->getIntegrationValue())->sum();

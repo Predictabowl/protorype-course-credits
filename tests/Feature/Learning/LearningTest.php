@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Seeders\GenerateSSD;
 use App\Models\User;
 use App\Models\Front;
+use App\Domain\TakenExamDTO;
 use App\Models\Ssd;
 use Tests\TestCase;
 
@@ -22,11 +23,11 @@ class LearningTest extends TestCase{
 //        $authUser = new User();
 //        $authUser->id = 1;
 //        $this->actingAs($authUser);
-        $front = Front::factory()->create([
-            "user_id" => User::factory()->create(),
-            "course_id" => null
-        ]);
-        dd(route("frontView",[$front]));
+        $obj = new TakenExamDTO(1, "test", "SSD1", 8);
+        $newObj = $obj->split(4);
+        
+        $this->assertNotSame($obj, $newObj);
+        $this->assertEquals($obj,$newObj);
     }
     
     /*

@@ -5,7 +5,7 @@ namespace App\Domain;
 /**
  * 
  */
-class ApprovedExam
+class ApprovedExam2
 {
     private $examOption;
     private $linkedTakenExams;
@@ -41,7 +41,7 @@ class ApprovedExam
         return $this->linkedTakenExams;
     }
     
-    public function getTakenExam($id): LinkedTakenExam{
+    public function getTakenExam($id): TakenExamDTO{
         return $this->linkedTakenExams[$id];
     }
 
@@ -53,7 +53,7 @@ class ApprovedExam
      *
      * @return Integration Value decifit.
      */
-    public function addTakenExam(LinkedTakenExam $exam): LinkedTakenExam
+    public function addTakenExam(TakenExamDTO $exam): TakenExamDTO
     {
         if (!$this->isTakenExamAddable($exam)){
             return $exam;
@@ -64,12 +64,12 @@ class ApprovedExam
             $value = $exam->getActualCfu();
         }
 
-        $this->linkedTakenExams[$exam->getTakenExam()->getId()] = $exam->split($value);
+        $this->linkedTakenExams[$exam->getId()] = $exam->split($value);
         $this->calculateIntegrationValue();
         return $exam;
     }
     
-    public function isTakenExamAddable(LinkedTakenExam $exam): bool
+    public function isTakenExamAddable(TakenExamDTO $exam): bool
     {
         if (($this->getIntegrationValue() < 1) || ($exam->getActualCfu() < 1)){
             return false;

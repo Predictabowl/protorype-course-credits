@@ -15,7 +15,7 @@ use InvalidArgumentException;
  *
  * @author piero
  */
-class LinkedTakenExam {
+class LinkedTakenExam2 {
     
     private $takenExam;
     private $actualCfu;
