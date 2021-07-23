@@ -5,12 +5,12 @@ namespace Tests\Unit\Services;
 use App\Models\Front;
 use App\Models\User;
 use App\Models\Course;
-use App\Factories\Interfaces\ManagersFactory;
+use App\Factories\Interfaces\FrontManagerFactory;
+use App\Factories\Interfaces\CourseManagerFactory;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Implementations\UserFrontManagerImpl;
-use App\Services\Interfaces\FrontInfoManager;
 use App\Repositories\Interfaces\FrontRepository;
 use Tests\TestCase;
 
@@ -21,7 +21,8 @@ class UserFrontManagerImplTest extends TestCase
     
     private $frontRepo;
     private $sut;
-    private $managerFactory;
+    private $frontFactory;
+    private $courseFactory;
 //    private $authUser;
     
 
@@ -30,10 +31,12 @@ class UserFrontManagerImplTest extends TestCase
         parent::setUp();
         
         $this->frontRepo = $this->frontRepo = $this->createMock(FrontRepository::class);
-        $this->managerFactory = $this->createMock(ManagersFactory::class);
+        $this->frontFactory = $this->createMock(FrontManagerFactory::class);
+        $this->courseFactory = $this->createMock(CourseManagerFactory::class);
         
         app()->instance(FrontRepository::class, $this->frontRepo);
-        app()->instance(ManagersFactory::class, $this->managerFactory);
+        app()->instance(FrontManagerFactory::class, $this->frontFactory);
+        app()->instance(CourseManagerFactory::class, $this->courseFactory);
         
 //        $this->authUser = new User();
 //        $this->authUser->id = self::FIXTURE_USER_ID;
@@ -208,7 +211,7 @@ class UserFrontManagerImplTest extends TestCase
         
         $frontManager = $this->createMock(FrontManager::class);
         
-        $this->managerFactory->expects($this->once())
+        $this->frontFactory->expects($this->once())
                 ->method("getFrontManager")
                 ->willReturn($frontManager);
         $this->frontRepo->expects($this->once())
@@ -222,7 +225,7 @@ class UserFrontManagerImplTest extends TestCase
     }
     
     public function test_getFrontManager_when_cannot_find_Front(){
-        $this->managerFactory->expects($this->never())
+        $this->frontFactory->expects($this->never())
                 ->method("getFrontManager");
         $this->frontRepo->expects($this->once())
                 ->method("getFromUser")

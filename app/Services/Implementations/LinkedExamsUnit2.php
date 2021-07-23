@@ -7,10 +7,10 @@ namespace App\Services\Implementations;
 use App\Domain\ExamAssignedValue;
 use App\Models\ExamBlockOption;
 use App\Models\TakenExam;
-use App\Services\Interfaces\LinkedExams;
+use App\Services\Interfaces\LinkedExams2;
 use Illuminate\Support\Collection;
 
-class LinkedExamsUnit implements LinkedExams
+class LinkedExamsUnit2 implements LinkedExams2
 {
 	private $takenExams;
 	private $grantedExam;

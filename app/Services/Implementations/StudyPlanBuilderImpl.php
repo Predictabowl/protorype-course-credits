@@ -38,12 +38,6 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         $this->buildStudyPlan();
         return $this->studyPlan;
     }
-
-//    public function setFront(int $id): StudyPlanBuilder {
-//        $this->frontManager->setFront($id);
-//        $this->refreshStudyPlan();
-//        return $this;
-//    }
     
     public function getApprovedExams() {
         return $this->examOptions;
@@ -83,14 +77,6 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
                         $option->getSsd() === $takenExam->getSsd())
                 ,$takenExam);
     }
-    
-//    public function getOptionsByCompatibility(TakenExamDTO $takenExam){
-//        return $this->getOptionsSorted(
-//                $this->examOptions->filter(fn($option) => 
-//                    $option->getSsd() === $takenExam->getSsd())
-//                        ->map(fn($option) => $option->getCompatibleOptions())
-//                        ->flatten()->unique(),$takenExam);
-//    }
     
     public function getOptionsByCompatibility(TakenExamDTO $takenExam){
         return $this->sortOptions(

@@ -42,7 +42,6 @@ class UserRepositoryImplTest extends TestCase {
             "name" => "nome",
             "password" => "password",
             "email" => "posta",
-            "role" => "user"
         ];
         $user = new User($attributes);
 

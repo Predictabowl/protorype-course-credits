@@ -8,16 +8,13 @@
 
 namespace App\Factories\Interfaces;
 
-use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\FrontManager;
 
 /**
  *
  * @author piero
  */
-interface ManagersFactory {
-    
-    public function getCourseManager($courseId): CourseManager;
+interface FrontManagerFactory {
     
     public function getFrontManager($frontId): FrontManager;
 }
