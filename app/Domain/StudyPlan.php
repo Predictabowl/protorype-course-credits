@@ -10,6 +10,7 @@ use App\Domain\ExamOptionDTO;
 class StudyPlan {
 
     private $examBlocks;
+    private $leftovers;
 
     /**
      * Class Constructor
@@ -19,6 +20,7 @@ class StudyPlan {
         $this->examBlocks = $examBlocks->mapWithKeys(
                 fn(ExamBlockDTO $block) => 
                     [$block->getId() => $block]);
+        $this->leftovers = collect([]);
     }
 
     public function addExamLink(ExamOptionDTO $option, TakenExamDTO $taken): TakenExamDTO {
@@ -53,10 +55,15 @@ class StudyPlan {
     }
     
     public function getRecognizedCredits(): int {
-//        return $this->examBlocks->map(fn(ExamBlockDTO $block) =>
-//                $block->getExamOptions()->map(fn(ExamOptionDTO $exam) =>
-//                    $exam->getIntegrationValue()))->flatten()->sum();
         return $this->getExamBlocks()->map(fn(ExamBlockDTO $block) =>
                 $block->getRecognizedCredits())->sum();
+    }
+    
+    public function setLeftoverExams(Collection $leftovers){
+        $this->leftovers = $leftovers;
+    }
+    
+    public function getLeftoverExams(): Collection{
+        return $this->leftovers;
     }
 }

@@ -8,6 +8,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Course;
 use App\Domain\ExamBlockDTO;
 use App\Domain\ExamOptionDTO;
 use App\Models\ExamBlock;
@@ -23,7 +24,7 @@ use PHPUnit\Framework\TestCase;
  */
 class CourseManagerImplTest extends TestCase{
 
-    private const FIXTURE_COURSE_ID = 7;    
+    private const FIXTURE_COURSE_ID = 7;
     
     private $blockRepo;
     private $manager;

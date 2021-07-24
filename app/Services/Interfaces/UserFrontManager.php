@@ -2,8 +2,7 @@
 
 namespace App\Services\Interfaces;
 
-use App\Services\Interfaces\FrontInfoManager;
-use App\Services\Interfaces\CourseManager;
+use App\Models\User;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Models\Front;
 
@@ -24,8 +23,8 @@ interface UserFrontManager {
     
     public function getFront(): ?Front;
 
-    public function setUserId($id): UserFrontManager;
-
+    public function setUserId($userId): UserFrontManager;
+    
     /**
      * Return a managing instance to extract info from the Front of the 
      * current user.

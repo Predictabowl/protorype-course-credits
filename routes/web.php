@@ -45,6 +45,8 @@ Route::get("/exams",[ExamController::class,"index"]); //only for testing purpose
 
 //Route::get("/front",[FrontController::class,"index"])->name("frontIndex");
 
+//-------------- Front
+
 Route::get("/front",[FrontController::class,"index"])->name("frontIndex");
 
 Route::get("/front/{front}",[FrontController::class,"show"])->name("frontView");
@@ -54,9 +56,14 @@ Route::put("/front/{front}",[FrontController::class,"put"]); //change course for
 Route::get("/front/options",[FrontController::class,"getOptions"]) //test round
         ->name("courseOptions");
 
-Route::post("/front/row",[TakenExamController::class,"create"]);
 
-Route::delete("/front/row",[TakenExamController::class,"delete"]);
+//-------------- Taken exams
+
+Route::post("/front/exam/{front}",[TakenExamController::class,"create"])->name("postTakenExam");
+
+Route::delete("/front/exam/{front}",[TakenExamController::class,"delete"])->name("deleteTakenExam");
+
+
 
 Route::get("/tests", function(){
     $course  = Course::first()->with("examBlocks.examBlockOptions.examApproved")->get();

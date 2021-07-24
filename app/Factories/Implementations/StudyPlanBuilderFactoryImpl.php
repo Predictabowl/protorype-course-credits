@@ -8,6 +8,8 @@
 
 namespace App\Factories\Implementations;
 
+use App\Models\Front;
+use App\Models\Course;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Implementations\StudyPlanBuilderImpl;

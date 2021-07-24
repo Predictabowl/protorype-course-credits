@@ -8,7 +8,6 @@
 
 namespace App\Services\Implementations;
 
-use App\Models\Course;
 use App\Models\Front;
 use App\Services\Interfaces\FrontManager;
 use App\Domain\TakenExamDTO;
@@ -39,9 +38,13 @@ class FrontManagerImpl implements FrontManager{
                 fn($exam) => $this->mapper->toDTO($exam));
     }
     
-    public function saveTakenExam(TakenExamDTO $exam) {
-        $this->getExamRepository()
-                ->save($this->mapper->toModel($exam, $this->frontId));
+    public function saveTakenExam($attributes) {
+        $exam = new TakenExamDTO(0, $attributes["name"], $attributes["ssd"], $attributes["cfu"]);
+        $takenExam = $this->mapper->toModel($exam, $this->frontId);
+        if(!isset($takenExam)){
+            throw new InvalidArgumentException();//message missing
+        }
+        $this->getExamRepository()->save($takenExam);
     }
 
     public function deleteTakenExam($examId) {

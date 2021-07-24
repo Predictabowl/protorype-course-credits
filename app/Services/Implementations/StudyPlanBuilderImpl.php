@@ -94,6 +94,10 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
                 $this->linkExam($this->getOptionsByCompatibility($linkedExam)
                             ,$linkedExam));
         }
+        
+        //setting leftover exams and credit
+        $this->studyPlan->setLeftoverExams($this->declaredExams->filter(
+                fn(TakenExamDTO $exam) => $exam->getActualCfu() > 0));
     }
     
     public function getOptionsBySsd(TakenExamDTO $takenExam){

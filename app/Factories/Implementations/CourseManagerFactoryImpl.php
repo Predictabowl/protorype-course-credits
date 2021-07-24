@@ -8,6 +8,7 @@
 
 namespace App\Factories\Implementations;
 
+use App\Models\Course;
 use App\Factories\Interfaces\CourseManagerFactory;
 use App\Services\Interfaces\CourseManager;
 use App\Services\Implementations\CourseManagerImpl;

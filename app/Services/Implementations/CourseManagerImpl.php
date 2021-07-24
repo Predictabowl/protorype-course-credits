@@ -2,6 +2,7 @@
 
 namespace App\Services\Implementations;
 
+use App\Models\Course;
 use App\Domain\ExamBlockDTO;
 use App\Services\Interfaces\CourseManager;
 use App\Repositories\Interfaces\ExamBlockRepository;
@@ -17,16 +18,16 @@ use Illuminate\Support\Facades\Gate;
 class CourseManagerImpl implements CourseManager {
     
     private $blockMapper;
-    private $id;
+    private $courseId;
     
     public function __construct($courseId) {
-        $this->id = $courseId;
+        $this->courseId = $courseId;
         $this->blockMapper = app()->make(ExamBlockMapper::class);
     }
 
     public function getExamBlocks(): Collection {
         return $this->getBlockRepository()
-                ->getFilteredByCourse($this->id)
+                ->getFilteredByCourse($this->courseId)
                 ->map(fn($block) => $this->blockMapper->toDTO($block));
     }
 
@@ -48,9 +49,10 @@ class CourseManagerImpl implements CourseManager {
             ddd("Method not implemented yet: normal user");
         }
     }
-
     
     private function getBlockRepository(): ExamBlockRepository {
         return app()->make(ExamBlockRepository::class);
     }
+
+
 }

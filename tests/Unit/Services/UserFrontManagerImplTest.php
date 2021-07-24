@@ -12,6 +12,7 @@ use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Implementations\UserFrontManagerImpl;
 use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Interfaces\CourseRepository;
 use Tests\TestCase;
 
 class UserFrontManagerImplTest extends TestCase
@@ -38,9 +39,6 @@ class UserFrontManagerImplTest extends TestCase
         app()->instance(FrontManagerFactory::class, $this->frontFactory);
         app()->instance(CourseManagerFactory::class, $this->courseFactory);
         
-//        $this->authUser = new User();
-//        $this->authUser->id = self::FIXTURE_USER_ID;
-//        $this->actingAs($this->authUser);
         $this->sut = new UserFrontManagerImpl(self::FIXTURE_USER_ID);
     }
 
@@ -245,14 +243,14 @@ class UserFrontManagerImplTest extends TestCase
         app()->instance(StudyPlanBuilderFactory::class, $studyFactory);
         $front = new Front(["course_id" => 5]);
         $front->id = self::FIXTURE_FRONT_ID;
-        
-        $studyFactory->expects($this->once())
-                ->method("getStudyPlanBuilder")
-                ->willReturn($studyPlanBuilder);
         $this->frontRepo->expects($this->once())
                 ->method("getFromUser")
                 ->with(self::FIXTURE_USER_ID)
                 ->willReturn($front);
+        $studyFactory->expects($this->once())
+                ->method("getStudyPlanBuilder")
+                ->with(self::FIXTURE_FRONT_ID,5)
+                ->willReturn($studyPlanBuilder);
         
         $result = $this->sut->getStudyPlanBuilder();
         

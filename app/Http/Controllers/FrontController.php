@@ -9,7 +9,6 @@ use App\Services\Interfaces\FrontManager;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Front;
-use Illuminate\Support\Facades\Gate;
 
 class FrontController extends Controller
 {

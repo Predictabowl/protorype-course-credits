@@ -67,7 +67,12 @@ class FrontManagerImplTest extends TestCase{
     }
 
     public function test_save_takenExam() {
-        $dto = new TakenExamDTO(3, "nome", "ssd2", 9);
+        $attributes = [
+            "name" => "nome",
+            "ssd" => "ssd2",
+            "cfu" => 9
+        ];
+        $dto = new TakenExamDTO(0,"nome","ssd2",9);
         $model = $this->makeTakenExam(13);
         $this->mapper->expects($this->once())
                 ->method("toModel")
@@ -77,7 +82,7 @@ class FrontManagerImplTest extends TestCase{
                 ->method("save")
                 ->with($model);
         
-        $this->manager->saveTakenExam($dto);
+        $this->manager->saveTakenExam($attributes);
     }
 
     public function test_delete_takenExam() {

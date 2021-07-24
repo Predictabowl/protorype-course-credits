@@ -26,7 +26,8 @@ class StudyPlanController extends Controller
             return back(); //should send a notification
         }
         return view("studyplan.showplan",[
-            "studyPlan" => $builder->getStudyPlan()
+            "studyPlan" => $builder->getStudyPlan(),
+            "front" => $front
         ]);
     }
 }

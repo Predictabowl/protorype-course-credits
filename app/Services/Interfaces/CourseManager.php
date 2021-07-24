@@ -8,6 +8,7 @@
 
 namespace App\Services\Interfaces;
 
+use App\Models\Course;
 use Illuminate\Support\Collection;
 
 /**

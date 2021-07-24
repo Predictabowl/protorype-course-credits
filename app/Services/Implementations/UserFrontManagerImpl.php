@@ -2,9 +2,11 @@
 
 namespace App\Services\Implementations;
 
+use App\Models\User;
 use \App\Models\Front;
 use App\Factories\Interfaces\FrontManagerFactory;
 use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Interfaces\CourseRepository;
 use \App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\StudyPlanBuilder;
@@ -60,11 +62,11 @@ class UserFrontManagerImpl implements UserFrontManager{
             return null;
         }
         return app()->make(StudyPlanBuilderFactory::class)
-                ->getStudyPlanBuilder($front->id,$front->course_id);
+                ->getStudyPlanBuilder($front->id, $front->course_id);
     }
 
-    public function setUserId($id): UserFrontManager {
-        $this->userId = $id;
+    public function setUserId($userId): UserFrontManager {
+        $this->userId = $userId;
         return $this;
     }
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Course;
 use App\Domain\ExamOptionDTO;
 use App\Domain\ExamBlockDTO;
 use App\Domain\TakenExamDTO;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 class StudyPlanBuilderImplTest extends TestCase
 {
     private $frontManager;
+    private $courseManager;
     private $examDistance;
     private $planBuilder;
     private $takenExams;
@@ -34,13 +36,16 @@ class StudyPlanBuilderImplTest extends TestCase
     
     private function setupMocks(){
         $this->frontManager->expects($this->any())
-                ->method("getTakenExams")->willReturn($this->takenExams);
+                ->method("getTakenExams")
+                ->willReturn($this->takenExams);
         
         $this->courseManager->expects($this->any())
-                ->method("getExamOptions")->willReturn($this->options);
+                ->method("getExamOptions")
+                ->willReturn($this->options);
 
         $this->courseManager->expects($this->any())
-                ->method("getExamBlocks")->willReturn(collect($this->blocks));
+                ->method("getExamBlocks")
+                ->willReturn(collect($this->blocks));
     }
 
     public function test_getOptionsBySsd() {
@@ -93,7 +98,8 @@ class StudyPlanBuilderImplTest extends TestCase
         
         $this->setupMocks();
         $this->examDistance->expects($this->exactly(12))                
-                ->method("calculateDistance")->willReturn(1);
+                ->method("calculateDistance")
+                ->willReturn(1);
         
         $studyPlan = $this->planBuilder->getStudyPlan();
 
@@ -112,6 +118,7 @@ class StudyPlanBuilderImplTest extends TestCase
         
         $this->assertCount(0, $studyPlan->getExam(14)->getTakenExams());
         $this->assertEquals(2,$studyPlan->getExam(14)->getIntegrationValue());
+        
     }
     
     private function setupData() {

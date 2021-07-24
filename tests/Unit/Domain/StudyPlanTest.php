@@ -8,6 +8,7 @@
 
 namespace Tests\Unit\Domain;
 
+use App\Models\Course;
 use PHPUnit\Framework\TestCase;
 use App\Domain\ExamOptionDTO;
 use App\Domain\TakenExamDTO;
@@ -21,21 +22,7 @@ use App\Domain\StudyPlan;
  */
 class StudyPlanTest extends TestCase{
 
-//    private $studyPlan;
-//    private $blocks;
-//    private $options;
-//
-//    protected function setUp(): void {
-//        $this->blocks = [new ExamBlockDTO(1,2),
-//            new ExamBlockDTO(2,1)];
-//        $this->options = [ new ExamOptionDTO(1,"option1", $this->blocks[0], 9, "ssd1"),
-//            new ExamOptionDTO(2,"option2", $this->blocks[0], 12, "ssd2"),
-//            new ExamOptionDTO(3,"option3", $this->blocks[1], 18, "ssd1")];
-//        $this->studyPlan = new StudyPlan($this->blocks);
-//    }
     
-    
-
     public function test_addExamLik_when_exam_not_present_in_the_course() {
         $block = new ExamBlockDTO(1,1);
         $option = new ExamOptionDTO(1,"option1", new ExamBlockDTO(2,1), 12, "ssd");

@@ -1,13 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Integrazione') }}
+            Tabella Integrazione ({{ $front->user->name }})
         </h2>
     </x-slot>
 
     <x-mainpanel width="max-w-full">
         <x-panel>
-            <h1>Crediti Assegnati</h1>
             <div class="place-content-center">
                 <table class="table-auto w-full">
                     <thead class="w-full bg-gray-100">
@@ -21,18 +20,19 @@
                             <th class="p-1">Integrazione</th>
                         </tr>
                     </thead>
-                    <tbody class="" >
+                    <tbody>
                         @foreach($studyPlan->getexamBlocks() as $examBlock)
-                           <tr class = "border-t-4 border-black" x-data="{ blockstart: 1 }"/>
+                            <tr class = "border-b-4 border-black"/>
                             <?php $startBlock = true; ?>
                             @foreach($examBlock->getExamOptions() as $option)
                                 <tr class="border-l border-r {{ !$startBlock ? "border-t" : ""}} border-gray-400">
+                               {{--  <tr class="border border-gray-400">  --}}
                                     <td class="text-xs" x-data="{ open: false }">
                                         <button x-on:click="open = !open" x-show="!open"
                                             class="rounded-full w-7 items-center hover:bg-blue-400 text-lg">
                                             +
                                         </button>
-                                        <div x-on:click="open = !open" x-show = "open"
+                                        <div x-on:click="open = !open" x-show="open"
                                             class="cursor-pointer hover:bg-blue-400">
                                             @foreach($option->getCompatibleOptions() as $compatibleOption)
                                                 {{$compatibleOption}}<br>
@@ -70,18 +70,29 @@
                                         </td>
                                     @endif
                                    <?php $startBlock = false; ?>
+                               </tr>
                             @endforeach
-                            <tr class = "border-t-4 border-black"/>
                         @endforeach
+                        <tr class = "border-b-4 border-black"/>
                     </tbody>
                 </table>
             </div>
         </x-panel>
         <x-panel>
-            <div class="text-xl">
+            <div class="text-xl pb-2">
                 <?php $cfu = $studyPlan->getRecognizedCredits() ?>
                 <p>Totale CFU riconosciuti: {{ $cfu }}</p>
-                <p>CFU da sostenere: {{ 180 - $cfu }}</p>
+                <p>CFU da sostenere: {{ $front->course->cfu - $cfu }}</p>
+            </div>
+            <div class="border-t border-gray-400 pt-2">
+                Lista esami con crediti inutilizzati:
+                <ul class="list-disc pl-6">
+                    @foreach($studyPlan->getLeftoverExams() as $exam)
+                        <li>
+                            {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu()}}
+                        </li>
+                    @endforeach
+                </ul>
             </div>
         </x-panel>
     </x-mainpanel>

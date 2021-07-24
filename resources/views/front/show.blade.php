@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Prospetto') }}
+            Prospetto ({{ $front->user->name }})
         </h2>
     </x-slot>
 
@@ -9,7 +9,7 @@
         <div class="sm:flex justify-between">
             <x-panel class="w-1/2">
                 <div>
-                    <form method="POST" action="/front/row">
+                    <form method="POST" action="{{ route("postTakenExam",[$front]) }}">
                     {{--<form method="POST" action="/post/{{$post->slug}}/comments">--}}
                         @csrf
                         <header class="flex items-center">
@@ -121,26 +121,26 @@
                             <th>ssd</th>
                             <th>Nome</th>
                             <th>CFU</th>
-                            <th/>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($exams as $exam)
                         <tr class="hover:bg-blue-100">
-                            <td>{{ $exam->getSsd() }}</td>
-                            <td>{{ $exam->getExamName() }}</td>
-                            <td class="text-center">{{ $exam->getCfu() }}</td>
-                            <td>
-                                {{-- <a href="/front/remove/{{$exam->getId()}}" class="ml-6 text-xs font-bold uppercase hover:bg-gray-200">Remove</a> --}}
-                                <form id="delete-row-{{$exam->getId()}}" method="POST" action="/front/row">
-                                    @csrf
-                                    @method("DELETE")
-                                    <input type="hidden" name="id" value="{{$exam->getId()}}">
-                                    <x-button-icon width="w-9" height="h-6" name="id" value="{{$exam->getId()}}">
-                                        <img src="/images/delete-icon.svg" alt="Elimina">
-                                    </x-button-icon>
-                                </form>                                
-                            </td>
+                                <td>{{ $exam->getSsd() }}</td>
+                                <td >{{ $exam->getExamName() }}</td>
+                                <td class="text-center">{{ $exam->getCfu() }}</td>
+                                <td class="w-10">
+                                    {{-- <a href="/front/remove/{{$exam->getId()}}" class="ml-6 text-xs font-bold uppercase hover:bg-gray-200">Remove</a> --}}
+                                    <form id="delete-row-{{$exam->getId()}}" method="POST" 
+                                            action="{{ route("deleteTakenExam",[$front]) }}">
+                                        @csrf
+                                        @method("DELETE")
+                                        <input type="hidden" name="id" value="{{$exam->getId()}}">
+                                        <x-button-icon width="w-9" height="h-6" name="id" value="{{$exam->getId()}}">
+                                            <img src="/images/delete-icon.svg" alt="Elimina">
+                                        </x-button-icon>
+                                    </form>                                
+                                </td>
 
                         </tr>
                         @endforeach
