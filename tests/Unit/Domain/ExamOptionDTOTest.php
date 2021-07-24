@@ -20,6 +20,7 @@ class ExamOptionDTOTest extends TestCase
         $option->addTakenExam($this->createTakenExam(2,"taken2"));
         
         $this->assertEquals(7,$option->getIntegrationValue());
+        $this->assertEquals(5,$option->getRecognizedCredits());
     }
 
     public function test_takenExam_is_not_added_if_Integration_is_zero(){

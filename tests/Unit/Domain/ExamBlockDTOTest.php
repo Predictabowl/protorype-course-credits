@@ -60,6 +60,17 @@ class ExamBlockDTOTest extends TestCase{
         $this->assertEquals(self::FIXTURE_CFU*self::FIXTURE_NUM_EXAMS -18, $value);
     }
     
+    public function test_getRecognizedCredits(){
+        $taken1 = new TakenExamDTO(1, "nome 1", "ssd1", 15);
+        $taken2 = new TakenExamDTO(2, "nome 2", "ssd2", 6);
+        $this->exams[0]->addTakenExam($taken1);
+        $this->exams[1]->addTakenExam($taken2);
+        
+        $value = $this->block->getRecognizedCredits();
+        
+        $this->assertEquals(18, $value);
+    }
+    
     public function test_getSlotsAvailable_when_empty(){
         $value = $this->block->getNumSlotsAvailable();
         

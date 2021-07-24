@@ -7,8 +7,8 @@
 
     <x-mainpanel>
         <div class="sm:flex justify-between">
-            <x-panel>
-                <div class="max-w-min">
+            <x-panel class="w-1/2">
+                <div>
                     <form method="POST" action="/front/row">
                     {{--<form method="POST" action="/post/{{$post->slug}}/comments">--}}
                         @csrf
@@ -26,7 +26,7 @@
                             @enderror
                         </div> --}}
                         <div class="mt-4">
-                            <input type="text" class="text-sm focus:outline-none focus:ring" name="name" placeholder="Nome insegnamento."
+                            <input type="text" class="text-sm w-full focus:outline-none focus:ring" name="name" placeholder="Nome insegnamento."
                                 value="{{old("name")}}">
 
                             @error("name")
@@ -34,14 +34,17 @@
                             @enderror
                         </div>
                         <div class="mt-4">
-                            <input type="number" name="cfu" placeholder="cfu" value="{{old("cfu")}}">
+                            <input class="w-20"
+                                type="number" name="cfu" placeholder="cfu" value="{{old("cfu")}}">
 
                             @error("cfu")
                             <span class="text-xs text-red-500">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="mt-4">
-                            <input type="text" class="text-sm focus:outline-none focus:ring" name="ssd" placeholder="SSD" value="{{old("ssd")}}">
+                            <input class="w-32"
+                                type="text" class="text-sm focus:outline-none focus:ring" name="ssd" placeholder="SSD" 
+                                value="{{old("ssd")}}">
 
                             @error("ssd")
                             <span class="text-xs text-red-500">{{ $message }}</span>

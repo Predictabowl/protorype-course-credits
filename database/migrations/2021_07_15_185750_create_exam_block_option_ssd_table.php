@@ -4,6 +4,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * This table holds the compatibility options between an exam and other SSDs,
+ * which will be used as secondary search for credit integration, after the
+ * main SSD.
+ */
+
 class CreateExamBlockOptionSsdTable extends Migration
 {
     /**

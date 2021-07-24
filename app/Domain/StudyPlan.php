@@ -52,9 +52,11 @@ class StudyPlan {
         return $this->examBlocks;
     }
     
-    public function getIntegrationValue(): int {
-        return $this->examBlocks->map(fn(ExamBlockDTO $block) =>
-                $block->getExamOptions()->map(fn(ExamOptionDTO $exam) =>
-                    $exam->getIntegrationValue()))->flatten()->sum();
+    public function getRecognizedCredits(): int {
+//        return $this->examBlocks->map(fn(ExamBlockDTO $block) =>
+//                $block->getExamOptions()->map(fn(ExamOptionDTO $exam) =>
+//                    $exam->getIntegrationValue()))->flatten()->sum();
+        return $this->getExamBlocks()->map(fn(ExamBlockDTO $block) =>
+                $block->getRecognizedCredits())->sum();
     }
 }

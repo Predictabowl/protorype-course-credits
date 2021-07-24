@@ -25,7 +25,7 @@ class ExamOptionDTO implements ExamDTO{
     private $ssd;
     private $compatibleOptions;
     private $linkedTakenExams;
-    private $integrationValue;
+    private $recognizedCredits;
 
     public function __construct($id, string $examName, ExamBlockDTO $block, int $cfu, string $ssd) {
         $this->id = $id;
@@ -36,7 +36,7 @@ class ExamOptionDTO implements ExamDTO{
         $this->compatibleOptions = collect([]);
         $block->setOption($this);
         $this->linkedTakenExams = collect([]);
-        $this->calculateIntegrationValue();
+        $this->calculateRecognizedCredits();
     }
     
     public function getExamName(): string {
@@ -103,7 +103,7 @@ class ExamOptionDTO implements ExamDTO{
         }
 
         $this->linkedTakenExams[$exam->getId()] = $exam->split($value);
-        $this->calculateIntegrationValue();
+        $this->calculateRecognizedCredits();
         return $exam;
     }
     
@@ -124,14 +124,17 @@ class ExamOptionDTO implements ExamDTO{
     
     public function getIntegrationValue(): int
     {
-        return $this->integrationValue;
+        return $this->getCfu() -
+            $this->getRecognizedCredits();
     }
     
+    public function getRecognizedCredits(): int{
+        return $this->recognizedCredits;
+    }
     
-    private function calculateIntegrationValue(){
-        $this->integrationValue = $this->getCfu() -
-            collect($this->linkedTakenExams)
-            ->map(fn ($item) => $item->getActualCfu())
-            ->sum();
+    private function calculateRecognizedCredits(){
+        $this->recognizedCredits = collect($this->linkedTakenExams)
+                ->map(fn ($item) => $item->getActualCfu())
+                ->sum();
     }
 }

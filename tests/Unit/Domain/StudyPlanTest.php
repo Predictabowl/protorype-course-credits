@@ -13,7 +13,6 @@ use App\Domain\ExamOptionDTO;
 use App\Domain\TakenExamDTO;
 use App\Domain\ExamBlockDTO;
 use App\Domain\StudyPlan;
-use App\Domain\LinkedTakenExam;
 
 /**
  * Description of StudyPlanTest
@@ -72,14 +71,14 @@ class StudyPlanTest extends TestCase{
                 ->getIntegrationValue());
     }
     
-    public function test_getIntegrationValue_with_empty_studyPlan() {
+    public function test_getRecognizedCredits_with_empty_studyPlan() {
         $studyPlan = new StudyPlan(collect([]));
-        $integration = $studyPlan->getIntegrationValue();
+        $integration = $studyPlan->getRecognizedCredits();
         
         $this->assertEquals(0, $integration);
     }
     
-    public function test_getIntegrationValue() {
+    public function test_getRecognizedCredits() {
         $block1 = new ExamBlockDTO(1,2);
         $block2 = new ExamBlockDTO(2,1);
         $option1 = new ExamOptionDTO(1,"option1", $block1, 9, "ssd1");
@@ -95,9 +94,9 @@ class StudyPlanTest extends TestCase{
         $studyPlan->addExamLink($option2, $taken2);
         $studyPlan->addExamLink($option3, $taken3);
         
-        $value = $studyPlan->getIntegrationValue();
+        $value = $studyPlan->getRecognizedCredits();
         
-        $this->assertEquals(15, $value);
+        $this->assertEquals(24, $value);
     }
     
 }

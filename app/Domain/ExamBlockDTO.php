@@ -53,13 +53,17 @@ class ExamBlockDTO{
     
     public function getIntegrationValue(): int{
         
-        return $this->getCfu() - 
-               $this->approvedExams->map(fn(ExamOptionDTO $exam) => 
+        return $this->getCfu() - $this->getRecognizedCredits();
+    }
+    
+    public function getRecognizedCredits(): int{
+        
+        return $this->approvedExams->map(fn(ExamOptionDTO $exam) => 
                     $exam->getTakenExams()->map(fn(TakenExamDTO $taken)=> 
                         $taken->getActualCfu()
                     )
                 )->flatten()->sum();
-        }
+    }
     
     // Is supposed that every exam in the block have the same cfu value
     public function getCfu(): int {
