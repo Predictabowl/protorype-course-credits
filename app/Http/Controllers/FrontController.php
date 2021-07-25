@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use App\Services\Interfaces\UserFrontManager;
+use App\Repositories\Interfaces\FrontRepository;
 use App\Services\Interfaces\FrontManager;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Factories\Interfaces\FrontManagerFactory;
@@ -24,7 +23,9 @@ class FrontController extends Controller
     
     public function index(){
         $this->authorize("viewAny", Front::class);
-        return "Hello World!";
+        return view("front.index", [
+           "fronts" => app()->make(FrontRepository::class)->getAll()
+        ]);
     }
     
     public function show(Front $front)

@@ -67,7 +67,7 @@ class FrontRepositoryImpl implements FrontRepository{
     }
 
     public function getAll() {
-        return Front::all();
+        return Front::all()->load("user","course");
     }
 
 }

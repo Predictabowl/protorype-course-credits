@@ -19,16 +19,17 @@
                 {{-- @if(Gate::allows("edit-courses")) --}}
                 @if(auth()->user()->isAdmin())
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            Amministratore
+                        <x-nav-link :href="route('frontIndex')" :active="request()->routeIs('frontIndex')">
+                            Lista Prospetti
+                        </x-nav-link>
+                    </div>
+                @else
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link href="{{route('frontView',[auth()->user()])}}" :active="request()->routeIs('frontView')">
+                            Prospetto
                         </x-nav-link>
                     </div>
                 @endif
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link href="{{route('frontPersonal')}}" :active="request()->routeIs('front')">
-                        Prospetto
-                    </x-nav-link>
-                </div>
             </div>
 
             <!-- Settings Dropdown -->

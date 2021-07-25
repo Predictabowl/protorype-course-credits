@@ -19,10 +19,14 @@
                     <tbody>
                         @foreach($fronts as $front)
                         <tr class="hover:bg-blue-100">
-                            <td>{{ $front->user->name }}</td>
+                            <td>
+                                <a class="hover:bg-blue-400" href="{{ route('frontView',[$front])}}">{{ $front->user->name }}</a>
+                            </td>
                             <td>
                                 @if(isset($front->course))
                                     {{ $front->course->name}}
+                                @else
+                                    Nessun corso selezionato
                                 @endif
                             </td>
                         </tr>

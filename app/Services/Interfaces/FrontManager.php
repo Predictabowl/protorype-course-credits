@@ -17,6 +17,7 @@ interface FrontManager {
     
     public function getFront(): Front;
     
+    
     /**
      * Wipe all attached TakenExams from the front
      */

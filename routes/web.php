@@ -43,7 +43,7 @@ Route::get('/admindashboard', [AdminController::class,"show"])->name('adminDashb
 
 Route::get("/exams",[ExamController::class,"index"]); //only for testing purposes
 
-//Route::get("/front",[FrontController::class,"index"])->name("frontIndex");
+
 
 //-------------- Front
 
@@ -53,9 +53,6 @@ Route::get("/front/{front}",[FrontController::class,"show"])->name("frontView");
 
 Route::put("/front/{front}",[FrontController::class,"put"]); //change course for the post
 
-Route::get("/front/options",[FrontController::class,"getOptions"]) //test round
-        ->name("courseOptions");
-
 
 //-------------- Taken exams
 
@@ -64,18 +61,13 @@ Route::post("/front/exam/{front}",[TakenExamController::class,"create"])->name("
 Route::delete("/front/exam/{front}",[TakenExamController::class,"delete"])->name("deleteTakenExam");
 
 
-
-Route::get("/tests", function(){
-    $course  = Course::first()->with("examBlocks.examBlockOptions.examApproved")->get();
-    $result = $course ->first()->examBlocks->map(fn($block) => $block->examBlockOptions)
-        ->flatten()->filter(fn ($option) => $option->examApproved->getAttribute("ssd_id") == 7);
-    ddd($result);
-
-    return $result;
-});
-
 Route::get("/studyplan/{front}",[StudyPlanController::class,"show"])->name("studyPlan");
 
-Route::get("/student/front",[StudentController::class,"showFront"])->name("frontPersonal");
 
-Route::get("/student/studyplan",[StudentController::class,"showStudyPlan"])->name("studyPlanPersonal");
+//-------------- Auto routing endpoints.
+// Will redirect to the Front routes, but these will automatically create 
+// the database entry for the authenticated user Front if is missing.
+// May think to remove it later and make FrontController handle everything
+// when the admin side is completely ironed out.
+
+Route::get("/student/front",[StudentController::class,"showFront"])->name("frontPersonal");
