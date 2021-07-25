@@ -12,6 +12,8 @@ class Ssd extends Model
     //protected $fillable = ["code"];
     protected $guarded = [];
 
+    
+    //---------- Relationships 
     public function exams()
     {
         return $this->hasMany(Exam::class);
@@ -24,5 +26,10 @@ class Ssd extends Model
     
     public function ExamBlockOptions(){
         return $this->belongsToMany(ExamBlockOption::class);
+    }
+    
+    //---------- Mutators
+    public function setCode($value){
+        $this->attributes["code"] = strtoupper("value");
     }
 }

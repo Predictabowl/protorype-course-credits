@@ -43,8 +43,8 @@
                         </div>
                         <div class="mt-4">
                             <input class="w-32"
-                                type="text" class="text-sm focus:outline-none focus:ring" name="ssd" placeholder="SSD" 
-                                value="{{old("ssd")}}">
+                                type="text" class="text-sm focus:outline-none focus:ring uppercase" name="ssd" placeholder="SSD" 
+                                value="{{old('ssd')}}">
 
                             @error("ssd")
                             <span class="text-xs text-red-500">{{ $message }}</span>
@@ -106,6 +106,7 @@
                     <x-button>
                         <a href="{{ route('studyPlan',[$front]) }}">Calcola Crediti</a>
                     </x-button>
+                    <x-flashStudyPlan/>
                 </div>
             </x-panel>
         </div>

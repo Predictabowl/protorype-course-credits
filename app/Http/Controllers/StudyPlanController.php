@@ -23,7 +23,7 @@ class StudyPlanController extends Controller
                 ->setUserId($front->user_id)
                 ->getStudyPlanBuilder();
         if (!isset($builder)){
-            return back(); //should send a notification
+            return back()->with("studyPlanFailure", "Non è stato selezionato alcun corso di laurea."); //should send a notification
         }
         return view("studyplan.showplan",[
             "studyPlan" => $builder->getStudyPlan(),

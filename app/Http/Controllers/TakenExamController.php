@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Front;
-use App\Domain\TakenExamDTO;
-use App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\FrontManager;
 use App\Factories\Interfaces\FrontManagerFactory;
 use Illuminate\Validation\Rule;
@@ -19,8 +17,11 @@ class TakenExamController extends Controller
 
     
     public function create(Front $front) {
+        $inputs = request()->all();
+        $inputs["ssd"] = strtoupper($inputs["ssd"]);
+        request()->replace($inputs);
         $attributes = request()->validate([
-            "name" => ["required", "max:255"],
+            "name" => ["required", "max:255", "alpha_num"],
             "cfu" => ["required", "numeric", "min:1", "max:18"],
             "ssd" => ["required", Rule::exists("ssds", "code")]
         ]);
