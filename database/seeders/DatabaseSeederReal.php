@@ -23,7 +23,7 @@ class DatabaseSeederReal extends Seeder
      */
     public function run()
     {
-        User::factory()->create([
+        User::create([
             "name" => "Amministratore Temporaneo",
             "email" => "admin@email.org",
             "password" => Hash::make("password")
