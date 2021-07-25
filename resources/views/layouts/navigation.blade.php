@@ -25,7 +25,7 @@
                     </div>
                 @else
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link href="{{route('frontView',[auth()->user()])}}" :active="request()->routeIs('frontView')">
+                        <x-nav-link :href="route('frontPersonal')" :active="request()->routeIs('frontView')">
                             Prospetto
                         </x-nav-link>
                     </div>
