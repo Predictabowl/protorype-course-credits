@@ -6,7 +6,7 @@ use App\Http\Controllers\FrontController;
 use App\Http\Controllers\StudentController;
 use App\Models\Course;
 use App\Http\Controllers\StudyPlanController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,8 +39,6 @@ require __DIR__.'/auth.php';
 
 //------------------
 
-Route::get('/admindashboard', [AdminController::class,"show"])->name('adminDashboard');
-
 Route::get("/exams",[ExamController::class,"index"]); //only for testing purposes
 
 
@@ -63,6 +61,12 @@ Route::delete("/front/exam/{front}",[TakenExamController::class,"delete"])->name
 
 Route::get("/studyplan/{front}",[StudyPlanController::class,"show"])->name("studyPlan");
 
+
+//-------------- Users
+Route::get("/user",[UserController::class,"index"])->name("userIndex");
+Route::get("/user/{user}",[UserController::class,"show"])->name("userShow");
+Route::put("/user/{user}",[UserController::class,"put"])->name("userUpdate");
+Route::delete("/user/{user}",[UserController::class,"delete"])->name("userDelete");
 
 //-------------- Auto routing endpoints.
 // Will redirect to the Front routes, but these will automatically create 

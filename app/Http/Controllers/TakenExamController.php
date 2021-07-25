@@ -17,6 +17,8 @@ class TakenExamController extends Controller
 
     
     public function create(Front $front) {
+        $this->authorize("create",$front);
+        
         $inputs = request()->all();
         $inputs["ssd"] = strtoupper($inputs["ssd"]);
         request()->replace($inputs);
@@ -32,6 +34,8 @@ class TakenExamController extends Controller
     }
     
     public function delete(Front $front){
+        $this->authorize("delete",$front);
+        
         $attributes = request()->validate([
             "id" => ["numeric", Rule::exists("taken_exams","id")]
         ]);

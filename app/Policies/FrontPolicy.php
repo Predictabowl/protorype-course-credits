@@ -58,9 +58,11 @@ class FrontPolicy
      * @param  \App\Models\User  $user
      * @return mixed
      */
-    public function create(User $user)
+    public function create(User $user, Front $front)
     {
-        //
+        return ($user->id === $front->user_id) ||
+            ($user->hasAtLeastOneRole(Role::ADMIN, Role::SUPERVISOR));
+        
     }
 
     /**
@@ -84,7 +86,8 @@ class FrontPolicy
      */
     public function delete(User $user, Front $front)
     {
-        //
+        return ($user->id === $front->user_id) ||
+            ($user->hasAtLeastOneRole(Role::ADMIN, Role::SUPERVISOR));
     }
 
     /**

@@ -15,9 +15,7 @@ class StudyPlanController extends Controller
     }
 
     public function show(Front $front){
-        if(Gate::denies("view-studyPlan", $front)){
-            abort(403);
-        }
+        Gate::authorize("view-studyPlan", $front);
         
         $builder = app()->make(UserFrontManager::class)
                 ->setUserId($front->user_id)

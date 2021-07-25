@@ -28,12 +28,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
-        //Gate::before(fn($user, $ability) => $user->isAdmin()); //before will disable following checks
-        //Gate::define("edit-courses", fn($user) => $user->isSupervisor() || $user->isAdmin());
-        //Gate::after(fn($user) => $user->isAdmin());
         Gate::define("view-studyPlan", fn(User $user, Front $front) => 
-                $user->isSupervisor() ||
-                $front->user_id === $user->id);
+                ($front->user_id === $user->id ||
+                    $user->isSupervisor()));
     }
 }

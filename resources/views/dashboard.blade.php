@@ -15,6 +15,15 @@
                         Amministratore: {{ auth()->user()->isAdmin()? "true" : "false" }} <br>
                         Supervisore: {{auth()->user()->isSupervisor()? "true" : "false"}}
                     </p>
+                    <div class="mt-4">
+                        <ul>
+                            <li>
+                                 <a class="underline text-blue-500 hover:text-blue-700" 
+                                    href="{{route('frontPersonal')}}">Prospetto
+                                </a>
+                            </li>
+                        </ul>                        
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,7 +3,9 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
@@ -17,9 +19,10 @@ class UserPolicy
      */
     public function viewAny(User $user)
     {
-        return ($user->hasAtLeastOneRole(Role::ADMIN, Role::SUPERVISOR))
-               ? Response::allow()
-               : Response::deny("Non hai l'autorizzazione per accedere");
+        return ($user->isAdmin()
+            ? Response::allow()
+            : Response::deny("Questa azione richiede un'autorizzazione da amministratore")
+        );
     }
 
     /**
@@ -31,7 +34,7 @@ class UserPolicy
      */
     public function view(User $user, User $model)
     {
-        
+        return ($user->hasAtLeastOneRole(Role::ADMIN, Role::SUPERVISOR));
     }
 
     /**
@@ -54,7 +57,10 @@ class UserPolicy
      */
     public function update(User $user, User $model)
     {
-        
+        return ($user->isAdmin()
+            ? Response::allow()
+            : Response::deny("Questa azione richiede un'autorizzazione da amministratore")
+        );
     }
 
     /**
@@ -66,7 +72,10 @@ class UserPolicy
      */
     public function delete(User $user, User $model)
     {
-
+        return ($user->isAdmin()
+            ? Response::allow()
+            : Response::deny("Questa azione richiede un'autorizzazione da amministratore")
+        );
     }
 
     /**

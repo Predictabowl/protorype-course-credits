@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-16 w-auto fill-current text-gray-600" />
+                        <x-application-logo class="block h-16 w-40 fill-current text-gray-600" />
                     </a>
                 </div>
 
@@ -17,19 +17,28 @@
                     </x-nav-link>
                 </div>
                 {{-- @if(Gate::allows("edit-courses")) --}}
-                @if(auth()->user()->isAdmin())
+                @if(auth()->user()->isSupervisor())
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link :href="route('frontIndex')" :active="request()->routeIs('frontIndex')">
                             Lista Prospetti
                         </x-nav-link>
                     </div>
-                @else
+                @endif
+                @can("viewAny",App\Models\Front::class)
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link :href="route('userIndex')" :active="request()->routeIs('userIndex')">
+                            Gestione Utenti
+                        </x-nav-link>
+                    </div>
+                @endcan
+                @if(auth()->user()->isStudent())
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link :href="route('frontPersonal')" :active="request()->routeIs('frontView')">
                             Prospetto
                         </x-nav-link>
                     </div>
                 @endif
+                
             </div>
 
             <!-- Settings Dropdown -->
