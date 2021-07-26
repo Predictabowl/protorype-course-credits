@@ -9,6 +9,8 @@ class Front extends Model
 {
     use HasFactory;
     
+    protected $attributes = ["course_id" => null];
+    
     protected $fillable = ["user_id", "course_id"];
     
 
@@ -26,4 +28,5 @@ class Front extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
 }

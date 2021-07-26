@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
 
 class FrontRepositoryImplTest extends TestCase
 {
@@ -23,14 +24,19 @@ class FrontRepositoryImplTest extends TestCase
     
     protected function setUp(): void {
         parent::setUp();
-        Course::factory(self::FIXTURE_COURSE_NUM)->create();
-        User::factory(self::FIXTURE_USER_NUM)->create();
+        
         
         $this->repository = new FrontRepositoryImpl();
     }
     
+    private function populateData(){
+        Course::factory(self::FIXTURE_COURSE_NUM)->create();
+        User::factory(self::FIXTURE_USER_NUM)->create();
+    }
+    
     public function test_save_successful()
     {
+        $this->populateData();
         $front = new Front([
             "user_id" => 3,
             "course_id" => 2
@@ -62,12 +68,13 @@ class FrontRepositoryImplTest extends TestCase
         $this->assertDatabaseCount("fronts", 0);
     }
     
-    public function test_save_when_course_not_exists()
+    public function test_save_when_course_id_not_exists()
     {
         $new = new Front([
             "user_id" => 2,
             "course_id" => self::FIXTURE_COURSE_NUM+1
         ]);
+        Log::shouldReceive("error")->once();
         
         $result = $this->repository->save($new);
         
@@ -78,6 +85,7 @@ class FrontRepositoryImplTest extends TestCase
     
     public function test_save_when_user_id_already_present()
     {
+        $this->populateData();
         Front::create([
             "course_id" => 3,
             "user_id" => 2
@@ -101,6 +109,7 @@ class FrontRepositoryImplTest extends TestCase
 
     
     public function test_delete_when_not_present(){
+        $this->populateData();
         Front::factory()->create();
         
         $result = $this->repository->delete(2);
@@ -110,6 +119,7 @@ class FrontRepositoryImplTest extends TestCase
     }
     
     public function test_delete_when_present(){
+        $this->populateData();
         Front::create([
             "id" => 1,
             "course_id" => 2,
@@ -137,6 +147,7 @@ class FrontRepositoryImplTest extends TestCase
     }
     
     public function test_get_success() {
+        $this->populateData();
         $frontArray = [
             "id" => 5,
             "course_id" => 3,
@@ -151,18 +162,21 @@ class FrontRepositoryImplTest extends TestCase
     }
     
     public function test_getFromUser_when_User_not_present() {
+        $this->populateData();
         $this->expectException(ModelNotFoundException::class);
 
         $this->repository->getFromUser(self::FIXTURE_USER_NUM+1);
     }
     
     public function test_getFromUser_when_front_not_present() {
+        $this->populateData();
         $sut = $this->repository->getFromUser(1);
         
         $this->assertEmpty($sut);
     }
     
     public function test_getFromUser_success() {
+        $this->populateData();
         $frontArray = [
             "id" => 1,
             "course_id" => 2,
@@ -185,12 +199,14 @@ class FrontRepositoryImplTest extends TestCase
     }
     
     public function test_updateCourse_when_Course_not_present(){
+        $this->populateData();
         $frontArray = [
             "id" => 1,
             "course_id" => 3,
             "user_id" => 3
         ];
         Front::factory()->create($frontArray);
+        Log::shouldReceive("error")->once();
         
         $result = $this->repository->updateCourse(1,self::FIXTURE_COURSE_NUM+1);
         
@@ -199,6 +215,7 @@ class FrontRepositoryImplTest extends TestCase
     }
     
     public function test_updateCourse_succesful(){
+        $this->populateData();
         $changedFront = [
             "id" => 1,
             "course_id" => 2,
@@ -215,5 +232,83 @@ class FrontRepositoryImplTest extends TestCase
         $this->assertEquals([1,2,3],
                 [$sut["id"],$sut["course_id"],$sut["user_id"]]);
         $this->assertDatabaseHas("fronts", $changedFront);
+    }
+    
+    public function test_getAll_no_filters(){
+        Front::create(["user_id" => User::factory()->create()->id]);
+        Front::create(["user_id" => User::factory()->create()->id]);
+        Front::create(["user_id" => User::factory()->create()->id]);
+                
+        $result = $this->repository->getAll([]);
+
+        $this->assertCount(3, $result);
+        $this->assertEquals(Front::all()->load("user","course"), $result);
+    }
+    
+    public function test_getAll_search_user_filter(){
+        Front::create([
+            "user_id" => User::factory()->create([
+                "name" => "mario",
+                "email" => "testmail"
+            ])->id
+        ]);
+        Front::create([
+            "user_id" => User::factory()->create([
+                "name" => "giulio",
+                "email" => "giulio@posta.it"
+            ])->id
+        ]);
+        Front::create([
+            "user_id" => User::factory()->create([
+                "name"  => "test 1",
+                "email" => "mariangela@email.com"
+            ])->id
+        ]);
+                
+        $result = $this->repository->getAll(["search" => "mar"]);
+        
+        $this->assertCount(2, $result);
+        $this->assertEquals(Front::with("user","course")->first(), $result[0]);
+        $this->assertEquals(Front::with("user","course")->find(3), $result[1]);
+    }
+    
+    public function test_getAll_search_course_filter(){
+        Front::factory()->create([
+            "course_id" => Course::factory()->create(["name" => "Corso di qualcosa"])
+        ]);
+        Front::factory()->create(["course_id" => null]);
+        Front::factory()->create([
+            "course_id" => Course::factory()->create(["name" => "Corso di qualcosaltro"])
+        ]);
+                
+        $result = $this->repository->getAll(["course" => "Corso di qualcosa"]);
+        
+        $this->assertCount(1, $result);
+        $this->assertEquals(Front::with("user","course")->first(), $result[0]);
+    }
+    
+    public function test_getAll_search_both_filters(){
+        $courseName = "Corso tangenziale";
+        $course = Course::factory()->create(["name" => $courseName]);
+        
+        Front::factory()->create([
+            "user_id" => USer::factory()->create(["name" => "carlo"]),
+            "course_id" => Course::factory()->create(["name" => "Corso di qualcosa"])
+        ]);
+        Front::factory()->create([
+            "user_id" => USer::factory()->create(["name" => "luigi"]),
+            "course_id" => 1
+        ]);
+        Front::factory()->create([
+            "user_id" => USer::factory()->create(["name" => "carlo"]),
+            "course_id" => 1
+        ]);
+                
+        $result = $this->repository->getAll([
+            "search" => "arl",
+            "course" => $courseName]);
+        
+        $this->assertCount(1, $result);
+        $this->assertEquals(Front::with("user","course")->find(3), $result[0]);
     }
 }

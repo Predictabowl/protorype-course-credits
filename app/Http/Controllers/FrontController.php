@@ -24,7 +24,10 @@ class FrontController extends Controller
     public function index(){
         $this->authorize("viewAny", Front::class);
         return view("front.index", [
-           "fronts" => app()->make(FrontRepository::class)->getAll()
+            "fronts" => app()->make(FrontRepository::class)
+                ->getAll(request(["search","course"])),
+            "courses" => app()->make(CourseRepository::class)
+                ->getAll()
         ]);
     }
     

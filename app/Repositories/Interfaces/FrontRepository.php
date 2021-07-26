@@ -9,6 +9,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\Front;
+use Illuminate\Support\Collection;
 
 /**
  * Description of FrontRepository
@@ -21,7 +22,7 @@ interface FrontRepository {
     
     public function getFromUser($id): ?Front;
     
-    public function getAll();
+    public function getAll(array $filters): Collection;
 
     /**
      * Create a new Front if not present.

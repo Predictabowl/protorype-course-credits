@@ -11,7 +11,7 @@ namespace App\Repositories\Implementations;
 use App\Repositories\Interfaces\FrontRepository;
 use App\Models\Front;
 use App\Models\User;
-use App\Models\Course;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
@@ -65,9 +65,23 @@ class FrontRepositoryImpl implements FrontRepository{
         }
         return $user->front;
     }
+        
+    public function getAll(array $filters): Collection {
+        $query = Front::with("user","course");
 
-    public function getAll() {
-        return Front::all()->load("user","course");
+        if (isset($filters["search"])){
+            $query->whereHas("user",fn($query) => 
+                    $query->where("users.name","like","%".$filters["search"]."%")
+                     ->orWhere("users.email","like","%".$filters["search"]."%")
+                   );
+        }
+        
+        if (isset($filters["course"])){
+            $query->whereHas("course",fn($query) => 
+                    $query->where("courses.name","=",$filters["course"]));
+        }
+        
+        return $query->get();
     }
 
 }

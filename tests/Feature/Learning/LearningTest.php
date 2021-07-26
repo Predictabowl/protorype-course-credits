@@ -20,11 +20,24 @@ class LearningTest extends TestCase{
     use RefreshDatabase;
     
     public function test_example() {
-        $ssd = "INF/01";
+        User::factory()->create([
+            "name" => "mario"
+        ]);
+        User::factory()->create([
+            "name" => "luigi"
+        ]);
+        User::factory()->create([
+            "name" => "carlo"
+        ]);
+        Front::create(["user_id" => 1]);
+        Front::create(["user_id" => 2]);
+        Front::create(["user_id" => 3]);
         
-        $id = GenerateSSD::getSSDId($ssd);
-        
-        $this->assertEquals(10, $id);
+        $query = Front::with("user","course");//->join("users","fronts.user_id","=","users.id");
+//        $result = Front::with("user","course")->join("users","fronts.user_id","=","users.id")
+//                ->where("users.name","like","%ca%")->get();
+        //$query = $query->where("users.name","like","%ca%");
+        dd($query->get()[1]->attributesToArray());
     }
    
     

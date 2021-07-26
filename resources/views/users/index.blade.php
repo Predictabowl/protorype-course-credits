@@ -9,16 +9,17 @@
 
         <x-panel>
             <div class="place-content-center">
-                <div class="relative mb-4 flex lg:inline-flex items-center bg-gray-100 rounded-xl px-3 py-2">
+{{--                 <div class="relative mb-4 flex lg:inline-flex items-center bg-gray-100 rounded-xl px-3 py-2">
                     <form method="GET" action="#">
-                      {{--   @if(request("category"))
+                        @if(request("category"))
                             <input type="hidden" name="category" value="{{request("category")}}">
-                        @endif --}}
+                        @endif
                         <input type="text" name="search" placeholder="Cerca utente"
                             class="bg-transparent placeholder-black font-semibold text-sm"
                             value="{{ request("search") }}">
                     </form>
-                </div>
+                </div> --}}
+                <x-searchUserBar class="mb-4" placeholder="Cerca utente" filter="role"/>
                 <table class="min-w-full rounded-lg">
                     <thead>
                         <tr class="bg-gray-100">
@@ -30,9 +31,7 @@
                     <tbody>
                         @foreach($users as $user)
                         <tr class="hover:bg-blue-100 active:bg-blue-400">
-                            <td>
-                                <a href="#">{{ $user->name }}</a>
-                            </td>
+                            <td> {{ $user->name }} </td>
                             <td> {{ $user->email}} </td>
                             <td> 
                                 @foreach($user->roles as $role)
