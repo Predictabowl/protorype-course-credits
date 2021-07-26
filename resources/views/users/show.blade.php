@@ -17,12 +17,14 @@
                     @method("PUT")
                     {{-- To be changed with a dynamic role foreach --}}
                     <div class="ml-4">
-                        <input type="checkbox" class="text-sm focus:outline-none focus:ring" name="admin" value="admin"
+                        <input type="checkbox" class="text-sm focus:outline-none focus:ring" id="admin" 
+                            name="{{ App\Models\Role::ADMIN }}"
                             {{ $user->isAdmin() ? "checked" : ""}}>
                         <label class="ml-2" for="admin">Amministratore</label>
                     </div>
                     <div class="ml-4 mt-4">
-                        <input type="checkbox" class="text-sm focus:outline-none focus:ring" name="supervisor" value="supervisor"
+                        <input type="checkbox" class="text-sm focus:outline-none focus:ring" id="supervisor"
+                            name="{{ App\Models\Role::SUPERVISOR }}"
                             {{ $user->isSupervisor() ? "checked" : ""}}>
                         <label class="ml-2" for="supervisor">Supervisore</label>
                     </div>

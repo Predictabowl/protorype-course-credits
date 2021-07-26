@@ -10,6 +10,11 @@ namespace App\Repositories\Implementations;
 
 use \App\Repositories\Interfaces\UserRepository;
 use App\Models\User;
+use \App\Models\Role;
+use App\Models\RoleUser;
+use Illuminate\Support\Collection;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Description of UserRepositoryImpl
@@ -23,7 +28,7 @@ class UserRepositoryImpl implements UserRepository {
     }
 
     public function get($id): ?User {
-        return User::find($id);
+        return User::with("roles")->find($id);
     }
 
     public function save(User $user): bool {
@@ -31,6 +36,39 @@ class UserRepositoryImpl implements UserRepository {
             throw new \InvalidArgumentException("User ID should be null while saving");
         }
         return $user->save();
+    }
+
+    public function addRole($userId, $roleName): bool {
+        $role = Role::where("name","$roleName")->first();
+        if(!isset($role)){
+            return false;
+        }
+        
+        try{
+            RoleUser::FirstOrCreate([
+                "role_id" => $role->id,
+                "user_id" => $userId
+            ]);
+        } catch (QueryException $exc){
+            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public function removeRole($userId, $roleName): bool {
+        $user = User::with("roles")->find($userId);
+        if (!isset($user)){
+            Log::error(__CLASS__ . "::" . __METHOD__ . ". Could not find User model with id: " . $userId);
+            return false;
+        }
+        $user->roles()->where("name",$roleName)->get()->map(fn($role) => 
+                $user->roles()->detach($role));
+        return true;
+    }
+
+    public function getAll(array $filters): Collection {
+        return User::with("roles")->filter($filters)->get();
     }
 
 }

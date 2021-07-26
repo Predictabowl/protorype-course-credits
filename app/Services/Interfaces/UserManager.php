@@ -8,8 +8,8 @@
 
 namespace App\Services\Interfaces;
 
-use App\Models\Front;
-use App\Services\Interfaces\FrontManager;
+use App\Models\User;
+use Illuminate\Support\Collection;
 
 /**
  *
@@ -17,30 +17,8 @@ use App\Services\Interfaces\FrontManager;
  */
 interface UserManager {
     
-    /**
-     * Must be called to initialize the instance.
-     * 
-     * @param type $id 1 is successful, 0 otherwise
-     */
-    public function setUser($id): int;
+    public function getAll($filters): Collection;
     
-    /**
-     * Return a manager for front associated with the user.
-     * If the Front exist it will automatically set it up.
-     * 
-     * @return FrontManager
-     */
-    public function getFrontManager(): FrontManager;
-    
-    /**
-     * Will return a manager for the $userId specified.
-     * If the Front exist it will automatically set it up.
-     * Will return null if the userId doesn't cannot be found or if the
-     * active user is not an admin.
-     * 
-     * @param type $userId
-     * @return FrontManager|null
-     */
-    public function getAdminFrontManager($userId): ?FrontManager;
+    public function modRole(User $user, array $attributes);
     
 }

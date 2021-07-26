@@ -9,6 +9,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 /**
  *
@@ -18,7 +19,14 @@ interface UserRepository {
     
     public function get($id): ?User;
     
+    public function getAll(array $filters): Collection;
+    
     public function save(User $user): bool;
     
     public function delete($id): bool;
+    
+    public function addRole($userId, $roleName): bool;
+    
+    public function removeRole($userId, $roleName): bool;
+    
 }

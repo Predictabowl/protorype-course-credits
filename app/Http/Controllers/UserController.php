@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Role;
-use App\Models\RoleUser;
+use App\Services\Interfaces\UserManager;
+use App\Repositories\Interfaces\UserRepository;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -14,9 +14,10 @@ class UserController extends Controller
     }
 
     public function index() {
-        $this->authorize("viewAny", auth()->user());
+        $this->authorize("viewAny", auth()->user());;
+        
         return view("users.index", [
-            "users" => User::with("roles")->filter(request(["search"]))->get()
+            "users" => $this->getUserManager()->getAll(request(["search"]))
         ]);
     }
     
@@ -25,30 +26,9 @@ class UserController extends Controller
      */
     public function put(User $user) {
         $this->authorize("update", $user);
-        // temp code, to move in a proper service layer
-        $attributes = request()->all();
         
-        // check if it already have the role
-        $role = Role::where("name",Role::ADMIN)->first();
-        if (isset($attributes["admin"])){
-            RoleUser::firstOrCreate([
-                "user_id" => $user->id,
-                "role_id" => $role->id
-            ]);
-        } else {
-            $user->roles()->detach($role);
-        }
+        $this->getUserManager()->modRole($user->id, request()->all());
         
-        $role = Role::where("name",Role::SUPERVISOR)->first();
-        if (isset($attributes["supervisor"])){
-            RoleUser::firstOrCreate([
-                "user_id" => $user->id,
-                "role_id" => $role->id
-            ]);
-        } else {
-            $user->roles()->detach($role);
-        }        
-
         return redirect()->route("userIndex");
     }
     
@@ -66,4 +46,8 @@ class UserController extends Controller
         ]);
     }
 
+    
+    private function getUserManager(): UserManager{
+        return app()->make(UserManager::class);
+    }
 }

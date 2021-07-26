@@ -10,12 +10,16 @@ use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Implementations\ExamBlockRepositoryImpl;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Implementations\CourseRepositoryImpl;
+use App\Repositories\Interfaces\UserRepository;
+use App\Repositories\Implementations\UserRepositoryImpl;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Implementations\ExamDistanceByName;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Implementations\StudyPlanBuilderImpl;
 use App\Services\Interfaces\UserFrontManager;
 use App\Services\Implementations\UserFrontManagerImpl;
+use App\Services\Interfaces\UserManager;
+use App\Services\Implementations\UserManagerImpl;
 use App\Mappers\Interfaces\TakenExamMapper;
 use App\Mappers\Implementations\TakenExamMapperImpl;
 use App\Mappers\Interfaces\ExamBlockMapper;
@@ -50,15 +54,17 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TakenExamMapper::class, TakenExamMapperImpl::class);
         
         //---- Repositories
+        $this->app->bind(CourseRepository::class, CourseRepositoryImpl::class);
         $this->app->bind(ExamBlockRepository::class, ExamBlockRepositoryImpl::class);
         $this->app->bind(FrontRepository::class, FrontRepositoryImpl::class);
         $this->app->bind(TakenExamRepository::class, TakenExamRespositoryImpl::class);
-        $this->app->bind(CourseRepository::class, CourseRepositoryImpl::class);
+        $this->app->bind(UserRepository::class, UserRepositoryImpl::class);
     
         //---- Services
         $this->app->bind(ExamDistance::class, ExamDistanceByName::class);
         $this->app->bind(StudyPlanBuilder::class, StudyPlanBuilderImpl::class);
         $this->app->bind(UserFrontManager::class, UserFrontManagerImpl::class);
+        $this->app->bind(UserManager::class, UserManagerImpl::class);
         
     }
 
