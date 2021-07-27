@@ -23,11 +23,21 @@ class FrontController extends Controller
     
     public function index(){
         $this->authorize("viewAny", Front::class);
+        
+// this should be done in the service layer
+        $courses = app()->make(CourseRepository::class)->getAll();
+        if (request()->has("course")){
+            $currentCourse = $courses->first(fn($course) => 
+                    $course->id == request()->get("course"));
+        } else {
+            $currentCourse = null;
+        }
+        
         return view("front.index", [
             "fronts" => app()->make(FrontRepository::class)
                 ->getAll(request(["search","course"])),
-            "courses" => app()->make(CourseRepository::class)
-                ->getAll()
+            "courses" => $courses,
+            "currentCourse" => $currentCourse
         ]);
     }
     
@@ -55,25 +65,5 @@ class FrontController extends Controller
     private function makeFrontManager($id): FrontManager{
         return app()->make(FrontManagerFactory::class)->getFrontManager($id);
     }
-    
-
-       
-//    public function create() {
-//        $attributes = request()->validate([
-//            "name" => ["required", "max:255"],
-//            "cfu" => ["required", "numeric", "min:1", "max:18"],
-//            "ssd" => ["required", Rule::exists("ssds", "code")]
-//        ]);
-//        
-//        $exam = new TakenExamDTO(0, $attributes["name"], $attributes["ssd"], $attributes["cfu"]);
-//        $this->getFrontManager()->saveTakenExam($exam);
-//        
-//        return back();
-//    }
-    
-//    public function delete(int $id){
-//        $this->getFrontManager()->deleteTakenExam($id);
-//        return back();
-//    }
     
 }

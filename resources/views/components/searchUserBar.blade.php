@@ -6,7 +6,7 @@
             <input type="hidden" name="{{$filter}}" value="{{request($filter)}}">
         @endif
         <input type="text" name="search" placeholder="{{ $placeholder }}"
-            class="bg-transparent placeholder-black font-semibold text-sm"
+            class="bg-transparent font-semibold text-sm"
             value="{{ request("search") }}">
     </form>
 </div>

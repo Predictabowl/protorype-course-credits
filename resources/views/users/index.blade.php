@@ -19,7 +19,9 @@
                             value="{{ request("search") }}">
                     </form>
                 </div> --}}
-                <x-searchUserBar class="mb-4" placeholder="Cerca utente" filter="role"/>
+                <div class="mb-4">
+                    <x-searchUserBar placeholder="Cerca per nome o email" filter="role"/>
+                </div>
                 <table class="min-w-full rounded-lg">
                     <thead>
                         <tr class="bg-gray-100">

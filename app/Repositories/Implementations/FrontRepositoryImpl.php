@@ -78,7 +78,7 @@ class FrontRepositoryImpl implements FrontRepository{
         
         if (isset($filters["course"])){
             $query->whereHas("course",fn($query) => 
-                    $query->where("courses.name","=",$filters["course"]));
+                    $query->where("courses.id","=",$filters["course"]));
         }
         
         return $query->get();
