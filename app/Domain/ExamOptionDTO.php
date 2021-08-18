@@ -27,7 +27,7 @@ class ExamOptionDTO implements ExamDTO{
     private $linkedTakenExams;
     private $recognizedCredits;
 
-    public function __construct($id, string $examName, ExamBlockDTO $block, int $cfu, string $ssd) {
+    public function __construct($id, string $examName, ExamBlockDTO $block, int $cfu, ?string $ssd) {
         $this->id = $id;
         $this->examName = $examName;
         $this->block = $block;
@@ -51,7 +51,7 @@ class ExamOptionDTO implements ExamDTO{
         return $this->cfu;
     }
 
-    public function getSsd(): string {
+    public function getSsd(): ?string {
         return $this->ssd;
     }
     

@@ -16,6 +16,4 @@ interface StudyPlanBuilder {
      */
     public function getTakenExams(): Collection;
 
-//    public function refreshStudyPlan(): StudyPlanBuilder;
-
 }

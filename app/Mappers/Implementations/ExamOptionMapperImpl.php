@@ -21,7 +21,11 @@ use App\Domain\ExamOptionDTO;
 class ExamOptionMapperImpl  implements ExamOptionMapper{
     
     public function toDTO(ExamBlockOption $model, ExamBlockDTO $block): ExamOptionDTO {
-        $newOption = new ExamOptionDTO($model->id, $model->exam->name, $block, $model->exam->cfu, $model->exam->ssd->code);
+        $ssd = $model->exam->ssd;
+        if($ssd != null){
+            $ssd = $ssd->code;
+        }
+        $newOption = new ExamOptionDTO($model->id, $model->exam->name, $block, $model->exam->cfu, $ssd);
         $model->ssds->each(fn($ssd) => $newOption->addCompatibleOption($ssd->code));
         return $newOption;
     }

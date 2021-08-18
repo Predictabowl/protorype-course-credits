@@ -27,6 +27,7 @@ class DatabaseSeederReal extends Seeder
             "name" => "Amministratore Temporaneo",
             "email" => "admin@email.org",
             "password" => Hash::make("password"),
+            "email_verified_at" => now()
         ]);
         $admin->email_verified_at = now();
         
@@ -161,6 +162,9 @@ class DatabaseSeederReal extends Seeder
             ["Istituzioni di diritto e procedura penale (a distanza)",9,"IUS/07"]],
             ["INF/01","IUS/01","IUS/05","IUS/07","IUS/10","IUS/12","IUS/14","IUS/16","IUS/17","M-STO/02","M-STO/04","SECS-S/04","SPS/02","SPS/03","SPS/04","SPS/08","SPS/09","SPS/12"]
         );
+        
+        $this->generateFreeChoiceExams($courseId, 2, 6);
+        
     }
     
     private function generateBlock($courseId, $maxExams, $data, $compatibilities = []){
@@ -190,5 +194,24 @@ class DatabaseSeederReal extends Seeder
             
         }
 
+    }
+    
+    private function generateFreeChoiceExams($courseId, $numExams, $cfu){
+        $exam = Exam::create([
+                "name" => "Esame a scelta dello studente",
+                "cfu" => $cfu,
+        ]);
+        
+        for ($index = 0; $index < $numExams; $index++) {
+            $block = ExamBlock::create([
+                "max_exams" => 1,
+                "course_id" => $courseId
+            ]);
+
+            $option = ExamBlockOption::create([
+                    "exam_id" => $exam->id,
+                    "exam_block_id" => $block->id
+            ]);
+        }
     }
 }

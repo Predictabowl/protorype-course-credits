@@ -59,7 +59,9 @@ Route::post("/front/exam/{front}",[TakenExamController::class,"create"])->name("
 Route::delete("/front/exam/{front}",[TakenExamController::class,"delete"])->name("deleteTakenExam");
 
 
+//-------------- Study Plan
 Route::get("/studyplan/{front}",[StudyPlanController::class,"show"])->name("studyPlan");
+Route::get("/studyplan/pdf/{front}",[StudyPlanController::class,"createPdf"])->name("studyPlanPdf");
 
 
 //-------------- Users

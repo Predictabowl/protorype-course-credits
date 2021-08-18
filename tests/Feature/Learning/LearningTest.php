@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Support\Seeders\GenerateSSD;
 use App\Models\User;
+use App\Models\Exam;
 use App\Models\Front;
 use App\Domain\TakenExamDTO;
 use App\Models\Ssd;

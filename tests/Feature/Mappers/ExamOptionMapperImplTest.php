@@ -59,4 +59,32 @@ class ExamOptionMapperImplTest extends TestCase{
                 $result->getExamName(),
                 $result->getSsd()]);
     }
+    
+    public function test_toTDO_on_exam_with_null_ssD() {
+        Ssd::factory(3)->create();
+        Course::factory()->create();
+        Exam::create([
+            "name" => "esame test",
+            "cfu" => 7
+        ]);
+        ExamBlock::factory()->create();
+        ExamBlockOption::factory()->create();
+        $option = ExamBlockOption::first();
+        $block = new ExamBlockDTO(1, 2);
+        
+        $result = $this->mapper->toDTO($option, $block);
+        
+        $this->assertEquals($block, $result->getBlock());
+        $this->assertEquals($block->getExamOption(1), $result);
+        $this->assertEquals(
+               [$option->id,
+                $option->exam->cfu,
+                $option->exam->name,
+                $option->exam->ssd,
+                ],
+               [$result->getId(),
+                $result->getCfu(),
+                $result->getExamName(),
+                $result->getSsd()]);
+    }
 }

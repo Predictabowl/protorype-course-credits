@@ -66,9 +66,13 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         return $this->studyPlan;
     }
     
-    public function getApprovedExams() {
-        return $this->examOptions;
+    public function getTakenExams(): Collection {
+        return $this->declaredExams;
     }
+    
+//    public function getApprovedExams() {
+//        return $this->examOptions;
+//    }
     
     public function refreshStudyPlan(): StudyPlanBuilder {
         $examBlocks = $this->courseManager->getExamBlocks();
@@ -78,20 +82,26 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         return $this;
     }
     
-    public function getTakenExams(): Collection {
-        return $this->declaredExams;
-    }
 
     
     private function buildStudyPlan() {
+        // First it checks direct ssd corrispondency
         $leftover = $this->declaredExams->map(fn($linkedExam) =>
             $this->linkExam($this->getOptionsBySsd($linkedExam)
                     ,$linkedExam)
         )->sum();
         
+        // If there's credits left to assign it check the option's compatibility list
+        if($leftover > 0){
+            $leftover = $this->declaredExams->map(fn($linkedExam) =>
+                $this->linkExam($this->getOptionsByCompatibility($linkedExam)
+                            ,$linkedExam))->sum();
+        }
+        
+        // Free choice exams are reserved for last
         if($leftover > 0){
             $this->declaredExams->map(fn($linkedExam) =>
-                $this->linkExam($this->getOptionsByCompatibility($linkedExam)
+                $this->linkExam($this->getFreeChoiceOptions($linkedExam)
                             ,$linkedExam));
         }
         
@@ -100,6 +110,12 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
                 fn(TakenExamDTO $exam) => $exam->getActualCfu() > 0));
     }
     
+    /**
+     * Return the ordered list of exams with the same ssd as the takenExam.
+     * The order is ascending based on the distance calculated by the object eDistance.
+     * @param TakenExamDTO $takenExam
+     * @return type
+     */
     public function getOptionsBySsd(TakenExamDTO $takenExam){
         return $this->sortOptions(
                 $this->examOptions->filter(fn($option) => 
@@ -107,11 +123,33 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
                 ,$takenExam);
     }
     
+    /**
+     * Return the ordered list of exams where their ssd appears in the option
+     * compatibility list of ssds.
+     * The order is ascending based on the distance calculated by the object eDistance.
+     * 
+     * @param TakenExamDTO $takenExam
+     * @return type
+     */
     public function getOptionsByCompatibility(TakenExamDTO $takenExam){
         return $this->sortOptions(
                 $this->examOptions->filter(fn(ExamOptionDTO $option) => 
                     $option->getCompatibleOptions()->contains(
                             fn(string $ssd) => $ssd === $takenExam->getSsd()))
+                ,$takenExam);
+    }
+    
+    /**
+     * Return the ordered list of exams with null ssd, as those are considered
+     * by default as "any ssd will fit".
+     * The order is ascending based on the distance calculated by the object eDistance.
+     * @param TakenExamDTO $takenExam
+     * @return type
+     */
+    public function getFreeChoiceOptions(TakenExamDTO $takenExam){
+        return $this->sortOptions(
+                $this->examOptions->filter(fn($option) => 
+                        $option->getSsd() === null)
                 ,$takenExam);
     }
     
