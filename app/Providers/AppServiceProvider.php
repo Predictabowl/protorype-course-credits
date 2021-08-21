@@ -20,6 +20,8 @@ use App\Services\Interfaces\UserFrontManager;
 use App\Services\Implementations\UserFrontManagerImpl;
 use App\Services\Interfaces\UserManager;
 use App\Services\Implementations\UserManagerImpl;
+use App\Services\Interfaces\FrontsSearchManager;
+use App\Services\Implementations\FrontsSearchManagerImpl;
 use App\Mappers\Interfaces\TakenExamMapper;
 use App\Mappers\Implementations\TakenExamMapperImpl;
 use App\Mappers\Interfaces\ExamBlockMapper;
@@ -65,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(StudyPlanBuilder::class, StudyPlanBuilderImpl::class);
         $this->app->bind(UserFrontManager::class, UserFrontManagerImpl::class);
         $this->app->bind(UserManager::class, UserManagerImpl::class);
+        $this->app->bind(FrontsSearchManager::class, FrontsSearchManagerImpl::class);
         
     }
 

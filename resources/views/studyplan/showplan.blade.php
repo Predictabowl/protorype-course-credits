@@ -7,6 +7,16 @@
 
     <x-mainpanel width="max-w-full">
         <x-panel>
+            <div class="flex justify-end mb-4">
+                <div>
+                    Versione stampabile
+                    <a href="{{route("studyPlanPdf",[$front])}}">
+                        <x-button-icon width="w-14" height="h-14" name="id">
+                            <img src="/images/print-icon.svg" alt="Stampa">
+                        </x-button-icon>
+                    </a>
+                </div>
+            </div>
             <div class="place-content-center">
                 <table class="table-auto w-full">
                     <thead class="w-full bg-gray-100">

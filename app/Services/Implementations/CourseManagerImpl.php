@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Domain\ExamBlockDTO;
 use App\Services\Interfaces\CourseManager;
 use App\Repositories\Interfaces\ExamBlockRepository;
+use App\Repositories\Interfaces\CourseRepository;
 use App\Mappers\Interfaces\ExamBlockMapper;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -43,11 +44,15 @@ class CourseManagerImpl implements CourseManager {
     }
 
     public function delExamBlock($id) {
-        if (Gate::allows("edit-courses")){
+        if (Gate::allows("edit-courses")){ //redundant, should not be the duty of the manager
             ddd("Method not implemented yet: admin");
         } else {
             ddd("Method not implemented yet: normal user");
         }
+    }
+    
+    public function getCourse(): Course {
+        return app()->make(CourseRepository::class)->get($this->courseId);
     }
     
     private function getBlockRepository(): ExamBlockRepository {

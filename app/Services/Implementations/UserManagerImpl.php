@@ -11,7 +11,7 @@ namespace App\Services\Implementations;
 use App\Models\Role;
 use App\Repositories\Interfaces\UserRepository;
 use App\Services\Interfaces\UserManager;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\Paginator;
 
 /**
  * Description of UserManagerImpl
@@ -36,11 +36,11 @@ class UserManagerImpl implements UserManager{
         }
     }
 
-    public function getAll($filters): Collection {
-        return $this->getUSerRepository()->getAll($filters);
+    public function getAll($filters): Paginator{
+        return $this->getUserRepository()->getAll($filters,25);
     }
     
-    private function getUSerRepository(): UserRepository{
+    private function getUserRepository(): UserRepository{
         return app()->make(UserRepository::class);
     }
 

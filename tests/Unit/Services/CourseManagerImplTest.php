@@ -9,6 +9,7 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Course;
+use App\Repositories\Interfaces\CourseRepository;
 use App\Domain\ExamBlockDTO;
 use App\Domain\ExamOptionDTO;
 use App\Models\ExamBlock;
@@ -96,6 +97,20 @@ class CourseManagerImplTest extends TestCase{
         
         $this->assertEquals(collect([$option1,$option2,$option3]), $result);
         
+    }
+    
+    public function test_getCourse(){
+        $course = new Course();
+        $courseRepo = $this->createMock(CourseRepository::class);
+        $courseRepo->expects($this->once())
+                ->method("get")
+                ->with(self::FIXTURE_COURSE_ID)
+                ->willReturn($course);
+        app()->instance(CourseRepository::class, $courseRepo);
+        
+        $result = $this->manager->getCourse();
+        
+        $this->assertSame($course, $result);
     }
     
 }

@@ -9,7 +9,7 @@
 namespace App\Services\Interfaces;
 
 use App\Models\User;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\Paginator;
 
 /**
  *
@@ -17,7 +17,7 @@ use Illuminate\Support\Collection;
  */
 interface UserManager {
     
-    public function getAll($filters): Collection;
+    public function getAll($filters): Paginator;
     
     public function modRole(User $user, array $attributes);
     

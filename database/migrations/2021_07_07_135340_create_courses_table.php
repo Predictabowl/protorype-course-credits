@@ -17,6 +17,7 @@ class CreateCoursesTable extends Migration
             $table->id();
             $table->string("name")->unique();
             $table->unsignedSmallInteger("cfu");
+            $table->unsignedSmallInteger("maxRecognizedCfu")->nullable();
             $table->timestamps();
         });
     }

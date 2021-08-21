@@ -239,10 +239,10 @@ class FrontRepositoryImplTest extends TestCase
         Front::create(["user_id" => User::factory()->create()->id]);
         Front::create(["user_id" => User::factory()->create()->id]);
                 
-        $result = $this->repository->getAll([]);
+        $result = $this->repository->getAll([],25);
 
         $this->assertCount(3, $result);
-        $this->assertEquals(Front::all()->load("user","course"), $result);
+        $this->assertEquals(Front::with("user","course")->paginate(25), $result);
     }
     
     public function test_getAll_search_user_filter(){
@@ -281,7 +281,9 @@ class FrontRepositoryImplTest extends TestCase
             "course_id" => Course::factory()->create(["name" => "Corso di qualcosaltro"])
         ]);
                 
-        $result = $this->repository->getAll(["course" => "Corso di qualcosa"]);
+        $result = $this->repository->getAll(["course" => 1]);
+        
+
         
         $this->assertCount(1, $result);
         $this->assertEquals(Front::with("user","course")->first(), $result[0]);
@@ -292,11 +294,11 @@ class FrontRepositoryImplTest extends TestCase
         $course = Course::factory()->create(["name" => $courseName]);
         
         Front::factory()->create([
-            "user_id" => USer::factory()->create(["name" => "carlo"]),
+            "user_id" => User::factory()->create(["name" => "carlo"]),
             "course_id" => Course::factory()->create(["name" => "Corso di qualcosa"])
         ]);
         Front::factory()->create([
-            "user_id" => USer::factory()->create(["name" => "luigi"]),
+            "user_id" => User::factory()->create(["name" => "luigi"]),
             "course_id" => 1
         ]);
         Front::factory()->create([
@@ -306,7 +308,7 @@ class FrontRepositoryImplTest extends TestCase
                 
         $result = $this->repository->getAll([
             "search" => "arl",
-            "course" => $courseName]);
+            "course" => $course->id]);
         
         $this->assertCount(1, $result);
         $this->assertEquals(Front::with("user","course")->find(3), $result[0]);

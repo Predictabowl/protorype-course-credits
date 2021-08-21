@@ -86,4 +86,82 @@ class StudyPlanTest extends TestCase{
         $this->assertEquals(24, $value);
     }
     
+    
+    public function test_getMaxCfu_when_not_declared_should_be_null(){
+        $plan = new StudyPlan(collect([]));
+        
+        $this->assertNull($plan->getMaxCfu());
+    }
+    
+    public function test_getMaxCfu_when_declared(){
+        $plan = new StudyPlan(collect([]),5);
+        
+        $this->assertEquals(5,$plan->getMaxCfu());
+    }
+    
+    
+    public function test_getLeftOverAllottedCfu() {
+        $block1 = $this->createMock(ExamBlockDTO::class);
+        $block2 = $this->createMock(ExamBlockDTO::class);
+        
+        $block1->expects($this->once())
+                ->method("getRecognizedCredits")
+                ->willReturn(10);
+        $block1->expects($this->once())
+                ->method("getId")
+                ->willReturn(1);
+        $block2->expects($this->once())
+                ->method("getRecognizedCredits")
+                ->willReturn(6);
+        $block2->expects($this->once())
+                ->method("getId")
+                ->willReturn(2);        
+        
+        $studyPlan = new StudyPlan(collect([$block1, $block2]),30);
+        ;
+        $value = $studyPlan->getLeftoverAllottedCfu();
+        
+        $this->assertEquals(30-10-6, $value);
+    }
+    
+    public function test_getLeftOverAllottedCfu_when_max_is_not_defined_should_be_null() {
+        $studyPlan = new StudyPlan(collect([]));
+                
+        $value = $studyPlan->getLeftoverAllottedCfu();
+        
+        $this->assertNull($value);
+    }
+    
+    public function test_addExamLink_with_max_cfu() {
+        $block1 = $this->createMock(ExamBlockDTO::class);
+        $option = $this->createMock(ExamOptionDTO::class);
+        $exam = $this->createMock(TakenExamDTO::class);
+        $macCfu = 15;
+        $recognizedCfu = 5;
+        
+        $block1->expects($this->once())
+                ->method("getExamOptions")
+                ->willReturn(collect([$option]));
+        $block1->expects($this->exactly(2))
+                ->method("getId")
+                ->willReturn(1);
+        $block1->expects($this->once())
+                ->method("getRecognizedCredits")
+                ->willReturn($recognizedCfu);
+        $option->expects($this->exactly(2))
+                ->method("getId")
+                ->willReturn(2);
+        $option->expects($this->once())
+                ->method("addTakenExam")
+                ->with($exam,$macCfu-$recognizedCfu);
+        $option->expects($this->once())
+                ->method("getBlock")
+                ->willReturn($block1);
+        
+        $studyPlan = new StudyPlan(collect([$block1]),$macCfu);
+        
+        $value = $studyPlan->addExamLink($option,$exam);
+        
+    }
+    
 }

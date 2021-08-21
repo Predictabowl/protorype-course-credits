@@ -11,7 +11,7 @@ namespace App\Repositories\Implementations;
 use App\Repositories\Interfaces\FrontRepository;
 use App\Models\Front;
 use App\Models\User;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
@@ -66,7 +66,7 @@ class FrontRepositoryImpl implements FrontRepository{
         return $user->front;
     }
         
-    public function getAll(array $filters): Collection {
+    public function getAll(array $filters, int $numInPage = 50): Paginator{
         $query = Front::with("user","course");
 
         if (isset($filters["search"])){
@@ -81,7 +81,7 @@ class FrontRepositoryImpl implements FrontRepository{
                     $query->where("courses.id","=",$filters["course"]));
         }
         
-        return $query->get();
+        return $query->paginate($numInPage)->withQueryString();
     }
 
 }

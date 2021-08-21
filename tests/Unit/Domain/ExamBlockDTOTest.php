@@ -86,7 +86,7 @@ class ExamBlockDTOTest extends TestCase{
         $this->assertEquals(1, $value);
     }
     
-    // if the result ends ne negative the it's an invalid state, but should not 
+    // if the result ends negative the it's an invalid state, but should not 
     // be the job of this sut to address that.
     public function test_getSlotsAvailable_when_non_is_available(){
         $taken1 = new TakenExamDTO(1, "nome 1", "ssd1", 15);

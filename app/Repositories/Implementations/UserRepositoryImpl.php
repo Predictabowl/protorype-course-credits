@@ -12,7 +12,7 @@ use \App\Repositories\Interfaces\UserRepository;
 use App\Models\User;
 use \App\Models\Role;
 use App\Models\RoleUser;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
@@ -67,8 +67,8 @@ class UserRepositoryImpl implements UserRepository {
         return true;
     }
 
-    public function getAll(array $filters): Collection {
-        return User::with("roles")->filter($filters)->get();
+    public function getAll(array $filters, int $numInPage = 50): Paginator{
+        return User::with("roles")->filter($filters)->paginate($numInPage);
     }
 
 }

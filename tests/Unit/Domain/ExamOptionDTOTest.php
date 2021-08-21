@@ -73,6 +73,18 @@ class ExamOptionDTOTest extends TestCase
         $this->assertEmpty($option3->getTakenExams());
     }
 
+    public function test_addTakenExam_when_maxCfu_is_set(){
+        $option1 = $this->createOption(12);
+        $takenExam = $this->createTakenExam(9,"name 1");
+        
+        $result = $option1->isTakenExamAddable($takenExam);
+        $result2 =  $option1->addTakenExam($takenExam,7);
+
+        $this->assertTrue($result);
+        $this->assertEquals(2,$result2->getActualCfu());
+        $this->assertEquals(5,$option1->getIntegrationValue());
+    }
+    
 
     private function createOption($cfu = 12): ExamOptionDTO
     {

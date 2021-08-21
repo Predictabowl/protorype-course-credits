@@ -14,6 +14,7 @@ use App\Domain\TakenExamDTO;
 use Illuminate\Support\Collection;
 use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
+use App\Repositories\Interfaces\CourseRepository;
 use App\Mappers\Interfaces\TakenExamMapper;
 
 /**
@@ -70,6 +71,10 @@ class FrontManagerImpl implements FrontManager{
 
     public function getFront(): Front {
         return $this->getFrontRepository()->get($this->frontId);
+    }
+
+    public function getCourses(): Collection {
+        return app()->make(CourseRepository::class)->getAll();
     }
 
 }

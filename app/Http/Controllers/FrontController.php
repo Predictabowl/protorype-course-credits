@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Repositories\Interfaces\FrontRepository;
+use App\Services\Interfaces\FrontsSearchManager;
 use App\Services\Interfaces\FrontManager;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Factories\Interfaces\FrontManagerFactory;
@@ -24,32 +24,24 @@ class FrontController extends Controller
     public function index(){
         $this->authorize("viewAny", Front::class);
         
-// this should be done in the service layer
-        $courses = app()->make(CourseRepository::class)->getAll();
-        if (request()->has("course")){
-            $currentCourse = $courses->first(fn($course) => 
-                    $course->id == request()->get("course"));
-        } else {
-            $currentCourse = null;
-        }
+        $manager = app()->make(FrontsSearchManager::class);
         
         return view("front.index", [
-            "fronts" => app()->make(FrontRepository::class)
-                ->getAll(request(["search","course"])),
-            "courses" => $courses,
-            "currentCourse" => $currentCourse
+            "fronts" => $manager->getFilteredFronts(25),
+            "courses" => $manager->getCourses(),
+            "currentCourse" => $manager->getCurrentCourse()
         ]);
     }
     
     public function show(Front $front)
     {   
         $this->authorize("view",$front);
+        
         $manager = $this->makeFrontManager($front->id);
-        $courseRepo = app()->make(CourseRepository::class);
         return view("front.show",[
             "exams" => $manager->getTakenExams(),
             "front" => $manager->getFront(),
-            "courses" => $courseRepo->getAll()
+            "courses" => $manager->getCourses()
         ]);
     }
     

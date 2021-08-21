@@ -91,7 +91,7 @@ class UserManagerImplTest extends TestCase{
     }
     
     public function test_getAll(){
-        $collection = collect([]);
+        $collection = $this->createMock(\Illuminate\Contracts\Pagination\Paginator::class);
         $this->userRepo->expects($this->once())
                 ->method("getAll")
                 ->with([])

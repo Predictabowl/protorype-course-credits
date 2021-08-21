@@ -50,7 +50,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
     private $courseManager;
     private $studyPlan;
     private $eDistance;
-    private $declaredExams;
+    public $declaredExams;
     private $examOptions;
 
     function __construct(FrontManager $frontManager, CourseManager $courseManager) {
@@ -78,7 +78,8 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         $examBlocks = $this->courseManager->getExamBlocks();
         $this->declaredExams = $this->frontManager->getTakenExams();
         $this->examOptions = $this->courseManager->getExamOptions();
-        $this->studyPlan = new StudyPlan($examBlocks);
+        $maxCfu = $this->courseManager->getCourse()->maxRecognizedCfu;
+        $this->studyPlan = new StudyPlan($examBlocks, $maxCfu);
         return $this;
     }
     
@@ -90,6 +91,9 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
             $this->linkExam($this->getOptionsBySsd($linkedExam)
                     ,$linkedExam)
         )->sum();
+        
+        //we could actually interrupt the search if the allotted credits are
+        //exhuasted, but this is only an optimization, will think about when is finished.
         
         // If there's credits left to assign it check the option's compatibility list
         if($leftover > 0){

@@ -38,7 +38,7 @@ class LearningTest extends TestCase{
 //        $result = Front::with("user","course")->join("users","fronts.user_id","=","users.id")
 //                ->where("users.name","like","%ca%")->get();
         //$query = $query->where("users.name","like","%ca%");
-        dd($query->get()[1]->attributesToArray());
+        //dd($query->get()[1]->attributesToArray());
     }
    
     

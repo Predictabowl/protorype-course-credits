@@ -166,7 +166,25 @@ class StudyPlanBuilderImplTest extends TestCase
         
     }
     
-     public function test_getStudyPlan() {
+    public function test_Course_max_cfu_is_set_up(){
+        $course = new Course();
+        $course->maxRecognizedCfu = 15;
+        $this->blocks = collect([]);
+        $this->options = collect([]);
+        $this->takenExams = collect([]);
+        $this->setupMocks();
+        
+        $this->courseManager->expects($this->any())
+                ->method("getCourse")
+                ->willReturn($course);
+        
+        $studyPlan = $this->planBuilder->getStudyPlan();
+        
+        $this->assertEquals(15, $studyPlan->getMaxCfu());
+    }
+    
+    
+    public function test_getStudyPlan() {
         
         $this->setupMocks();
         $this->examDistance->expects($this->exactly(12))                
@@ -191,6 +209,26 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->assertCount(0, $studyPlan->getExam(14)->getTakenExams());
         $this->assertEquals(2,$studyPlan->getExam(14)->getIntegrationValue());
         
+    }
+    
+    public function test_getStudyPlan_with_max_cfu() {
+        $course = new Course();
+        $course->maxRecognizedCfu = 15;
+        
+        $this->courseManager->expects($this->any())
+                ->method("getCourse")
+                ->willReturn($course);
+        
+        $this->setupMocks();
+        $this->examDistance->expects($this->exactly(12))                
+                ->method("calculateDistance")
+                ->willReturn(1);
+        
+        $studyPlan = $this->planBuilder->getStudyPlan();
+
+        $this->assertEquals(15, $studyPlan->getRecognizedCredits());
+        $this->assertEquals(0, $studyPlan->getLeftoverAllottedCfu());
+        $this->assertCount(6,$studyPlan->getLeftoverExams());
     }
    
     
@@ -232,4 +270,5 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->options[5]->addCompatibleOption("IUS/03");
         $this->options[6]->addCompatibleOption("IUS/0");
     }
+
 }

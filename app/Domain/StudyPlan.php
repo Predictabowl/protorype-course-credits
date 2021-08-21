@@ -11,16 +11,26 @@ class StudyPlan {
 
     private $examBlocks;
     private $leftovers;
+    private $maxCfu;
 
     /**
      * Class Constructor
      * @param    $approvedExam   
      */
-    public function __construct(Collection $examBlocks) {
+    public function __construct(Collection $examBlocks, ?int $maxCfu = null) {
         $this->examBlocks = $examBlocks->mapWithKeys(
                 fn(ExamBlockDTO $block) => 
                     [$block->getId() => $block]);
         $this->leftovers = collect([]);
+        $this->maxCfu = $maxCfu;
+    }
+    
+    public function getMaxCfu(): ?int {
+        return $this->maxCfu;
+    }
+    
+    public function setMaxCfu(int $maxCfu){
+        $this->maxCfu = $maxCfu;
     }
 
     public function addExamLink(ExamOptionDTO $option, TakenExamDTO $taken): TakenExamDTO {
@@ -29,13 +39,12 @@ class StudyPlan {
         if (!isset($appExam)){
             throw new \InvalidArgumentException(__METHOD__.": could not find exam option with id :".$id);
         }
-        $linkInserted = $appExam->addTakenExam($taken);
+        $linkInserted = $appExam->addTakenExam($taken, $this->getLeftoverAllottedCfu());
         $this->setExam($appExam);
         return $linkInserted;
     }
     
     public function getExam($id): ?ExamOptionDTO{
-        
         return $this->getExams()->first(fn(ExamOptionDTO $exam) =>
                 $exam->getId() === $id);
     }
@@ -65,5 +74,12 @@ class StudyPlan {
     
     public function getLeftoverExams(): Collection{
         return $this->leftovers;
+    }
+    
+    public function getLeftoverAllottedCfu(): ?int{
+        if (isset($this->maxCfu)){
+            return $this->maxCfu - $this->getRecognizedCredits();
+        }
+        return null;
     }
 }

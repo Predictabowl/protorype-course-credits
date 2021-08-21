@@ -42,7 +42,7 @@ class CourseRepositoryImpl implements CourseRepository {
         }
     }
 
-    public function getAll(): Collection {
+    public function getAll() {
         return Course::all();
     }
 

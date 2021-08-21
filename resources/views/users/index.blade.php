@@ -61,6 +61,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">
+                {{ $users->links() }}
+            </div>
         </x-panel>
     </x-mainpanel>
 </x-app-layout>

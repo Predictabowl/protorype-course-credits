@@ -77,6 +77,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">
+                {{ $fronts->links() }}
+            </div>
         </x-panel>
     </x-mainpanel>
 </x-app-layout>

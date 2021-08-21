@@ -19,7 +19,7 @@ interface CourseRepository {
     
     public function get($id): ?Course;
     
-    public function getAll(): Collection;
+    public function getAll();
     
     public function save(Course $course): bool;
     

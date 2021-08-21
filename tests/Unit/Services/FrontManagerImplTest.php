@@ -13,6 +13,7 @@ use App\Models\Front;
 use App\Domain\TakenExamDTO;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Interfaces\CourseRepository;
 use App\Services\Implementations\FrontManagerImpl;
 use App\Mappers\Interfaces\TakenExamMapper;
 use PHPUnit\Framework\TestCase;
@@ -133,8 +134,20 @@ class FrontManagerImplTest extends TestCase{
         
         $this->assertFalse($result);
     }
-    
-     
+
+    public function test_getCourses(){
+        $courses = collect([]);
+        $courseRepo = $this->createMock(CourseRepository::class);
+        $courseRepo->expects($this->once())
+                ->method("getAll")
+                ->willReturn($courses);
+        app()->instance(CourseRepository::class, $courseRepo);
+        
+        $result = $this->manager->getCourses();
+        
+        $this->assertSame($courses, $result);
+    }
+
     
     private function makeTakenExam($id =1): TakenExam{            
         $mock = new TakenExam();

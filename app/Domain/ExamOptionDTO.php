@@ -91,13 +91,16 @@ class ExamOptionDTO implements ExamDTO{
      *
      * @return Integration Value decifit.
      */
-    public function addTakenExam(TakenExamDTO $exam): TakenExamDTO
+    public function addTakenExam(TakenExamDTO $exam, ?int $maxCfu = null): TakenExamDTO
     {
         if (!$this->isTakenExamAddable($exam)){
             return $exam;
         }
 
         $value = $this->getIntegrationValue();
+        if (isset($maxCfu) && $value > $maxCfu){
+            $value = $maxCfu;
+        }
         if ($value > $exam->getActualCfu()){
             $value = $exam->getActualCfu();
         }
