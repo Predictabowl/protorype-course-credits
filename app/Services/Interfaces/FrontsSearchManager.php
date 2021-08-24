@@ -14,10 +14,10 @@ use Illuminate\Http\Request;
  */
 interface FrontsSearchManager {
     
-    public function getFilteredFronts(int $pageSize): Paginator;
+    public function getFilteredFronts(Request $request, int $pageSize): Paginator;
     
     public function getCourses(): Collection;
     
-    public function getCurrentCourse(): ?Course;
+    public function getCurrentCourse(Request $request): ?Course;
     
 }

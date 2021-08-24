@@ -15,7 +15,7 @@ class FrontController extends Controller
     public function __construct() {
         
         $this->middleware(["auth","verified"]);
-        // This auto biding policy makes viewAny fails... this is a Laravel bug
+        // The following auto biding policy makes viewAny fails... this is a Laravel bug
         // It's better to use the $this->authorize() method
         //$this->middleware("can:view,front");
         //$this->middleware("can:viewAny,App/Front");
@@ -27,9 +27,9 @@ class FrontController extends Controller
         $manager = app()->make(FrontsSearchManager::class);
         
         return view("front.index", [
-            "fronts" => $manager->getFilteredFronts(25),
+            "fronts" => $manager->getFilteredFronts(request(),25),
             "courses" => $manager->getCourses(),
-            "currentCourse" => $manager->getCurrentCourse()
+            "currentCourse" => $manager->getCurrentCourse(request())
         ]);
     }
     
@@ -40,7 +40,7 @@ class FrontController extends Controller
         $manager = $this->makeFrontManager($front->id);
         return view("front.show",[
             "exams" => $manager->getTakenExams(),
-            "front" => $manager->getFront(),
+            "front" => $front,
             "courses" => $manager->getCourses()
         ]);
     }

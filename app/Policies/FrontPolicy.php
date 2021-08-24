@@ -45,8 +45,8 @@ class FrontPolicy
      */
     public function view(User $user, Front $front)
     {
-        return ($user->id === $front->user_id) ||
-               ($user->hasAtLeastOneRole(Role::ADMIN, Role::SUPERVISOR))
+        return (($user->id == $front->user_id) ||
+               ($user->isSupervisor()))
                ? Response::allow()
                : Response::deny("Non hai l'autorizzazione per accedere");
                 
@@ -60,8 +60,8 @@ class FrontPolicy
      */
     public function create(User $user, Front $front)
     {
-        return ($user->id === $front->user_id) ||
-            ($user->hasAtLeastOneRole(Role::ADMIN, Role::SUPERVISOR));
+        return ($user->id == $front->user_id) || 
+                    ($user->isSupervisor());
         
     }
 
@@ -74,7 +74,8 @@ class FrontPolicy
      */
     public function update(User $user, Front $front)
     {
-        return ($user->id === $front->user_id);
+        return ($user->id == $front->user_id) ||
+                ($user->isSupervisor());
     }
 
     /**
@@ -86,7 +87,7 @@ class FrontPolicy
      */
     public function delete(User $user, Front $front)
     {
-        return ($user->id === $front->user_id) ||
+        return ($user->id == $front->user_id) ||
             ($user->hasAtLeastOneRole(Role::ADMIN, Role::SUPERVISOR));
     }
 

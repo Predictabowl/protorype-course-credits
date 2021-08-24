@@ -27,15 +27,14 @@ class TakenExamController extends Controller
             "cfu" => ["required", "numeric", "min:1", "max:18"],
             "ssd" => ["required", Rule::exists("ssds", "code")]
         ]);
-
         $this->getFrontManager($front)->saveTakenExam($attributes);
-        
         return back();
     }
     
     public function delete(Front $front){
         $this->authorize("delete",$front);
         
+        // This validation is not needed
         $attributes = request()->validate([
             "id" => ["numeric", Rule::exists("taken_exams","id")]
         ]);

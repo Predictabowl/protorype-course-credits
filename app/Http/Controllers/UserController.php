@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\Interfaces\UserManager;
-use App\Repositories\Interfaces\UserRepository;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -14,7 +13,7 @@ class UserController extends Controller
     }
 
     public function index() {
-        $this->authorize("viewAny", auth()->user());;
+        $this->authorize("viewAny", auth()->user());
         
         return view("users.index", [
             "users" => $this->getUserManager()->getAll(request(["search"]))

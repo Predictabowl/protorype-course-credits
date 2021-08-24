@@ -29,7 +29,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define("view-studyPlan", fn(User $user, Front $front) => 
-                ($front->user_id === $user->id ||
+                ($front->user_id == $user->id ||
                     $user->isSupervisor()));
     }
 }

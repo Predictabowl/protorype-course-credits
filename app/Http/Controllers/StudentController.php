@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\Interfaces\UserFrontManager;
 
 class StudentController extends Controller

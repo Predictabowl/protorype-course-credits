@@ -38,12 +38,6 @@ class StudyPlanController extends Controller
                 ->setUserId($front->user_id)
                 ->getStudyPlanBuilder()->getStudyPlan();
         
-//        return view("studyplan.showplanPdf",[
-//            "studyPlan" => $plan,
-//            "front" => $front
-//        ]);
-        
-        
         return $this->setupDomPdf($front, $plan)->stream("prospetto.pdf");
     }
     

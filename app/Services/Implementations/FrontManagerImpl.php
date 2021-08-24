@@ -16,6 +16,7 @@ use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Mappers\Interfaces\TakenExamMapper;
+use Illuminate\Validation\Rule;
 
 /**
  * Description of FrontManagerImpl
@@ -39,7 +40,7 @@ class FrontManagerImpl implements FrontManager{
                 fn($exam) => $this->mapper->toDTO($exam));
     }
     
-    public function saveTakenExam($attributes) {
+    public function saveTakenExam($attributes) {        
         $exam = new TakenExamDTO(0, $attributes["name"], $attributes["ssd"], $attributes["cfu"]);
         $takenExam = $this->mapper->toModel($exam, $this->frontId);
         if(!isset($takenExam)){
@@ -60,14 +61,6 @@ class FrontManagerImpl implements FrontManager{
         $front = $this->getFrontRepository()->updateCourse($this->frontId, $courseId);
         return isset($front) ? true : false;
     }
-    
-    private function getExamRepository(): TakenExamRepository{
-        return app()->make(TakenExamRepository::class);
-    }
-    
-    private function getFrontRepository(): FrontRepository{
-        return app()->make(FrontRepository::class);
-    }
 
     public function getFront(): Front {
         return $this->getFrontRepository()->get($this->frontId);
@@ -77,4 +70,11 @@ class FrontManagerImpl implements FrontManager{
         return app()->make(CourseRepository::class)->getAll();
     }
 
+    private function getExamRepository(): TakenExamRepository{
+        return app()->make(TakenExamRepository::class);
+    }
+    
+    private function getFrontRepository(): FrontRepository{
+        return app()->make(FrontRepository::class);
+    }
 }

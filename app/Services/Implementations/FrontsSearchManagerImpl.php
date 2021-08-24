@@ -35,18 +35,20 @@ class FrontsSearchManagerImpl implements FrontsSearchManager{
         return $this->courses;
     }
 
-    public function getCurrentCourse(): ?Course {
-         if (request()->has("course")){
+    public function getCurrentCourse(Request $request): ?Course {
+         if ($request->has("course")){
             return $this->getCourses()->first(fn($course) => 
-                    $course->id == request()->get("course"));
+                    $course->id == $request->get("course"));
         };
         
         return $currentCourse = null;
     }
 
-    public function getFilteredFronts(int $pageSize = 50): Paginator {
+    public function getFilteredFronts(Request $request, int $pageSize = 50): Paginator {
+        $filters = $request->only(["search","course"]);
+
         return app()->make(FrontRepository::class)
-                ->getAll(request(["search","course"]),$pageSize);
+                ->getAll($filters,$pageSize);
     }
 
 }

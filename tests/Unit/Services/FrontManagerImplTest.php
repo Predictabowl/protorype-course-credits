@@ -67,12 +67,13 @@ class FrontManagerImplTest extends TestCase{
         
     }
 
-    public function test_save_takenExam() {
+    public function test_save_takenExam_success() {
         $attributes = [
             "name" => "nome",
             "ssd" => "ssd2",
             "cfu" => 9
         ];
+        
         $dto = new TakenExamDTO(0,"nome","ssd2",9);
         $model = $this->makeTakenExam(13);
         $this->mapper->expects($this->once())
