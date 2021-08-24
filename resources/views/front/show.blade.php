@@ -103,9 +103,7 @@
                     </x-slot>
                 </x-dropdown>
                 <div class="flex justify-end mt-4 pt-4 border-t border-gray-200">
-                    <x-button>
-                        <a href="{{ route('studyPlan',[$front]) }}">Calcola Crediti</a>
-                    </x-button>
+                    <x-button-link href="{{ route('studyPlan',[$front]) }}">Calcola Crediti</x-button-link>
                     <x-flashStudyPlan/>
                 </div>
             </x-panel>
