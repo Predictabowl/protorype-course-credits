@@ -9,6 +9,7 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Role;
+use \App\Models\User;
 use PHPUnit\Framework\TestCase;
 use App\Services\Implementations\UserManagerImpl;
 use App\Repositories\Interfaces\UserRepository;
@@ -100,5 +101,28 @@ class UserManagerImplTest extends TestCase{
         $result = $this->manger->getAll([]);
         
         $this->assertSame($collection, $result);
+    }
+    
+    public function test_setName(){
+        $userId = 17;
+        $oldName = "Maria";
+        $newName = "Mario";
+        $user = new User([
+            "id" => $userId,
+            "name" => $oldName
+        ]);
+        $changedUser = new User([
+            "id" => $userId,
+            "name" => $newName
+        ]);
+        $this->userRepo->expects($this->once())
+                ->method("get")
+                ->with($userId)
+                ->willReturn($user);
+        $this->userRepo->expects($this->once())
+                ->method("update")
+                ->with($changedUser);
+        
+        $this->manger->setName($userId, $newName);
     }
 }

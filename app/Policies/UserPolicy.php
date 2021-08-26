@@ -57,6 +57,11 @@ class UserPolicy
      */
     public function update(User $user, User $model)
     {
+        return ($user->id == $model->id || $user->isAdmin());
+    }
+    
+    public function updateRole(User $user, User $model)
+    {
         return ($user->isAdmin()
             ? Response::allow()
             : Response::deny("Questa azione richiede un'autorizzazione da amministratore")
@@ -72,10 +77,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model)
     {
-        return ($user->isAdmin()
-            ? Response::allow()
-            : Response::deny("Questa azione richiede un'autorizzazione da amministratore")
-        );
+        return ($user->id == $model->id || $user->isAdmin());
     }
 
     /**

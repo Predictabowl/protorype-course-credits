@@ -8,7 +8,6 @@
 
 namespace App\Services\Interfaces;
 
-use App\Models\User;
 use Illuminate\Contracts\Pagination\Paginator;
 
 /**
@@ -19,6 +18,8 @@ interface UserManager {
     
     public function getAll($filters): Paginator;
     
-    public function modRole(User $user, array $attributes);
+    public function modRole($userId, array $attributes);
+    
+    public function setName($userId, string $name);
     
 }

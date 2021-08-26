@@ -23,6 +23,8 @@ interface UserRepository {
     
     public function save(User $user): bool;
     
+    public function update(User $user): bool;
+    
     public function delete($id): bool;
     
     public function addRole($userId, $roleName): bool;

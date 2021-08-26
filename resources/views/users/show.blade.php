@@ -12,7 +12,7 @@
         </header>
         <x-panel class="w-max mx-auto">
             <div>
-                <form method="POST" action="{{ route("userUpdate",[$user]) }}">
+                <form method="POST" action="{{ route("userRoleUpdate",[$user]) }}">
                     @csrf
                     @method("PUT")
                     {{-- To be changed with a dynamic role foreach --}}

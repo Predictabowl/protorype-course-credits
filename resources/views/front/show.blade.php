@@ -10,41 +10,27 @@
             <x-panel class="w-1/2">
                 <div>
                     <form method="POST" action="{{ route("postTakenExam",[$front]) }}">
-                    {{--<form method="POST" action="/post/{{$post->slug}}/comments">--}}
                         @csrf
                         <header class="flex items-center">
-                            {{-- <img src="https://i.pravatar.cc/60?u={{ auth()->id() }}" width="40" height="40" class="rounded-full"> --}}
-                            <h2 class="ml-3">Aggiungi Esame Sostenuto</h2>
+                            <h2 class="ml-3 text-lg">{{ __("Add Taken Exam") }}</h2>
                         </header>
-                        {{-- <div class="mt-4">
-                            <textarea name="name" 
-                                      class="w-full text-sm focus:outline-none focus:ring"
-                                      rows="5" placeholder="Nome insegnamento." required></textarea>
-
-                            @error("name")
-                            <span class="text-xs text-red-500">{{ $message }}</span>
-                            @enderror
-                        </div> --}}
-                        <div class="mt-4">
-                            <input type="text" class="text-sm w-full focus:outline-none focus:ring" name="name" placeholder="Nome insegnamento."
-                                value="{{old("name")}}">
+                        <div class="mt-3">
+                            <x-input type="text" class="w-full" name="name" :placeholder="__('Teaching name')" 
+                                :value="old('name')"/>
 
                             @error("name")
                             <span class="text-xs text-red-500">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="mt-4">
-                            <input class="w-20"
-                                type="number" name="cfu" placeholder="cfu" value="{{old("cfu")}}">
-
+                        <div class="mt-3">
+                            <x-input class="w-20" type="number" placeholder="cfu" name="cfu" :value="old('cfu')" required autofocus />
                             @error("cfu")
-                            <span class="text-xs text-red-500">{{ $message }}</span>
+                               <span class="text-xs text-red-500">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="mt-4">
-                            <input class="w-32"
-                                type="text" class="text-sm focus:outline-none focus:ring uppercase" name="ssd" placeholder="SSD" 
-                                value="{{old('ssd')}}">
+                        <div class="mt-3">
+                            <x-input class="w-32" type="text" name="ssd" placeholder="SSD" 
+                                value="{{old('ssd')}}"/>
 
                             @error("ssd")
                             <span class="text-xs text-red-500">{{ $message }}</span>
@@ -52,7 +38,7 @@
                         </div>
                         <div class="flex justify-end mt-4 pt-4 border-t border-gray-200">
                             <x-button>
-                                Conferma
+                                {{ __("Confirm") }}
                             </x-button>
                         </div>
                     </form>
@@ -60,7 +46,7 @@
             </x-panel>            
             <x-panel class="flex-initial sm:items-center sm:ml-6 place-self-start">
                 <div class="pr-2">
-                    Corso di Laurea:
+                    {{ __("Degree Course") }}:
                </div>
                 <x-dropdown align="right" width="w-max">
                     <x-slot name="trigger">
@@ -69,7 +55,7 @@
                                 @if(isset($front->course))
                                     {{ $front->course->name }}
                                 @else
-                                    Nessuno selezionato
+                                    {{ __("None Selected") }}
                                 @endif
                             </div>
 

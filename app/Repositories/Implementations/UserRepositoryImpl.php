@@ -71,4 +71,11 @@ class UserRepositoryImpl implements UserRepository {
         return User::with("roles")->filter($filters)->paginate($numInPage);
     }
 
+    public function update(User $user): bool {
+        if (!isset($user->id)){
+            throw new \InvalidArgumentException("User ID missing");
+        }
+        return $user->update();
+    }
+
 }

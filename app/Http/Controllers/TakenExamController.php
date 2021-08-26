@@ -23,7 +23,7 @@ class TakenExamController extends Controller
         $inputs["ssd"] = strtoupper($inputs["ssd"]);
         request()->replace($inputs);
         $attributes = request()->validate([
-            "name" => ["required", "max:255"],
+            "name" => ["required", "string", "max:255"],
             "cfu" => ["required", "numeric", "min:1", "max:18"],
             "ssd" => ["required", Rule::exists("ssds", "code")]
         ]);

@@ -11,10 +11,10 @@
         <!-- Scripts (Apline) -->
   {{--       <script src="{{ asset('js/app.js') }}" defer></script> --}}
     
-    <title></title>
+    <title> Prospetto Pdf </title>
 
     <style type="text/css">
-        table {
+        .table-prospetto {
             page-break-inside:auto;
             page-break-after: auto;
             font-size: 14px;
@@ -60,38 +60,36 @@
         So what I'm doing here is abusing the property "page-break-inside:avoid" to make whole tables
         inside <td> tags in a single <tr> so those won't be be split in page breaks. --}}
         <div>
-            <table>
+            <table style="table-layout: fixed; width: 100%;">
                 <tr>
                     <td style="width: 24%;">
-                        <img src="{{public_path()."/images/logo_new.svg"}}" alt="Università degli studi di Torino" style="width: 120;">
                     </td>
                     <td style="text-align:center; font-size: 17px;">
-                        <span style="font-weight:bold; font-size:18px;"> Dipartimento di Giurisprudenza</span><br>
+                        <span style="font-weight:bold; font-size:19px;"> Dipartimento di Giurisprudenza</span><br>
                         Valutazione Carriera <br>
                         Prospetto riconoscimento esami
                     </td>
-                    <td  style="width:24%;"/>
+                    <td  style="width:24%;">
+                        <img src="{{public_path()."/images/logo_new.svg"}}" alt="Università degli studi di Torino" style="width: 120;">
+                    </td>
                 </tr>
             </table>
-            <section  style="font-size: 16px; border-collapse: unset;">
-                <p> Corso: {{ $front->course->name }}
-                </p>
-                <p> Nome:
-                    <span style="border-bottom:1px solid; padding-right:300px;">&nbsp;</span>
+            <section style="margin-top: 10px; margin-bottom: 10px; font-size:16px;">
+                <p>
+                    Corso: <span style="font-weight:  bold;">{{ $front->course->name }}</span>
                 </p>
                 <p>
-                    Cognome:
-                    <span style="border-bottom:1px solid; padding-right:300px;">&nbsp;</span>
+                    Nome e Cognome: <span style="font-weight: bold;">{{ $front->user->name }}</span>
                 </p>
                 <p>
-                    Email:
-                    <span style="border-bottom:1px solid; padding-right: 300px;">&nbsp;</span>
+                    Email: <span style="font-weight: bold;">{{ $front->user->email }}</span>
                 </p>
             </section>
+
         </div>
 
         <div style="text-overflow: auto;">
-            <table style="border: 2px solid;">
+            <table class="table-prospetto" style="border: 2px solid;">
                 <thead style="border: 2px solid black;">
                     <tr>
                         <th width="70%">Insegnamento e corrispondenti Esami Riconosciuti </th>
@@ -104,7 +102,7 @@
                             <td>
                             <?php $startBlock = true; ?>
                             @foreach($examBlock->getExamOptions() as $option)
-                                <table class="no-break-table">
+                                <table class="table-prospetto no-break-table">
 {{--                                         <tr>
                                         <td width="12%" class={{!$startBlock ? "border-t" : ""}}>
                                             {{$option->getSsd()}}
@@ -178,12 +176,12 @@
             </ul>
         </div>
 
-        <div style="margin-top: 20px;">
-            <p>
+        <div>
+            <p style="margin-top: 50px; text-align: right;">
                 Firma del docente:
                 <span style="border-bottom:1px solid; padding-left:300px;">&nbsp;</span>
             </p>
-             <p>
+             <p style="margin-top: 50px; text-align:right;">
                 Firma dello studente per accettazione:
                 <span style="border-bottom:1px solid; padding-left:300px;">&nbsp;</span>
             </p>

@@ -40,8 +40,16 @@ class UserManagerImpl implements UserManager{
         return $this->getUserRepository()->getAll($filters,25);
     }
     
+    public function setName($userId, string $name) {
+        $repo = $this->getUserRepository();
+        $user = $repo->get($userId);
+        $user->name = $name;
+        $repo->update($user);
+    }
+    
     private function getUserRepository(): UserRepository{
         return app()->make(UserRepository::class);
     }
+
 
 }

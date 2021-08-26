@@ -20,11 +20,31 @@ class UserController extends Controller
         ]);
     }
     
+    public function updateView(User $user) {
+        $this->authorize("update", $user);
+        
+        return view("users.updateView",[
+            "user" => $user
+        ]);
+    }
+    
+    public function put(User $user) {
+        $this->authorize("update", $user);
+        
+        $attributes = request()->validate([
+            "name" => ["required","string","max:255"],
+        ]);
+        
+        $this->getUserManager()->setName($user->id, $attributes["name"]);
+        
+        return redirect()->route("dashboard");
+    }
+    
     /*
      * It needs a check to avoid to remove all admins from the system
      */
-    public function put(User $user) {
-        $this->authorize("update", $user);
+    public function putRoles(User $user) {
+        $this->authorize("updateRole", $user);
         
         $this->getUserManager()->modRole($user->id, request()->all());
         

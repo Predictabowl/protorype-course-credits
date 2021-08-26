@@ -7,18 +7,18 @@
 
     <x-mainpanel width="max-w-full">
         <x-panel>
-            <div class="flex justify-end mb-4">
+            <div class="flex justify-start mb-4">
                 <div>
-                    Versione stampabile
                     <a href="{{route("studyPlanPdf",[$front])}}">
                         <x-button-icon width="w-14" height="h-14" name="id">
                             <img src="/images/print-icon.svg" alt="Stampa">
                         </x-button-icon>
                     </a>
+                    {{ __("Print") }}
                 </div>
             </div>
             <div class="place-content-center">
-                <table class="table-auto w-full">
+                <table class="table-auto w-full border-4 border-black">
                     <thead class="w-full bg-gray-100">
                         <tr>
                             <th/>
@@ -54,14 +54,16 @@
                                     </td>
                                     <td>{{ $option->getExamName() }}</td>
                                     <td class="text-sm">
-
+                                        <ul class="list-disc">
                                         @foreach($option->getTakenExams() as $taken)
-                                            {{ $taken->getExamName() }}({{ $taken->getSsd() }}): 
-                                            {{ $taken->getActualCfu()}}/{{$taken->getCfu()}}
-                                            <br>
+                                            <li>
+                                                {{ $taken->getExamName() }}({{ $taken->getSsd() }}): 
+                                                {{ $taken->getActualCfu()}}/{{$taken->getCfu()}}
+                                            </li>
                                         @endforeach
+                                        </ul>
                                     </td>
-                                    <td class="text-center">{{ $option->getCfu() }}</td>
+                                    <td class="text-center">{{ $option->getRecognizedCredits() }}</td>
                                     
                                     @if($startBlock)
                                         <?php $rows = $examBlock->getExamOptions()->count() ?>
@@ -71,7 +73,10 @@
                                                     Obbligatorio.
                                                 @else
                                                     <?php $numOptions = $examBlock->getNumExams() ?>
-                                                    {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} a scelta.
+                                                    <div class="m-auto" style="max-width: 120px;">
+                                                        {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da 
+                                                        {{ $option->getCfu() }} cfu a scelta.
+                                                    </div>
                                                 @endif
                                         </td>
                                         <td class="text-center font-semibold text-lg border-l border-gray-400" 
@@ -83,7 +88,7 @@
                                </tr>
                             @endforeach
                         @endforeach
-                        <tr class = "border-b-4 border-black"/>
+                        {{-- <tr class = "border-b-4 border-black"/> --}}
                     </tbody>
                 </table>
             </div>

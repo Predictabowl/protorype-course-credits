@@ -58,8 +58,12 @@ Route::get("/studyplan/pdf/{front}",[StudyPlanController::class,"createPdf"])->n
 //-------------- Users
 Route::get("/user",[UserController::class,"index"])->name("userIndex");
 Route::get("/user/{user}",[UserController::class,"show"])->name("userShow");
-Route::put("/user/{user}",[UserController::class,"put"])->name("userUpdate");
 Route::delete("/user/{user}",[UserController::class,"delete"])->name("userDelete");
+Route::get("/userUpdate/{user}",[UserController::class,"updateView"])->name("userUpdate");
+Route::put("/userUpdate/{user}",[UserController::class,"put"]);
+
+//-------------- User Roles
+Route::put("/userRole/{user}",[UserController::class,"putRoles"])->name("userRoleUpdate");
 
 //-------------- Auto routing endpoints.
 // Will redirect to the Front routes, but these will automatically create 

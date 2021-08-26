@@ -237,4 +237,51 @@ class UserRepositoryImplTest extends TestCase {
         $this->assertCount(1, $result);
         $this->assertEquals(User::with("roles")->find(2), $result[0]);
     }
+    
+    public function test_update_successful() {
+        $user = User::factory()->create([
+            "name" => "old name"
+        ]);
+        $user->name = "new name";
+
+        $result = $this->repository->update($user);
+        
+        $this->assertDatabaseCount("users", 1);
+        $this->assertDatabaseHas("users", ["name" => "new name"]);
+        $this->assertDatabaseMissing("users", ["name" => "old name"]);
+        $this->assertTrue($result);
+    }
+
+    public function test_update_with_id_null_should_throw() {
+        $user = new User([
+            "name" => "nome",
+            "password" => "password",
+            "email" => "posta",
+            "role" => "user"
+        ]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        
+        $result = $this->repository->update($user);
+        
+        $this->assertDatabaseCount("users", 0);
+        $this->assertFalse($result);
+    }
+    
+    public function test_update_non_existing_model_not_save() {
+        $user = new User([
+            "name" => "nome",
+            "password" => "password",
+            "email" => "posta",
+            "role" => "user"
+        ]);
+        $user->id = 5;
+
+//        $this->expectException(\InvalidArgumentException::class);
+        
+        $result = $this->repository->update($user);
+        
+        $this->assertDatabaseCount("users", 0);
+        $this->assertFalse($result);
+    }
 }

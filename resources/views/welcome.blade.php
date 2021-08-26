@@ -45,20 +45,27 @@
 
                         <div class="ml-12 mt-6">
                             <h2 class="text-2xl">Valutazione Carriera - Prospetto riconoscimento esami</h2>
-                            <div class="flex max-w-lg justify-evenly mt-4 pt-4 border-t border-gray-200">
+                            <div class="flex justify-center gap-4 mt-4 pt-4 border-t border-gray-200">
                                 @if (Route::has('login'))
                                     @auth
-                                        <x-button-link href="{{ url('/dashboard') }}"> Accedi </x-button>
+                                        <x-button-link href="{{ url('/dashboard') }}"> {{ __("Dashboard") }} </x-button>
                                     @else
-                                        <x-button-link href="{{ route('login') }}"> Log in</x-button>
+                                        <x-button-link href="{{ route('login') }}"> {{ __("Log in") }} </x-button>
                                         @if (Route::has('register'))
-                                           <x-button-link href="{{ route('register') }}"> Registrati </x-button>
+                                           <x-button-link href="{{ route('register') }}"> {{ __("Register") }} </x-button>
                                         @endif
                                     @endauth
                                 @endif
                             </div>
                         </div>
                     </div>
+                </div>
+                <div>
+                    <h1 class="text-2xl"> Test Infos</h1>
+                    Locale: {{app()->currentLocale()}}
+                    <p>
+                        {{__("Forgot your password?")}}
+                    </p>
                 </div>
 
 {{--                 <div class="flex justify-center mt-4 sm:items-center sm:justify-between">
