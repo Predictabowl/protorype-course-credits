@@ -2,132 +2,73 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\Course;
-use App\Models\Front;
-use App\Models\Ssd;
-use App\Models\ExamBlock;
 use App\Models\Exam;
+use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
+use App\Models\ExamBlockOptionSsd;
+use App\Models\Front;
+use App\Models\Role;
 use App\Models\TakenExam;
+use App\Models\RoleUser;
+use App\Models\User;
+use App\Support\Seeders\GenerateSSD;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeederTest extends Seeder
 {
-    
-    public const FIXTURE_NUM_BLOCKS = 3;
-    public const FIXTURE_NUM_TAKENEXAMS = 4;
-    public const FIXTURE_NUM_EXAMS = 4;
     /**
-     * Run the database seeds.
+     * Seed the application's database.
      *
      * @return void
      */
     public function run()
     {
-        User::factory()->create();
-
-        $this->course = Course::factory()->create([
-            "name" => "Course Test"
+        GenerateSSD::createAll();
+        
+        Role::create([
+            "id" => 1,
+            "name" => "admin"
         ]);
-
-        Front::factory()->create([
-            "course_id" => 1,
-            "user_id" => 1
+        Role::create([
+            "id" => 2,
+            "name" => "supervisor"
+        ]);
+        // \App\Models\User::factory(10)->create();
+        User::factory()->create([
+            "id" => 1,
+            "name" => "Amministratore Temporaneo",
+            "email" => "admin@email.org",
+            "password" => Hash::make("password")
+        ]);
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create([
+            "email" => "mario@email.com",
+            "password" => Hash::make("password")
         ]);
         
-
-        $ssds = Ssd::factory(10)->create();
-
-        $block1 = ExamBlock::factory()->create([
-            "max_exams" => 2,
-            "course_id" => $this->course->id
-        ]);
-
-        $block2 = ExamBlock::factory()->create([
-            "max_exams" => 1,
-            "course_id" => $this->course->id
+        RoleUser::create([
+            "user_id" => 1,
+            "role_id" => 1
         ]);
         
-        $block3 = ExamBlock::factory()->create([
-            "max_exams" => 1,
-            "course_id" => $this->course->id
-        ]);
+        Course::factory()->create();
 
-        $exam1 = Exam::factory()->create([
-            "ssd_id" => 1,
-            "name" => "test exam 01",
-            "cfu" => 12
-        ]);
-
-        $exam2 = Exam::factory()->create([
-            "ssd_id" => 2,
-            "name" => "test exam 02",
-            "cfu" => 12
-        ]);
-
-        $exam3 = Exam::factory()->create([
-            "ssd_id" => 3,
-            "name" => "test exam 03",
-            "cfu" => 9
-        ]);        
-
-        $exam4 = Exam::factory()->create([
-            "ssd_id" => 4,
-            "name" => "test exam 04",
-            "cfu" => 6
-        ]);        
-
-
-        $option1 = ExamBlockOption::factory()->create([
-            "exam_id" => 1,
-            "exam_block_id" => $block1->id
-        ]);
-
-        $option2 = ExamBlockOption::factory()->create([
-            "exam_id" => 2,
-            "exam_block_id" => $block1->id
-        ]);
-
-        $option3 = ExamBlockOption::factory()->create([
-            "exam_id" => 3,
-            "exam_block_id" => $block2->id
-        ]);
-           
-        $option4 = ExamBlockOption::factory()->create([
-            "exam_id" => 4,
-            "exam_block_id" => $block2->id
-        ]);
+        $front1 = Front::factory()->create(["user_id" => 1]);
+        $front2 = Front::factory()->create(["user_id" => 2]);
+        //$user1->front()->associate($front1);
+        //$user2->front()->associate($front2);
         
-        $option1->ssds()->attach([1,2,3]);
 
-
-        TakenExam::factory()->create([
-            "name" => "test exam 01 mod 1",
-            "cfu" => 6,
-            "ssd_id" => 1,
-            "front_id" => 1
-        ]);
-
-        TakenExam::factory()->create([
-            "name" => "test exam 02 mod 2",
-            "cfu" => 9,
-            "ssd_id" => 2,
-            "front_id" => 1
-        ]);
-
-        TakenExam::factory()->create([
-            "name" => "test exam 03 mod 3",
-            "cfu" => 5,
-            "ssd_id" => 3,
-            "front_id" => 1
-        ]);
-        
-        TakenExam::factory()->create([
-            "name" => "test exam 04 mod 3",
-            "cfu" => 18,
-            "ssd_id" => 3,
-            "front_id" => 1
-        ]);
+        Exam::factory(20)->create();
+        ExamBlock::factory(10)->create();
+        ExamBlockOption::factory(10)->create();
+        TakenExam::factory(30)->create();
+        ExamBlockOptionSsd::factory(40)->create();
+        /*Exam::first()->courses()->create([
+            "code" => "cl1",
+            "name" => "Corso creato per test"
+        ]);*/
     }
 }

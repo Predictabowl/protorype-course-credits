@@ -22,4 +22,6 @@ interface UserManager {
     
     public function setName($userId, string $name);
     
+    public function deleteUser($userId): bool;
+    
 }

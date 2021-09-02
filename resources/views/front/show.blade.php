@@ -40,6 +40,7 @@
                             <x-button>
                                 {{ __("Confirm") }}
                             </x-button>
+                            <x-flash/>
                         </div>
                     </form>
                 </div>
@@ -65,6 +66,7 @@
                                 </svg>
                             </div>
                         </button>
+                        <x-flashStudyPlan/>
                     </x-slot>
 
                     <x-slot name="content">
@@ -90,7 +92,7 @@
                 </x-dropdown>
                 <div class="flex justify-end mt-4 pt-4 border-t border-gray-200">
                     <x-button-link href="{{ route('studyPlan',[$front]) }}">Calcola Crediti</x-button-link>
-                    <x-flashStudyPlan/>
+                    
                 </div>
             </x-panel>
         </div>

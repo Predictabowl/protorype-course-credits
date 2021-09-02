@@ -15,20 +15,6 @@
     <body>
         {{-- <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-10 sm:pt-0" --}}
         <div class="relative flex justify-center min-h-screen bg-gray-100 sm:items-center sm:pb-40">
-{{--             @if (Route::has('login'))
-                <div class="hidden fixed top-0 right-0 px-6 py-4 sm:block">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="text-sm text-gray-700 underline">Dashboard</a>
-                    @else
-                        <a href="{{ route('login') }}" class="text-sm text-gray-700 underline">Log in</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 underline">Register</a>
-                        @endif
-                    @endauth
-                </div>
-            @endif
- --}}
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
                 <div class="flex mx-auto justify-center w-80 pt-8 sm:justify-start sm:pt-0">
                     <img class="center" src="/images/logo_new.svg" alt="Università degli studi di Torino.">
@@ -48,7 +34,7 @@
                             <div class="flex justify-center gap-4 mt-4 pt-4 border-t border-gray-200">
                                 @if (Route::has('login'))
                                     @auth
-                                        <x-button-link href="{{ url('/dashboard') }}"> {{ __("Dashboard") }} </x-button>
+                                        <x-button-link href="{{ url('/dashboard') }}"> {{ __("Heading") }} </x-button>
                                     @else
                                         <x-button-link href="{{ route('login') }}"> {{ __("Log in") }} </x-button>
                                         @if (Route::has('register'))
@@ -60,21 +46,6 @@
                         </div>
                     </div>
                 </div>
-                <div>
-                    <h1 class="text-2xl"> Test Infos</h1>
-                    Locale: {{app()->currentLocale()}}
-                    <p>
-                        {{__("Forgot your password?")}}
-                    </p>
-                </div>
-
-{{--                 <div class="flex justify-center mt-4 sm:items-center sm:justify-between">
-
-
-                    <div class="ml-4 text-center text-sm text-gray-500 sm:text-right sm:ml-0">
-                        Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})
-                    </div>
-                </div> --}}
             </div>
         </div>
     </body>

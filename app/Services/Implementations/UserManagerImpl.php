@@ -47,9 +47,12 @@ class UserManagerImpl implements UserManager{
         $repo->update($user);
     }
     
+    public function deleteUser($userId): bool {
+        return $this->getUserRepository()->delete($userId);
+    }
+    
     private function getUserRepository(): UserRepository{
         return app()->make(UserRepository::class);
     }
-
 
 }

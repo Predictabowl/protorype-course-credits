@@ -49,7 +49,7 @@ class StudyPlanController extends Controller
                 "front" => $front
             ]);
         
-        $footer = "pag. {PAGE_NUM} / {PAGE_COUNT}";
+        $footer = "{PAGE_NUM} / {PAGE_COUNT}";
         $size = 10;
         $domPDF = $pdf->getDomPDF();
         $font = $domPDF->getFontMetrics()->getFont("Serif");

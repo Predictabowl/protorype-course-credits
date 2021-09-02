@@ -28,7 +28,7 @@ class TakenExamController extends Controller
             "ssd" => ["required", Rule::exists("ssds", "code")]
         ]);
         $this->getFrontManager($front)->saveTakenExam($attributes);
-        return back();
+        return back()->with("success", "Aggiunto: ".$attributes["name"]);
     }
     
     public function delete(Front $front){
@@ -41,7 +41,7 @@ class TakenExamController extends Controller
         
         $this->getFrontManager($front)->deleteTakenExam($attributes["id"]);
         
-        return back();
+        return back()->with("success", "Esame Eliminato");
     }
     
     

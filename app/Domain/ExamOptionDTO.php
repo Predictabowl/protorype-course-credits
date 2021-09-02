@@ -120,7 +120,7 @@ class ExamOptionDTO implements ExamDTO{
                 $this->block->getNumSlotsAvailable() < 1){
             return false;
         }
-        
+
         return true;
     }
 

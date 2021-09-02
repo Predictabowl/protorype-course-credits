@@ -21,7 +21,7 @@ use App\Repositories\Interfaces\UserRepository;
  */
 class UserManagerImplTest extends TestCase{
     
-    private $manger;
+    private $manager;
     private $userRepo;
     
     protected function setUp(): void {
@@ -30,7 +30,7 @@ class UserManagerImplTest extends TestCase{
         $this->userRepo = $this->createMock(UserRepository::class);
         
         app()->instance(UserRepository::class, $this->userRepo);
-        $this->manger = new UserManagerImpl();
+        $this->manager = new UserManagerImpl();
     }
 
     
@@ -47,7 +47,7 @@ class UserManagerImplTest extends TestCase{
                 ->with(1, Role::SUPERVISOR)
                 ->willReturn(true);
         
-        $this->manger->modRole(1, $attributes);
+        $this->manager->modRole(1, $attributes);
     }
     
     public function test_add_supervisor_role() {
@@ -63,7 +63,7 @@ class UserManagerImplTest extends TestCase{
                 ->with(1, Role::SUPERVISOR)
                 ->willReturn(true);
         
-        $this->manger->modRole(1, $attributes);
+        $this->manager->modRole(1, $attributes);
     }
     
     public function test_remove_both_roles() {
@@ -74,7 +74,7 @@ class UserManagerImplTest extends TestCase{
                 ->withConsecutive([1, Role::ADMIN], [1, Role::SUPERVISOR])
                 ->willReturn(true);
         
-        $this->manger->modRole(1, $attributes);
+        $this->manager->modRole(1, $attributes);
     }
     
     public function test_add_both_roles() {
@@ -88,7 +88,7 @@ class UserManagerImplTest extends TestCase{
                 ->withConsecutive([1, Role::ADMIN], [1, Role::SUPERVISOR])
                 ->willReturn(true);
         
-        $this->manger->modRole(1, $attributes);
+        $this->manager->modRole(1, $attributes);
     }
     
     public function test_getAll(){
@@ -98,7 +98,7 @@ class UserManagerImplTest extends TestCase{
                 ->with([])
                 ->willReturn($collection);
         
-        $result = $this->manger->getAll([]);
+        $result = $this->manager->getAll([]);
         
         $this->assertSame($collection, $result);
     }
@@ -123,6 +123,30 @@ class UserManagerImplTest extends TestCase{
                 ->method("update")
                 ->with($changedUser);
         
-        $this->manger->setName($userId, $newName);
+        $this->manager->setName($userId, $newName);
+    }
+    
+    public function test_deleteUser_failure(){
+        $userId = 17;        
+        $this->userRepo->expects($this->once())
+                ->method("delete")
+                ->with($userId)
+                ->willReturn(false);
+        
+        $result = $this->manager->deleteUser($userId);
+        
+        $this->assertFalse($result);
+    }
+    
+    public function test_deleteUser_success(){
+        $userId = 17;        
+        $this->userRepo->expects($this->once())
+                ->method("delete")
+                ->with($userId)
+                ->willReturn(true);
+        
+        $result = $this->manager->deleteUser($userId);
+        
+        $this->assertTrue($result);
     }
 }

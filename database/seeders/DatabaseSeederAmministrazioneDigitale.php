@@ -146,7 +146,7 @@ class DatabaseSeederAmministrazioneDigitale extends Seeder
         ]);
         
         foreach ($data as $value) {
-            $exam = Exam::create([
+            $exam = Exam::firstOrCreate([
                 "name" => $value[0],
                 "cfu" => $cfu,
                 "ssd_id" => GenerateSSD::getSSDId($value[1])
@@ -169,7 +169,7 @@ class DatabaseSeederAmministrazioneDigitale extends Seeder
     }
     
     private function generateFreeChoiceExams($courseId, $numExams, $cfu){
-        $exam = Exam::create([
+        $exam = Exam::firstOrCreate([
                 "name" => "Esame a scelta dello studente",
                 "cfu" => $cfu,
         ]);

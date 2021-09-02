@@ -49,6 +49,19 @@
             border-top: 1px solid;
         }
 
+        .signature-label{
+            margin-top: 3rem;
+            text-align:center;
+        }
+
+        .signature-underline{
+            margin-top: 2.5rem;
+            width: 100%;
+            border-bottom: 1px solid;
+            display: inline-block;
+        }
+
+
     </style>
 </head>
 <body>
@@ -74,7 +87,19 @@
                     </td>
                 </tr>
             </table>
-            <section style="margin-top: 10px; margin-bottom: 10px; font-size:16px;">
+
+
+            <section style="font-size: 14px; margin-top: 1rem;">
+
+                <p>
+                    La presente bozza di riconoscimento esami è predisposta dagli Uffici di Segreteria Didattica del Dipartimento di Giurisprudenza e la sua validità è subordinata all’approvazione da parte della Commissione riconoscimento esami del corso di laurea, nonché alla correttezza e alla completezza delle informazioni (CFU, nome dell'insegnamento, SSD, etc.) contenute nell'autocertificazione trasmessa agli Uffici.
+                </p>
+                <p>
+                    In particolare si invitano gli studenti a controllare con molta attenzione il contenuto, per verificare che i dati in esse imputati corrispondano esattamente agli insegnamenti sostenuti e dei quali si richiede il riconoscimento.
+                </p>
+            </section>
+
+            <section style="margin-top: 0.7rem; margin-bottom: 2rem; font-size:16px;">
                 <p>
                     Corso: <span style="font-weight:  bold;">{{ $front->course->name }}</span>
                 </p>
@@ -84,11 +109,36 @@
                 <p>
                     Email: <span style="font-weight: bold;">{{ $front->user->email }}</span>
                 </p>
+                <p>
+                    Cellulare: <span style="border-bottom:1px solid; padding-left: 200px;">&nbsp;</span>
+                </p>
+            </section>
+
+            <section style="border:1px  solid; text-align:center; width: 50%; margin:auto;">
+
+                <?php $cfu = $studyPlan->getRecognizedCredits() ?>
+                <p>
+                    Totale CFU riconosciuti: <span style="font-weight: bold;">{{ $cfu }}</span>
+                </p>
+                <p>
+                    CFU da sostenere: <span style="font-weight: bold;">{{ $front->course->cfu - $cfu }}</span>
+                </p>
+            </section>
+
+            <section style="position: relative; width: 30%; left: 5%;">
+                <div class="signature-label"">Data</div>
+                <div class="signature-underline"/>
+            </section>
+            <section style="position:relative; width:40%; left: 50%;">
+                <div class="signature-label"> Firma del docente</div>
+                <div class="signature-underline"/>
+                <div class="signature-label"> Firma dello studente per accettazione</div>
+                <div class="signature-underline"/>
             </section>
 
         </div>
 
-        <div style="text-overflow: auto;">
+        <div style="text-overflow: auto; page-break-before:always;">
             <table class="table-prospetto" style="border: 2px solid;">
                 <thead style="border: 2px solid black;">
                     <tr>
@@ -160,44 +210,18 @@
             </table>
         </div>
 
-        <div style="font-size: 16px; page-break-before: always;">
-            <?php $cfu = $studyPlan->getRecognizedCredits() ?>
-            <p>Totale CFU riconosciuti: {{ $cfu }}</p>
-            <p>CFU da sostenere: {{ $front->course->cfu - $cfu }}</p>
-        </div>
-        <div style="border-top: 1px solid; padding-top: 5px;">
-            Lista esami con crediti inutilizzati:
-            <ul class="list-disc pl-6">
-                @foreach($studyPlan->getLeftoverExams() as $exam)
-                    <li>
-                        {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu()}}
-                    </li>
-                @endforeach
-            </ul>
-        </div>
 
-        <div>
-            <p style="margin-top: 50px; text-align: right;">
-                Firma del docente:
-                <span style="border-bottom:1px solid; padding-left:300px;">&nbsp;</span>
-            </p>
-             <p style="margin-top: 50px; text-align:right;">
-                Firma dello studente per accettazione:
-                <span style="border-bottom:1px solid; padding-left:300px;">&nbsp;</span>
-            </p>
-        </div>
-
-{{--         <script type="text/php">
-             if (isset($pdf)) {
-                $text = "pagina {PAGE_NUM} / {PAGE_COUNT}";
-                $size = 10;
-                $font = $fontMetrics->getFont("Serif");
-                $width = $fontMetrics->get_text_width($text, $font, $size) / 2;
-                $x = ($pdf->get_width() - $width) -20;
-                $y = $pdf->get_height() - 35;
-                $pdf->page_text($x, $y, $text, $font, $size);
-            }
-        </script> --}}
-
+        @if($studyPlan->getLeftoverExams()->count() > 0)
+            <div style="border-top: 1px solid; border-bottom: 1px solid; margin-top: 10px; padding-top: 10px; padding-bottom: 10px;">
+                Lista esami con crediti inutilizzati:
+                <ul class="list-disc pl-6">
+                    @foreach($studyPlan->getLeftoverExams() as $exam)
+                        <li>
+                            {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu()}}
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 </body>
 </html>
