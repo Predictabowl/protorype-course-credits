@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Models\Front;
-use App\Models\Role;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 

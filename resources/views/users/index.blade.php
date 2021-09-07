@@ -9,16 +9,6 @@
 
         <x-panel  x-data="{ showmodal: false, formId: ''}">
             <div class="place-content-center">
-{{--                 <div class="relative mb-4 flex lg:inline-flex items-center bg-gray-100 rounded-xl px-3 py-2">
-                    <form method="GET" action="#">
-                        @if(request("category"))
-                            <input type="hidden" name="category" value="{{request("category")}}">
-                        @endif
-                        <input type="text" name="search" placeholder="Cerca utente"
-                            class="bg-transparent placeholder-black font-semibold text-sm"
-                            value="{{ request("search") }}">
-                    </form>
-                </div> --}}
                 <div class="mb-4">
                     <x-searchUserBar placeholder="Cerca per nome o email" filter="role"/>
                 </div>

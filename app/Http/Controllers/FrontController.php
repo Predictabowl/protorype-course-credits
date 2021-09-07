@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\Interfaces\FrontsSearchManager;
 use App\Services\Interfaces\FrontManager;
-use App\Repositories\Interfaces\CourseRepository;
 use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Front;
 

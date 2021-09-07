@@ -7,7 +7,7 @@
 
     <x-mainpanel>
         <div class="sm:flex justify-between">
-            <x-panel class="w-1/2">
+            <x-panel class="sm:w-2/3">
                 <div>
                     <form method="POST" action="{{ route("postTakenExam",[$front]) }}">
                         @csrf
@@ -38,7 +38,7 @@
                         </div>
                         <div class="flex justify-end mt-4 pt-4 border-t border-gray-200">
                             <x-button>
-                                {{ __("Confirm") }}
+                                {{ __("Add") }}
                             </x-button>
                             <x-flash/>
                         </div>
@@ -75,14 +75,6 @@
                             <form method="POST" action="{{ route("frontView",[$front])}}">
                                 @csrf
                                 @method("PUT")
-                            {{-- <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();"> --}}
-                          
-                                {{-- <x-dropdown-link>                                            
-                                    {{ $course->name }}
-                                </x-dropdown-link>
-                                <input type="hidden" name="courseId" value="{{$course->id}}"> --}}
                                 <x-dropdown-button type="submit" name="courseId" value="{{ $course->id }}">
                                     {{ $course->name }}
                                 </x-dropdown-button>
@@ -91,7 +83,7 @@
                     </x-slot>
                 </x-dropdown>
                 <div class="flex justify-end mt-4 pt-4 border-t border-gray-200">
-                    <x-button-link href="{{ route('studyPlan',[$front]) }}">Calcola Crediti</x-button-link>
+                    <x-button-link href="{{ route('studyPlan',[$front]) }}">{{ __("Calculate Credits")}}</x-button-link>
                     
                 </div>
             </x-panel>
@@ -100,13 +92,13 @@
 
 
         <x-panel>
-            <h1>Esami Sostenuti</h1>
+            <h1>{{ __("Exams Taken") }}</h1>
             <div class="place-content-center" x-data="{rowId = 1}">
                 <table class="min-w-full rounded-lg">
                     <thead>
                         <tr class="bg-gray-100">
                             <th>ssd</th>
-                            <th>Nome</th>
+                            <th>{{ __("Name") }}</th>
                             <th>CFU</th>
                         </tr>
                     </thead>
@@ -117,7 +109,6 @@
                                 <td >{{ $exam->getExamName() }}</td>
                                 <td class="text-center">{{ $exam->getCfu() }}</td>
                                 <td class="w-10">
-                                    {{-- <a href="/front/remove/{{$exam->getId()}}" class="ml-6 text-xs font-bold uppercase hover:bg-gray-200">Remove</a> --}}
                                     <form method="POST" action="{{ route("deleteTakenExam",[$front]) }}">
                                         @csrf
                                         @method("DELETE")
@@ -126,7 +117,6 @@
                                         </x-button-icon>
                                     </form>                                
                                 </td>
-
                         </tr>
                         @endforeach
                     </tbody>

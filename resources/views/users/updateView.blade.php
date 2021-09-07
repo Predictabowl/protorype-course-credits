@@ -20,7 +20,7 @@
                     </div>
                     <div class="flex items-center justify-end mt-4">
                         <x-button>
-                            Modifica
+                            {{ __("Modify") }}
                         </x-button>
                     </div>
                 </form>

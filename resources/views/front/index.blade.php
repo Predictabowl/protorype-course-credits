@@ -16,14 +16,13 @@
                 <table class="min-w-full rounded-lg">
                     <thead>
                         <tr class="bg-gray-100">
-                            <th>Studente</th>
+                            <th> {{ __("Student") }}</th>
                             <th class="flex place-content-center">
                                 <x-dropdown align="right" width="w-max">
                                     <x-slot name="trigger">
-                                        {{-- <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out"> --}}
                                         <button class="flex items-center text-sm hover:text-blue-600 text-gray-500 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
                                             <div class="font-bold text-base text-black hover:text-blue-600">
-                                                Corso:
+                                                {{ __("Course") }}:
                                             </div>
                                             @if(isset($currentCourse))
                                                 <div class="ml-2">
@@ -63,13 +62,16 @@
                         @foreach($fronts as $front)
                         <tr class="hover:bg-blue-100 ">
                             <td>
-                                <a class="hover:bg-blue-700 hover:text-white hover:font-semibold" href="{{ route('frontView',[$front])}}">{{ $front->user->name }}</a>
+                                <a class="hover:bg-blue-700 hover:text-white hover:font-semibold" 
+                                    href="{{ route('frontView',[$front])}}">
+                                        {{ $front->user->name }}
+                                </a>
                             </td>
                             <td>
                                 @if(isset($front->course))
                                     {{ $front->course->name}}
                                 @else
-                                    Nessun corso selezionato
+                                    {{ __("None Selected") }}
                                 @endif
                             </td>
                         </tr>

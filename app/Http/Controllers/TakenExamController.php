@@ -34,7 +34,7 @@ class TakenExamController extends Controller
     public function delete(Front $front){
         $this->authorize("delete",$front);
         
-        // This validation is not needed
+        // This validation is superfluous
         $attributes = request()->validate([
             "id" => ["numeric", Rule::exists("taken_exams","id")]
         ]);
@@ -46,8 +46,6 @@ class TakenExamController extends Controller
     
     
     private function getFrontManager(Front $front): FrontManager {
-        //$userManager = app()->make(UserFrontManager::class);
-        //return $userManager->getFrontInfoManager();
         $factory = app()->make(FrontManagerFactory::class);
         return $factory->getFrontManager($front->id);
     }

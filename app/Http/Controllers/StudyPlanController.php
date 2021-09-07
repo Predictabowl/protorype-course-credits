@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 class StudyPlanController extends Controller
 {
     
+    
     public function __construct() {
         $this->middleware(["auth","verified"]);
     }
@@ -23,8 +24,9 @@ class StudyPlanController extends Controller
                 ->setUserId($front->user_id)
                 ->getStudyPlanBuilder();
         if (!isset($builder)){
-            return back()->with("studyPlanFailure", "Non è stato selezionato alcun corso di laurea."); //should send a notification
+            return back()->with("studyPlanFailure", __("A degree course must be selected"));
         }
+        
         return view("studyplan.showplan",[
             "studyPlan" => $builder->getStudyPlan(),
             "front" => $front

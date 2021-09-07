@@ -3,11 +3,10 @@
 namespace App\Domain;
 
 use Illuminate\Support\Collection;
-
 use App\Domain\ExamBlockDTO;
 use App\Domain\ExamOptionDTO;
 
-class StudyPlan {
+class StudyPlan{
 
     private $examBlocks;
     private $leftovers;
@@ -82,4 +81,5 @@ class StudyPlan {
         }
         return null;
     }
+
 }

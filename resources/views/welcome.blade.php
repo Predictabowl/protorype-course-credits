@@ -13,7 +13,6 @@
 
     </head>
     <body>
-        {{-- <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-10 sm:pt-0" --}}
         <div class="relative flex justify-center min-h-screen bg-gray-100 sm:items-center sm:pb-40">
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
                 <div class="flex mx-auto justify-center w-80 pt-8 sm:justify-start sm:pt-0">

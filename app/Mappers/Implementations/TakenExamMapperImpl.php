@@ -3,7 +3,6 @@
 namespace App\Mappers\Implementations;
 
 use App\Models\Ssd;
-use App\Models\Front;
 use App\Models\TakenExam;
 use App\Domain\TakenExamDTO;
 use App\Mappers\Interfaces\TakenExamMapper;

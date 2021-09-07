@@ -27,22 +27,11 @@ class ExamBlockMapperImpl implements ExamBlockMapper{
         $this->optionMapper = app()->make(ExamOptionMapper::class);
     }
     
-//    public function toDTO(ExamBlock $model): ExamBlockDTO {
-//        $newBlock = new ExamBlockDTO($model->id, $model->max_exams);
-//        $model->examBlockOptions->map(fn(ExamBlockOption $option) =>  
-//                $this->optionMapper->toDTO($option, $newBlock));
-//        return $newBlock;
-//    }
-    
     public function toDTO(ExamBlock $model): ExamBlockDTO {
         $newBlock = new ExamBlockDTO($model->id, $model->max_exams);
         $model->examBlockOptions->map(fn(ExamBlockOption $option) =>  
                 $this->optionMapper->toDTO($option, $newBlock));
         return $newBlock;
     }
-
-//            $newOption = new ExamOptionDTO($model->id, $model->exam->name, $block, $model->exam->cfu, $model->exam->ssd->code);
-//        $model->ssds->each(fn($ssd) => $newOption->addCompatibleOption($ssd->code));
-//        return $newOption;
     
 }

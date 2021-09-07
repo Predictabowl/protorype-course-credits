@@ -16,18 +16,17 @@
                         {{ __('Heading') }}
                     </x-nav-link>
                 </div>
-                {{-- @if(Gate::allows("edit-courses")) --}}
-                @if(auth()->user()->isSupervisor())
+                @can("viewAny",App\Models\Front::class)
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link :href="route('frontIndex')" :active="request()->routeIs('frontIndex')">
                             Lista Prospetti
                         </x-nav-link>
                     </div>
-                @endif
-                @can("viewAny",App\Models\Front::class)
+                @endcan
+                @can("viewAny",App\Models\User::class)
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link :href="route('userIndex')" :active="request()->routeIs('userIndex')">
-                            Gestione Utenti
+                            {{ __("Users Management") }}
                         </x-nav-link>
                     </div>
                 @endcan
@@ -91,8 +90,23 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Heading') }}
             </x-responsive-nav-link>
+            @can("viewAny",App\Models\Front::class)
+                <x-responsive-nav-link :href="route('frontIndex')" :active="request()->routeIs('frontIndex')">
+                    Lista Prospetti
+                </x-responsive-nav-link>
+            @endcan
+            @can("viewAny",App\Models\User::class)
+                <x-responsive-nav-link :href="route('userIndex')" :active="request()->routeIs('userIndex')">
+                    {{ __("Users Management") }}
+                </x-responsive-nav-link>
+            @endcan
+            @if(auth()->user()->isStudent())                
+                <x-responsive-nav-link :href="route('frontPersonal')" :active="request()->routeIs('frontView')">
+                    Prospetto
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

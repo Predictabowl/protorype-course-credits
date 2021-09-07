@@ -14,7 +14,7 @@
                             <img src="/images/print-icon.svg" alt="Stampa">
                         </x-button-icon>
                     </a>
-                    {{ __("Print") }}
+                    {{ __("Download PDF") }}
                 </div>
             </div>
             <div class="place-content-center">
@@ -88,7 +88,6 @@
                                </tr>
                             @endforeach
                         @endforeach
-                        {{-- <tr class = "border-b-4 border-black"/> --}}
                     </tbody>
                 </table>
             </div>
@@ -99,16 +98,18 @@
                 <p>Totale CFU riconosciuti: {{ $cfu }}</p>
                 <p>CFU da sostenere: {{ $front->course->cfu - $cfu }}</p>
             </div>
-            <div class="border-t border-gray-400 pt-2">
-                Lista esami con crediti inutilizzati:
-                <ul class="list-disc pl-6">
-                    @foreach($studyPlan->getLeftoverExams() as $exam)
-                        <li>
-                            {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu()}}
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
+            @if($studyPlan->getLeftoverExams()->count() > 0)
+                <div class="border-t border-gray-400 pt-2">
+                    Lista esami con crediti inutilizzati:
+                    <ul class="list-disc pl-6">
+                        @foreach($studyPlan->getLeftoverExams() as $exam)
+                            <li>
+                                {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu()}}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </x-panel>
     </x-mainpanel>
 </x-app-layout>
