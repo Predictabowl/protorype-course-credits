@@ -71,7 +71,7 @@ class DatabaseSeederUserExample extends Seeder
     }
     
     private function createEntry($name, $ssd, $cfu, $frontId){
-        TakenExam::factory()->create([
+        TakenExam::create([
             "name" => $name,
             "cfu" => $cfu,
             "ssd_id" => GenerateSSD::getSSDId($ssd),
