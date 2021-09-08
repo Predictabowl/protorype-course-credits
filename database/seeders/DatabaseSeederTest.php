@@ -16,7 +16,7 @@ use App\Support\Seeders\GenerateSSD;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class DatabaseSeederTest extends Seeder
+class DatabaseSeederTest2 extends Seeder
 {
     /**
      * Seed the application's database.
