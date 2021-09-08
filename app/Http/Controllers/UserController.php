@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\Interfaces\UserManager;
-use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -41,7 +40,12 @@ class UserController extends Controller
     }
     
     /*
-     * It needs a check to avoid to remove all admins from the system
+     * It needs a check to avoid to remove all admins from the system,
+     * and it should be the service layer responsability
+     * 
+     * Thsi method is not tested yet, it's here only for learning
+     * purposes and should be properly implemented before opening the 
+     * admin dashboard to the public.
      */
     public function putRoles(User $user) {
         $this->authorize("updateRole", $user);
@@ -54,7 +58,8 @@ class UserController extends Controller
     public function delete(User $user){
         $this->authorize("delete", $user);
         
-        return "Trying to delete user: ".$user->name.", with id: ".$user->id."<br>This function has not been implemented yet.";
+        $this->getUserManager()->deleteUser($user->id);
+        return back()->with("success", "Eliminato utente: ".$user->name);
     }
     
     public function show(User $user){

@@ -78,6 +78,8 @@
             <div class="mt-4">
                 {{ $users->links() }}
             </div>
+
+            <x-flash/>
         </x-panel>
     </x-mainpanel>
 </x-app-layout>

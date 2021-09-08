@@ -3,7 +3,6 @@
 use App\Http\Controllers\TakenExamController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\StudentController;
-use App\Models\Course;
 use App\Http\Controllers\StudyPlanController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -26,13 +25,6 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth',"verified"])->name('dashboard');
-
-
-Route::get("/testpage",function(){
-        $course = Course::with("examBlocks.examBlockOptions.exam.ssd",
-                "examBlocks.examBlockOptions.ssds")->find(1);
-        return view("testpage");
-    }); //only for tests
 
 require __DIR__.'/auth.php';
 
