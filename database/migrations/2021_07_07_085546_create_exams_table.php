@@ -18,7 +18,7 @@ class CreateExamsTable extends Migration
             $table->foreignId("ssd_id")->nullable()->constrained()->cascadeOnDelete();
             $table->string("code")->unique()->nullable(); //unused right now, but left for future applications
             $table->string("name");
-            $table->integer("cfu");
+            $table->unsignedTinyInteger("cfu");
             $table->timestamps();
         });
     }
