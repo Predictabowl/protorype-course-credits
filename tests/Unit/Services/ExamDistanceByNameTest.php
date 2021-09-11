@@ -20,11 +20,11 @@ class ExamDistanceByNameTest extends TestCase{
     
     protected function setUp(): void {
         $this->eDistance = new ExamDistanceByName();
-        $this->block = new ExamBlockDTO(1,1);
+        $this->block = new ExamBlockDTO(1,1,10);
     }
     
     public function test_name_distance_insertion() {
-        $option = new ExamOptionDTO(1,"nome insegnamento", $this->block, 10, "ssd");
+        $option = new ExamOptionDTO(1,"nome insegnamento", $this->block, "ssd");
         $taken = new TakenExamDTO(1,"nome dell'insegnamento","ssd",6);
         
         $dist = $this->eDistance->calculateDistance($option, $taken);
@@ -33,7 +33,7 @@ class ExamDistanceByNameTest extends TestCase{
     }
     
     public function test_name_distance_deletion() {
-        $option = new ExamOptionDTO(1,"Nome Insegnamento", $this->block, 10, "ssd");
+        $option = new ExamOptionDTO(1,"Nome Insegnamento", $this->block, "ssd");
         $taken = new TakenExamDTO(1,"nome insegna","ssd",6);
         
         $dist = $this->eDistance->calculateDistance($option, $taken);
@@ -42,7 +42,7 @@ class ExamDistanceByNameTest extends TestCase{
     }
     
     public function test_name_distance_replacement() {
-        $option = new ExamOptionDTO(1,"Nome insegnamento", $this->block, 10, "ssd");
+        $option = new ExamOptionDTO(1,"Nome insegnamento", $this->block, "ssd");
         $taken = new TakenExamDTO(1,"nome insegnamenti","ssd",6);
         
         $dist = $this->eDistance->calculateDistance($option, $taken);

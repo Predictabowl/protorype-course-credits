@@ -70,10 +70,6 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         return $this->declaredExams;
     }
     
-//    public function getApprovedExams() {
-//        return $this->examOptions;
-//    }
-    
     public function refreshStudyPlan(): StudyPlanBuilder {
         $examBlocks = $this->courseManager->getExamBlocks();
         $this->declaredExams = $this->frontManager->getTakenExams();

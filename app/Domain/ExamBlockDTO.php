@@ -18,11 +18,13 @@ class ExamBlockDTO{
     private $id;
     private $approvedExams;
     private $numExams;
+    private $cfu;
     
-    public function __construct($id, int $numExams) {
+    public function __construct($id, int $numExams, int $cfu) {
         $this->id = $id;
         $this->approvedExams = collect([]);
         $this->numExams = $numExams;
+        $this->cfu = $cfu;
     }
     
     public function getId() {
@@ -53,7 +55,7 @@ class ExamBlockDTO{
     
     public function getIntegrationValue(): int{
         
-        return $this->getCfu() - $this->getRecognizedCredits();
+        return $this->getTotalCfu() - $this->getRecognizedCredits();
     }
     
     public function getRecognizedCredits(): int{
@@ -65,13 +67,12 @@ class ExamBlockDTO{
                 )->flatten()->sum();
     }
     
-    // Is supposed that every exam in the block have the same cfu value
+    public function getTotalCfu(): int {
+        return $this->cfu * $this->numExams;
+    }
+    
     public function getCfu(): int {
-        $exam = $this->approvedExams->first();
-        if (!isset($exam)){
-            return 0;
-        }
-        return $exam->getCfu() * $this->numExams;
+        return $this->cfu;
     }
     
     /**
@@ -86,16 +87,4 @@ class ExamBlockDTO{
                 ->sum();
     }
     
-//    public function setApprovedExam(ExamOptionDTO $exam) {
-//        $this->approvedExams[$exam->getId()] = $exam;
-//        return $this;
-//    }
-    
-//    public function getApprovedExams() {
-//        return $this->approvedExams;
-//    }
-//    
-//    public function getApprovedExam($id): ExamOptionDTO{
-//        return $this->approvedExams->get($id);
-//    }
 }

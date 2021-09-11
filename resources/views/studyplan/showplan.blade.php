@@ -75,7 +75,7 @@
                                                     <?php $numOptions = $examBlock->getNumExams() ?>
                                                     <div class="m-auto" style="max-width: 120px;">
                                                         {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da 
-                                                        {{ $option->getCfu() }} cfu a scelta.
+                                                        {{ $examBlock->getCfu() }} cfu a scelta.
                                                     </div>
                                                 @endif
                                         </td>

@@ -25,7 +25,7 @@ class ExamFactory extends Factory
         return [
             "ssd_id" => $this->faker->numberBetween(1,Ssd::count()),
             "name" => $this->faker->sentence(),
-            "cfu" => $this->faker->numberBetween(3,12)
+            //"cfu" => $this->faker->numberBetween(3,12)
         ];
     }
 }

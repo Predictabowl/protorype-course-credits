@@ -173,7 +173,7 @@
                                         Obbligatorio
                                     @else
                                         <?php $numOptions = $examBlock->getNumExams() ?>
-                                        {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da {{$examBlock->getExamOptions()->first()->getCfu()}} CFU a scelta
+                                        {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da {{$examBlock->getCfu()}} CFU a scelta
                                     @endif
                             </td>
                             <td class="outer-td" style="text-align: center; font-weight: bold; font-size:15px" width="5%">

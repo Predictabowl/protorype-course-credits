@@ -21,17 +21,15 @@ class ExamOptionDTO implements ExamDTO{
     private $id;
     private $examName;
     private $block;
-    private $cfu;
     private $ssd;
     private $compatibleOptions;
     private $linkedTakenExams;
     private $recognizedCredits;
 
-    public function __construct($id, string $examName, ExamBlockDTO $block, int $cfu, ?string $ssd) {
+    public function __construct($id, string $examName, ExamBlockDTO $block, ?string $ssd) {
         $this->id = $id;
         $this->examName = $examName;
         $this->block = $block;
-        $this->cfu = $cfu;
         $this->ssd = $ssd;
         $this->compatibleOptions = collect([]);
         $block->setOption($this);
@@ -48,7 +46,7 @@ class ExamOptionDTO implements ExamDTO{
     }
 
     public function getCfu(): int {
-        return $this->cfu;
+        return $this->block->getCfu();
     }
 
     public function getSsd(): ?string {

@@ -24,8 +24,8 @@ class StudyPlanTest extends TestCase{
 
     
     public function test_addExamLik_when_exam_not_present_in_the_course() {
-        $block = new ExamBlockDTO(1,1);
-        $option = new ExamOptionDTO(1,"option1", new ExamBlockDTO(2,1), 12, "ssd");
+        $block = new ExamBlockDTO(1,1,12);
+        $option = new ExamOptionDTO(1,"option1", new ExamBlockDTO(2,1,12), "ssd");
         $taken = new TakenExamDTO(1,"taken1", "ssd", 9);
         $takenPk = $taken->getId();
         
@@ -37,9 +37,9 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_addExamLink_leftover_cfu_values() {
-        $block = new ExamBlockDTO(1,2);
-        $option1 = new ExamOptionDTO(1,"option1", $block, 12, "ssd");
-        $option2 = new ExamOptionDTO(2,"option2", $block, 12, "ssd");
+        $block = new ExamBlockDTO(1,2,12);
+        $option1 = new ExamOptionDTO(1,"option1", $block, "ssd");
+        $option2 = new ExamOptionDTO(2,"option2", $block, "ssd");
         $taken1 = new TakenExamDTO(1,"taken1", "ssd", 10);
         $taken2 = new TakenExamDTO(2,"taken2", "ssd", 6);
         
@@ -66,11 +66,11 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_getRecognizedCredits() {
-        $block1 = new ExamBlockDTO(1,2);
-        $block2 = new ExamBlockDTO(2,1);
-        $option1 = new ExamOptionDTO(1,"option1", $block1, 9, "ssd1");
-        $option2 = new ExamOptionDTO(2,"option2", $block1, 12, "ssd2");
-        $option3 = new ExamOptionDTO(3,"option3", $block2, 18, "ssd1");
+        $block1 = new ExamBlockDTO(1,2,9);
+        $block2 = new ExamBlockDTO(2,1,18);
+        $option1 = new ExamOptionDTO(1,"option1", $block1, "ssd1");
+        $option2 = new ExamOptionDTO(2,"option2", $block1, "ssd2");
+        $option3 = new ExamOptionDTO(3,"option3", $block2, "ssd1");
         $taken1 = new TakenExamDTO(1,"taken1", "ssd1", 10);
         $taken2 = new TakenExamDTO(2,"taken2", "ssd2", 6);
         $taken3 = new TakenExamDTO(2,"taken2", "ssd1", 9);
