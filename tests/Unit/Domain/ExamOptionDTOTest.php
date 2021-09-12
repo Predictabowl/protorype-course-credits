@@ -85,6 +85,33 @@ class ExamOptionDTOTest extends TestCase
         $this->assertEquals(5,$option1->getIntegrationValue());
     }
     
+    
+    public function test_serialization_ok(){
+        $block = new ExamBlockDTO(3, 1, 9);
+        $option = new ExamOptionDTO(5, "test", $block, "ssd1");
+        $taken1 = new TakenExamDTO(7, "taken 1", "ssd3", 3);
+        $taken2 = new TakenExamDTO(11, "taken 2", "ssd5", 4);
+        $option->addTakenExam($taken1);
+        $option->addTakenExam($taken2);
+        
+        $string = serialize($option);
+        $result = unserialize($string);
+        
+        $this->assertInstanceOf(ExamOptionDTO::class, $result);
+        $result->setBlock($block);
+        $this->assertEquals($option,$result);
+    }
+    
+    public function test_serialization_invalid_state(){
+        $block = new ExamBlockDTO(3, 1, 9);
+        $option = new ExamOptionDTO(5, "test", $block, "ssd1");
+        
+        $string = serialize($option);
+        $result = unserialize($string);
+        
+        $this->expectException(\App\Exceptions\Custom\InvalidStateException::class);
+        $result->getBlock();
+    }
 
     private function createOption($cfu = 12): ExamOptionDTO
     {

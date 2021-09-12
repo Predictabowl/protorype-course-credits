@@ -8,12 +8,14 @@
 
 namespace App\Domain;
 
+use App\Domain\ExamOptionDTO;
+
 /**
  * Description of ExamBlockDTO
  *
  * @author piero
  */
-class ExamBlockDTO{
+class ExamBlockDTO implements \Serializable{
     
     private $id;
     private $approvedExams;
@@ -86,5 +88,25 @@ class ExamBlockDTO{
                         $exam->getTakenExams()->isEmpty() ? 0 : 1)
                 ->sum();
     }
-    
+
+    public function serialize(): string {
+        return serialize([
+            "id" => $this->id,
+            "numExams" => $this->numExams,
+            "cfu" => $this->cfu,
+            "approvedExams" => $this->approvedExams
+        ]);
+    }
+
+    public function unserialize(string $serialized): void {
+        $array = unserialize($serialized);
+        $this->id = $array["id"];
+        $this->numExams = $array["numExams"];
+        $this->cfu = $array["cfu"];
+        $this->approvedExams = $array["approvedExams"]->map(function (ExamOptionDTO $option){ 
+                $option->setBlock($this);
+                return $option;
+            });
+    }
+
 }

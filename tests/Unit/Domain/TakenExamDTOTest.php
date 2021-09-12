@@ -41,4 +41,15 @@ class TakenExamDTOTest extends TestCase
         $exam1->setActualCfu(5);
         $this->assertEquals($exam1, $exam2);
     }
+    
+    public function test_serialize(){
+        $exam = new TakenExamDTO(7, "taken", "code1", 12);
+        
+        $string = serialize($exam);
+        $result = unserialize($string);
+        
+        $this->assertInstanceOf(TakenExamDTO::class, $result);
+        $this->assertEquals($exam, $result);
+        $this->assertNotSame($exam, $result);
+    }
 }

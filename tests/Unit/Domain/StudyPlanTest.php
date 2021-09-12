@@ -164,4 +164,18 @@ class StudyPlanTest extends TestCase{
         
     }
     
+    public function test_serialize(){
+        $block1 = new ExamBlockDTO(1, 1, 10);
+        $block2 = new ExamBlockDTO(3, 2, 9);
+        $plan = new StudyPlan(collect([$block1, $block2]));
+        
+        $string = serialize($plan);
+        $result = unserialize($string);
+        
+        $this->assertInstanceOf(StudyPlan::class, $result);
+        $this->assertEquals($plan, $result);
+        $this->assertNotSame($plan, $result);
+        
+    }
+    
 }

@@ -27,8 +27,10 @@ class StudyPlanController extends Controller
             return back()->with("studyPlanFailure", __("A degree course must be selected"));
         }
         
+        $studyPlan = $builder->getStudyPlan();
+        request()->session()->put("studyPlan",$studyPlan);
         return view("studyplan.showplan",[
-            "studyPlan" => $builder->getStudyPlan(),
+            "studyPlan" => $studyPlan,
             "front" => $front
         ]);
     }
@@ -36,10 +38,7 @@ class StudyPlanController extends Controller
     public function createPdf(Front $front){
         Gate::authorize("view-studyPlan", $front);
         
-        $plan = app()->make(UserFrontManager::class)
-                ->setUserId($front->user_id)
-                ->getStudyPlanBuilder()->getStudyPlan();
-        
+        $plan = session()->get("studyPlan");
         return $this->setupDomPdf($front, $plan)->stream("prospetto.pdf");
     }
     

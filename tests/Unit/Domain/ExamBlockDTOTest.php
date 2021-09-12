@@ -98,4 +98,17 @@ class ExamBlockDTOTest extends TestCase{
         
         $this->assertEquals(0, $value);
     }
+    
+    public function test_serialize(){
+        $block1 = new ExamBlockDTO(3, 2, 10);
+        $option1 = new ExamOptionDTO(5, "option 1", $block1, "ssd1");
+        $option2 = new ExamOptionDTO(7, "option 2", $block1, "ssd5");
+        
+        $string = serialize($block1);
+        $result = unserialize($string);
+        
+        $this->assertInstanceOf(ExamBlockDTO::class, $result);
+        $this->assertEquals($block1, $result);
+        $this->assertNotSame($block1, $result);
+    }
 }
