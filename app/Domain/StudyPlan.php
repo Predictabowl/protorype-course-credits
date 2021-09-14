@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use App\Domain\ExamBlockDTO;
 use App\Domain\ExamOptionDTO;
 
-class StudyPlan{
+class StudyPlan implements \Serializable{
 
     private $examBlocks;
     private $leftovers;
@@ -80,6 +80,21 @@ class StudyPlan{
             return $this->maxCfu - $this->getRecognizedCredits();
         }
         return null;
+    }
+
+    public function serialize(): string {
+        return serialize([
+            "examBlocks" => $this->examBlocks,
+            "maxCfu" => $this->maxCfu,
+            "leftovers" => $this->leftovers
+        ]);
+    }
+
+    public function unserialize(string $serialized): void {
+        $array = unserialize($serialized);
+        $this->maxCfu = $array["maxCfu"];
+        $this->examBlocks = $array["examBlocks"];
+        $this->leftovers = $array["leftovers"];
     }
 
 }

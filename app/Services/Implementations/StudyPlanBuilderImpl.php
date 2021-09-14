@@ -61,18 +61,9 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
     }
 
     public function getStudyPlan(): StudyPlan {
-        $this->refreshStudyPlan();
-        $this->buildStudyPlan();
+        $this->refreshStudyPlan()->buildStudyPlan();
         return $this->studyPlan;
     }
-    
-    public function getTakenExams(): Collection {
-        return $this->declaredExams;
-    }
-    
-//    public function getApprovedExams() {
-//        return $this->examOptions;
-//    }
     
     public function refreshStudyPlan(): StudyPlanBuilder {
         $examBlocks = $this->courseManager->getExamBlocks();
@@ -92,10 +83,10 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
                     ,$linkedExam)
         )->sum();
         
-        //we could actually interrupt the search if the allotted credits are
+        //we could actually interrupt the search if the course's allotted credits are
         //exhuasted, but this is only an optimization, will think about when is finished.
         
-        // If there's credits left to assign it check the option's compatibility list
+        // If there's credits left to assign it checks the option's compatibility list
         if($leftover > 0){
             $leftover = $this->declaredExams->map(fn($linkedExam) =>
                 $this->linkExam($this->getOptionsByCompatibility($linkedExam)
@@ -112,6 +103,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         //setting leftover exams and credit
         $this->studyPlan->setLeftoverExams($this->declaredExams->filter(
                 fn(TakenExamDTO $exam) => $exam->getActualCfu() > 0));
+
     }
     
     /**

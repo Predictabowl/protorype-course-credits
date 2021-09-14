@@ -25,7 +25,7 @@ class ExamOptionMapperImpl  implements ExamOptionMapper{
         if($ssd != null){
             $ssd = $ssd->code;
         }
-        $newOption = new ExamOptionDTO($model->id, $model->exam->name, $block, $model->exam->cfu, $ssd);
+        $newOption = new ExamOptionDTO($model->id, $model->exam->name, $block, $ssd);
         $model->ssds->each(fn($ssd) => $newOption->addCompatibleOption($ssd->code));
         return $newOption;
     }

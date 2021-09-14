@@ -57,10 +57,10 @@ class ExamOptionDTOTest extends TestCase
     }
     
     public function test_addTakenExam_is_not_added_if_block_is_full(){
-        $block = new ExamBlockDTO(1,2);
-        $option1 = new ExamOptionDTO(1, "name 1", $block, 12, "ssd1");
-        $option2 = new ExamOptionDTO(2, "name 2", $block, 12, "ssd2");
-        $option3 = new ExamOptionDTO(3, "name 3", $block, 12, "ssd3");
+        $block = new ExamBlockDTO(1,2,12);
+        $option1 = new ExamOptionDTO(1, "name 1", $block, "ssd1");
+        $option2 = new ExamOptionDTO(2, "name 2", $block, "ssd2");
+        $option3 = new ExamOptionDTO(3, "name 3", $block, "ssd3");
         
         $takenExam1 = $option1->addTakenExam($this->createTakenExam(9,"name 1"));
         $takenExam2 = $option2->addTakenExam($this->createTakenExam(9,"name 2"));
@@ -85,10 +85,37 @@ class ExamOptionDTOTest extends TestCase
         $this->assertEquals(5,$option1->getIntegrationValue());
     }
     
+    
+    public function test_serialization_ok(){
+        $block = new ExamBlockDTO(3, 1, 9);
+        $option = new ExamOptionDTO(5, "test", $block, "ssd1");
+        $taken1 = new TakenExamDTO(7, "taken 1", "ssd3", 3);
+        $taken2 = new TakenExamDTO(11, "taken 2", "ssd5", 4);
+        $option->addTakenExam($taken1);
+        $option->addTakenExam($taken2);
+        
+        $string = serialize($option);
+        $result = unserialize($string);
+        
+        $this->assertInstanceOf(ExamOptionDTO::class, $result);
+        $result->setBlock($block);
+        $this->assertEquals($option,$result);
+    }
+    
+    public function test_serialization_invalid_state(){
+        $block = new ExamBlockDTO(3, 1, 9);
+        $option = new ExamOptionDTO(5, "test", $block, "ssd1");
+        
+        $string = serialize($option);
+        $result = unserialize($string);
+        
+        $this->expectException(\App\Exceptions\Custom\InvalidStateException::class);
+        $result->getBlock();
+    }
 
     private function createOption($cfu = 12): ExamOptionDTO
     {
-        return new ExamOptionDTO(1,"test", new ExamBlockDTO(1,2), $cfu,"ssd");
+        return new ExamOptionDTO(1,"test", new ExamBlockDTO(1,2,$cfu),"ssd");
     }
     
     private function createTakenExam($cfu = 9, $name = "taken", $actual = null): TakenExamDTO

@@ -99,11 +99,24 @@ class StudyPlanControllerTest extends TestCase
                 ->from(self::FIXTURE_START_URI)
                 ->get(route("studyPlan",[$this->front]));
         
+        $response->assertOk()
+            ->assertViewHas([
+                "front" => $this->front,
+                "studyPlan" => $plan
+            ])
+            ->assertSessionHas("studyPlan", $plan);
+    }
+    
+    public function test_createPdf_Ok(){
+        $course = Course::factory()->create();
+        $this->front->course()->associate($course);
+        $this->front->save();
+        session()->put("studyPlan",new StudyPlan(collect([])));
+        
+        $response =  $this->actingAs($this->user)
+                ->get(route("studyPlanPdf",[$this->front]));
+        
         $response->assertOk();
-        $response->assertViewHas([
-            "front" => $this->front,
-            "studyPlan" => $plan
-        ]);
     }
     
 }

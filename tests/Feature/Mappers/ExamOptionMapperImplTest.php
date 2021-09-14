@@ -42,7 +42,7 @@ class ExamOptionMapperImplTest extends TestCase{
         ExamBlock::factory()->create();
         ExamBlockOption::factory()->create();
         $option = ExamBlockOption::first();
-        $block = new ExamBlockDTO(1, 2);
+        $block = new ExamBlockDTO(1, 2, 9);
         
         $result = $this->mapper->toDTO($option, $block);
         
@@ -50,7 +50,7 @@ class ExamOptionMapperImplTest extends TestCase{
         $this->assertEquals($block->getExamOption(1), $result);
         $this->assertEquals(
                [$option->id,
-                $option->exam->cfu,
+                9,
                 $option->exam->name,
                 $option->exam->ssd->code
                 ],
@@ -65,12 +65,11 @@ class ExamOptionMapperImplTest extends TestCase{
         Course::factory()->create();
         Exam::create([
             "name" => "esame test",
-            "cfu" => 7
         ]);
         ExamBlock::factory()->create();
         ExamBlockOption::factory()->create();
         $option = ExamBlockOption::first();
-        $block = new ExamBlockDTO(1, 2);
+        $block = new ExamBlockDTO(1, 2, 7);
         
         $result = $this->mapper->toDTO($option, $block);
         
@@ -78,7 +77,7 @@ class ExamOptionMapperImplTest extends TestCase{
         $this->assertEquals($block->getExamOption(1), $result);
         $this->assertEquals(
                [$option->id,
-                $option->exam->cfu,
+                7,
                 $option->exam->name,
                 $option->exam->ssd,
                 ],

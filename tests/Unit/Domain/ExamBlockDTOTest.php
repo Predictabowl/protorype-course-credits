@@ -27,15 +27,15 @@ class ExamBlockDTOTest extends TestCase{
     private $exams;
     
     protected function setUp(): void {
-        $this->block=  new ExamBlockDTO(1,self::FIXTURE_NUM_EXAMS);
-        $this->exams[0] = new ExamOptionDTO(1,"first", $this->block, self::FIXTURE_CFU, "ssd1");
-        $this->exams[1] = new ExamOptionDTO(2,"second", $this->block, self::FIXTURE_CFU, "ssd2");
-        $this->exams[2] = new ExamOptionDTO(3,"third", $this->block, self::FIXTURE_CFU, "ssd3");
+        $this->block=  new ExamBlockDTO(1,self::FIXTURE_NUM_EXAMS, self::FIXTURE_CFU);
+        $this->exams[0] = new ExamOptionDTO(1,"first", $this->block, "ssd1");
+        $this->exams[1] = new ExamOptionDTO(2,"second", $this->block, "ssd2");
+        $this->exams[2] = new ExamOptionDTO(3,"third", $this->block, "ssd3");
     }
     
     
-    public function test_getCfuValue(){
-        $cfu = $this->block->getCfu();
+    public function test_getTotalCfuValue(){
+        $cfu = $this->block->getTotalCfu();
         
         $this->assertEquals(self::FIXTURE_CFU*self::FIXTURE_NUM_EXAMS, $cfu);
     }
@@ -97,5 +97,18 @@ class ExamBlockDTOTest extends TestCase{
         $value = $this->block->getNumSlotsAvailable();
         
         $this->assertEquals(0, $value);
+    }
+    
+    public function test_serialize(){
+        $block1 = new ExamBlockDTO(3, 2, 10);
+        $option1 = new ExamOptionDTO(5, "option 1", $block1, "ssd1");
+        $option2 = new ExamOptionDTO(7, "option 2", $block1, "ssd5");
+        
+        $string = serialize($block1);
+        $result = unserialize($string);
+        
+        $this->assertInstanceOf(ExamBlockDTO::class, $result);
+        $this->assertEquals($block1, $result);
+        $this->assertNotSame($block1, $result);
     }
 }

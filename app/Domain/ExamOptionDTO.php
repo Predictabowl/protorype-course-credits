@@ -10,28 +10,27 @@ namespace App\Domain;
 
 use App\Domain\Interfaces\ExamDTO;
 use Illuminate\Support\Collection;
+use App\Exceptions\Custom\InvalidStateException;
 
 /**
  * Description of ExamOptionDTO
  *
  * @author piero
  */
-class ExamOptionDTO implements ExamDTO{
+class ExamOptionDTO implements ExamDTO, \Serializable{
 
     private $id;
     private $examName;
     private $block;
-    private $cfu;
     private $ssd;
     private $compatibleOptions;
     private $linkedTakenExams;
     private $recognizedCredits;
 
-    public function __construct($id, string $examName, ExamBlockDTO $block, int $cfu, ?string $ssd) {
+    public function __construct($id, string $examName, ExamBlockDTO $block, ?string $ssd) {
         $this->id = $id;
         $this->examName = $examName;
         $this->block = $block;
-        $this->cfu = $cfu;
         $this->ssd = $ssd;
         $this->compatibleOptions = collect([]);
         $block->setOption($this);
@@ -44,11 +43,19 @@ class ExamOptionDTO implements ExamDTO{
     }
 
     public function getBlock(): ExamBlockDTO {
+        if(!isset($this->block)){
+            throw new InvalidStateException(__METHOD__ . " " 
+                    ."Exam Block null value, likely was not set after unserialization.");
+        }
         return $this->block;
+    }
+    
+    public function setBlock(ExamBlockDTO $block): void {
+        $this->block = $block;
     }
 
     public function getCfu(): int {
-        return $this->cfu;
+        return $this->getBlock()->getCfu();
     }
 
     public function getSsd(): ?string {
@@ -117,7 +124,7 @@ class ExamOptionDTO implements ExamDTO{
         }
         
         if ($this->linkedTakenExams->isEmpty() && 
-                $this->block->getNumSlotsAvailable() < 1){
+                $this->getBlock()->getNumSlotsAvailable() < 1){
             return false;
         }
 
@@ -140,4 +147,27 @@ class ExamOptionDTO implements ExamDTO{
                 ->map(fn ($item) => $item->getActualCfu())
                 ->sum();
     }
+    
+    public function serialize(): string {
+        return serialize([
+            "id" => $this->id,
+            "examName" => $this->examName,
+            "ssd" => $this->ssd,
+            "compatibleOptions" => $this->compatibleOptions,
+            "linkedTakenExams" => $this->linkedTakenExams,
+            "recognizedCredits" => $this->recognizedCredits
+        ]);
+    }
+
+    public function unserialize(string $serialized): void {
+        $array = unserialize($serialized);
+        $this->id = $array["id"];
+        $this->examName = $array["examName"];
+        $this->block = null;
+        $this->ssd = $array["ssd"];
+        $this->compatibleOptions = $array["compatibleOptions"];
+        $this->linkedTakenExams = $array["linkedTakenExams"];
+        $this->recognizedCredits = $array["recognizedCredits"];
+    }
+
 }

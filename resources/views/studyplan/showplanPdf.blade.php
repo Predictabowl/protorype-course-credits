@@ -81,13 +81,7 @@
 
 
             <section style="font-size: 14px; margin-top: 1rem;">
-
-                <p>
-                    La presente bozza di riconoscimento esami è predisposta dagli Uffici di Segreteria Didattica del Dipartimento di Giurisprudenza e la sua validità è subordinata all’approvazione da parte della Commissione riconoscimento esami del corso di laurea, nonché alla correttezza e alla completezza delle informazioni (CFU, nome dell'insegnamento, SSD, etc.) contenute nell'autocertificazione trasmessa agli Uffici.
-                </p>
-                <p>
-                    In particolare si invitano gli studenti a controllare con molta attenzione il contenuto, per verificare che i dati in esse imputati corrispondano esattamente agli insegnamenti sostenuti e dei quali si richiede il riconoscimento.
-                </p>
+                <x-legal-heading/>
             </section>
 
             <section style="margin-top: 0.7rem; margin-bottom: 2rem; font-size:16px;">
@@ -173,7 +167,7 @@
                                         Obbligatorio
                                     @else
                                         <?php $numOptions = $examBlock->getNumExams() ?>
-                                        {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da {{$examBlock->getExamOptions()->first()->getCfu()}} CFU a scelta
+                                        {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da {{$examBlock->getCfu()}} CFU a scelta
                                     @endif
                             </td>
                             <td class="outer-td" style="text-align: center; font-weight: bold; font-size:15px" width="5%">
@@ -193,7 +187,7 @@
                 <ul class="list-disc pl-6">
                     @foreach($studyPlan->getLeftoverExams() as $exam)
                         <li>
-                            {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu()}}
+                            {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu() }}
                         </li>
                     @endforeach
                 </ul>

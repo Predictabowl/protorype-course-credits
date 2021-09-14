@@ -15,7 +15,7 @@ use App\Domain\Interfaces\ExamDTO;
  *
  * @author piero
  */
-class TakenExamDTO implements ExamDTO{
+class TakenExamDTO implements ExamDTO, \Serializable{
 
     private $id;
     private $examName;
@@ -78,5 +78,25 @@ class TakenExamDTO implements ExamDTO{
             throw new \InvalidArgumentException("The actual cfu cannot be higher than the max cfu value");
         }
         $this->actualCfu = $value;
-    }   
+    }
+
+    public function serialize(): string {
+        return serialize([
+            "id" => $this->id,
+            "examName" => $this->examName,
+            "cfu" => $this->cfu,
+            "ssd" => $this->ssd,
+            "actualCfu" => $this->actualCfu
+        ]);
+    }
+
+    public function unserialize(string $serialized): void {
+        $array = unserialize($serialized);
+        $this->id = $array["id"];
+        $this->examName = $array["examName"];
+        $this->cfu = $array["cfu"];
+        $this->ssd = $array["ssd"];
+        $this->actualCfu = $array["actualCfu"];
+    }
+
 }
