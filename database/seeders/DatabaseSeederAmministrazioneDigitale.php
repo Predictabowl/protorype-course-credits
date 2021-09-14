@@ -4,11 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Course;
-use App\Models\ExamBlockOption;
-use App\Models\ExamBlockOptionSsd;
-use App\Models\ExamBlock;
-use App\Models\Exam;
-use App\Support\Seeders\GenerateSSD;
 use App\Support\Seeders\GenerateExamBlock;
 
 class DatabaseSeederAmministrazioneDigitale extends Seeder
