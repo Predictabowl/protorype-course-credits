@@ -1,0 +1,11 @@
+## YAML Template.
+
+name: run-tests
+on: [push]
+jobs:
+    phpunit:
+        name: PHPUnit
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: nathanheffley/laravel-phpunit-action@v0.1.0
