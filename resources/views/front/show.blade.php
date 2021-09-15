@@ -93,9 +93,9 @@
 
 
         {{-- Taken exams table --}}
-        <x-panel class="overflow-y-scroll">
+        <x-panel >
             <h1 class="text-lg">{{ __("Exams Taken") }}</h1>
-            <div class="place-content-center lg:h-96">
+            <div class="place-content-center">
                 <table class="min-w-full rounded-lg">
                     <thead>
                         <tr class="bg-gray-100">
