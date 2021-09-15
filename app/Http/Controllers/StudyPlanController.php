@@ -50,12 +50,12 @@ class StudyPlanController extends Controller
                 "front" => $front
             ]);
         
-        $footer = "{PAGE_NUM} / {PAGE_COUNT}";
+        $footer = $front->user->name." - {PAGE_NUM} / {PAGE_COUNT}";
         $size = 10;
         $domPDF = $pdf->getDomPDF();
         $font = $domPDF->getFontMetrics()->getFont("Serif");
         $width = $domPDF->getFontMetrics()->get_text_width($footer, $font, $size) / 2;
-        $x = ($domPDF->getCanvas()->get_width() - $width) -20;
+        $x = ($domPDF->getCanvas()->get_width() - $width) -30;
         $y = $domPDF->getCanvas()->get_height() - 35;
         $domPDF->getCanvas()->page_text($x, $y, $footer, $font, $size);
         
