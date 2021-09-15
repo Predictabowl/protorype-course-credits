@@ -57,7 +57,7 @@ class ExamOptionDTOTest extends TestCase
     }
     
     public function test_addTakenExam_is_not_added_if_block_is_full(){
-        $block = new ExamBlockDTO(1,2,12);
+        $block = new ExamBlockDTO(1,2,12, 1);
         $option1 = new ExamOptionDTO(1, "name 1", $block, "ssd1");
         $option2 = new ExamOptionDTO(2, "name 2", $block, "ssd2");
         $option3 = new ExamOptionDTO(3, "name 3", $block, "ssd3");
@@ -87,10 +87,10 @@ class ExamOptionDTOTest extends TestCase
     
     
     public function test_serialization_ok(){
-        $block = new ExamBlockDTO(3, 1, 9);
+        $block = new ExamBlockDTO(3, 1, 9, 2);
         $option = new ExamOptionDTO(5, "test", $block, "ssd1");
-        $taken1 = new TakenExamDTO(7, "taken 1", "ssd3", 3);
-        $taken2 = new TakenExamDTO(11, "taken 2", "ssd5", 4);
+        $taken1 = new TakenExamDTO(7, "taken 1", "ssd3", 3, 18);
+        $taken2 = new TakenExamDTO(11, "taken 2", "ssd5", 4, 20);
         $option->addTakenExam($taken1);
         $option->addTakenExam($taken2);
         
@@ -103,7 +103,7 @@ class ExamOptionDTOTest extends TestCase
     }
     
     public function test_serialization_invalid_state(){
-        $block = new ExamBlockDTO(3, 1, 9);
+        $block = new ExamBlockDTO(3, 1, 9, null);
         $option = new ExamOptionDTO(5, "test", $block, "ssd1");
         
         $string = serialize($option);
@@ -115,12 +115,12 @@ class ExamOptionDTOTest extends TestCase
 
     private function createOption($cfu = 12): ExamOptionDTO
     {
-        return new ExamOptionDTO(1,"test", new ExamBlockDTO(1,2,$cfu),"ssd");
+        return new ExamOptionDTO(1,"test", new ExamBlockDTO(1,2,$cfu,2),"ssd");
     }
     
     private function createTakenExam($cfu = 9, $name = "taken", $actual = null): TakenExamDTO
     {
-        return new TakenExamDTO($name,$name,"ssd",$cfu, $actual);
+        return new TakenExamDTO($name,$name,"ssd",$cfu, 22, null, $actual);
     }
    
 }

@@ -28,7 +28,11 @@ class ExamBlockMapperImpl implements ExamBlockMapper{
     }
     
     public function toDTO(ExamBlock $model): ExamBlockDTO {
-        $newBlock = new ExamBlockDTO($model->id, $model->max_exams, $model->cfu);
+        $newBlock = new ExamBlockDTO(
+                $model->id,
+                $model->max_exams,
+                $model->cfu,
+                $model->courseYear);
         $model->examBlockOptions->map(fn(ExamBlockOption $option) =>  
                 $this->optionMapper->toDTO($option, $newBlock));
         return $newBlock;

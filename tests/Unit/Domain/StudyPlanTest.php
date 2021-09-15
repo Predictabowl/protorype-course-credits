@@ -24,9 +24,9 @@ class StudyPlanTest extends TestCase{
 
     
     public function test_addExamLik_when_exam_not_present_in_the_course() {
-        $block = new ExamBlockDTO(1,1,12);
-        $option = new ExamOptionDTO(1,"option1", new ExamBlockDTO(2,1,12), "ssd");
-        $taken = new TakenExamDTO(1,"taken1", "ssd", 9);
+        $block = new ExamBlockDTO(1,1,12,3);
+        $option = new ExamOptionDTO(1,"option1", new ExamBlockDTO(2,1,12,2), "ssd");
+        $taken = new TakenExamDTO(1,"taken1", "ssd", 9, 24);
         $takenPk = $taken->getId();
         
         $studyPlan = new StudyPlan(collect([$block]));
@@ -37,11 +37,11 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_addExamLink_leftover_cfu_values() {
-        $block = new ExamBlockDTO(1,2,12);
+        $block = new ExamBlockDTO(1,2,12,2);
         $option1 = new ExamOptionDTO(1,"option1", $block, "ssd");
         $option2 = new ExamOptionDTO(2,"option2", $block, "ssd");
-        $taken1 = new TakenExamDTO(1,"taken1", "ssd", 10);
-        $taken2 = new TakenExamDTO(2,"taken2", "ssd", 6);
+        $taken1 = new TakenExamDTO(1,"taken1", "ssd", 10, 19);
+        $taken2 = new TakenExamDTO(2,"taken2", "ssd", 6, 27);
         
         $studyPlan = new StudyPlan(collect([$block]));
 
@@ -66,14 +66,14 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_getRecognizedCredits() {
-        $block1 = new ExamBlockDTO(1,2,9);
-        $block2 = new ExamBlockDTO(2,1,18);
+        $block1 = new ExamBlockDTO(1,2,9,1);
+        $block2 = new ExamBlockDTO(2,1,18,2);
         $option1 = new ExamOptionDTO(1,"option1", $block1, "ssd1");
         $option2 = new ExamOptionDTO(2,"option2", $block1, "ssd2");
         $option3 = new ExamOptionDTO(3,"option3", $block2, "ssd1");
-        $taken1 = new TakenExamDTO(1,"taken1", "ssd1", 10);
-        $taken2 = new TakenExamDTO(2,"taken2", "ssd2", 6);
-        $taken3 = new TakenExamDTO(2,"taken2", "ssd1", 9);
+        $taken1 = new TakenExamDTO(1,"taken1", "ssd1", 10, 23);
+        $taken2 = new TakenExamDTO(2,"taken2", "ssd2", 6, 24);
+        $taken3 = new TakenExamDTO(2,"taken2", "ssd1", 9, 22);
         
         $studyPlan = new StudyPlan(collect([$block1,$block2]));
         
@@ -165,8 +165,8 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_serialize(){
-        $block1 = new ExamBlockDTO(1, 1, 10);
-        $block2 = new ExamBlockDTO(3, 2, 9);
+        $block1 = new ExamBlockDTO(1, 1, 10, 2);
+        $block2 = new ExamBlockDTO(3, 2, 9, 3);
         $plan = new StudyPlan(collect([$block1, $block2]));
         
         $string = serialize($plan);

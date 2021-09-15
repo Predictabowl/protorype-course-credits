@@ -155,7 +155,7 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
             "ssd" => $this->ssd,
             "compatibleOptions" => $this->compatibleOptions,
             "linkedTakenExams" => $this->linkedTakenExams,
-            "recognizedCredits" => $this->recognizedCredits
+            "recognizedCredits" => $this->recognizedCredits,
         ]);
     }
 
@@ -168,6 +168,10 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
         $this->compatibleOptions = $array["compatibleOptions"];
         $this->linkedTakenExams = $array["linkedTakenExams"];
         $this->recognizedCredits = $array["recognizedCredits"];
+    }
+
+    public function getCourseYear(): ?int {
+        return $this->getBlock()->getCourseYear();
     }
 
 }

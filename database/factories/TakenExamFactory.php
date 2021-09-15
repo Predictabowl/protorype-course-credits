@@ -27,7 +27,9 @@ class TakenExamFactory extends Factory
             "name" => $this->faker->sentence(4),
             "ssd_id" => $this->faker->numberBetween(1,Ssd::count()),
             "front_id" => $this->faker->numberBetween(1,Front::count()),
-            "cfu" => $this->faker->numberBetween(3,12)
+            "cfu" => $this->faker->numberBetween(3,12),
+            "grade" => $this->faker->numberBetween(18,30),
+            "courseYear" => $this->faker->numberBetween(1,3)
         ];
     }
 }

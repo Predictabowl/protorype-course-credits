@@ -15,4 +15,6 @@ interface ExamDTO {
     public function getCfu(): int;
     
     public function getSsd(): ?string;
+    
+    public function getCourseYear(): ?int;
 }

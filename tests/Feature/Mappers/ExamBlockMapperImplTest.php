@@ -45,12 +45,13 @@ class ExamBlockMapperImplTest extends TestCase{
         $model = ExamBlock::create([
             "max_exams" => 2,
             "course_id" => 1,
-            "cfu" => 10
+            "cfu" => 10,
+            "courseYear" => 1
         ]);
         ExamBlockOption::factory(3)->create([
            "exam_block_id" => 1,
         ]);
-        $block = new ExamBlockDTO(5, 3, 7);
+        $block = new ExamBlockDTO(5, 3, 7, 2);
         
         $optionDto1 = new ExamOptionDTO(4, "nome 2", $block,"ssd6");
         $optionDto2 = new ExamOptionDTO(7, "nome test", $block, "ssd4");
@@ -70,7 +71,7 @@ class ExamBlockMapperImplTest extends TestCase{
         $mapper = new ExamBlockMapperImpl();
         $result = $mapper->toDTO($model);
         
-        $this->assertEquals(new ExamBlockDTO(1, 2, 10), $result);
+        $this->assertEquals(new ExamBlockDTO(1, 2, 10, 1), $result);
     }
     
     

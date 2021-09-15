@@ -24,7 +24,9 @@ class CourseFactory extends Factory
         return [
             "name" => $this->faker->sentence(4),
             //"code" => $this->faker->bothify("???-##"),
-            "cfu" => 180
+            "cfu" => 180,
+            "finalExamCfu" => $this->faker->numberBetween(6, 12),
+            "otherActivitiesCfu" => $this->faker->numberBetween(0, 9)
         ];
     }
 }

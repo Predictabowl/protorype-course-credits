@@ -48,7 +48,7 @@ class CourseManagerImplTest extends TestCase{
         $models = collect([
             new ExamBlock(["id" => 1]), 
             new ExamBlock(["id" => 2])]);
-        $blocks = collect([new ExamBlockDTO(1, 2, 9), new ExamBlockDTO(1, 1, 6)]);
+        $blocks = collect([new ExamBlockDTO(1, 2, 9, null), new ExamBlockDTO(1, 1, 6, 3)]);
         $this->blockRepo->expects($this->once())
                 ->method("getFilteredByCourse")
                 ->with(self::FIXTURE_COURSE_ID)
@@ -75,8 +75,8 @@ class CourseManagerImplTest extends TestCase{
 
 
     public function test_getExamOptions() {
-        $block1 = new ExamBlockDTO(1, 2, 12);
-        $block2 = new ExamBlockDTO(1, 1, 12);
+        $block1 = new ExamBlockDTO(1, 2, 12, 2);
+        $block2 = new ExamBlockDTO(1, 1, 12, null);
         $option1 = new ExamOptionDTO(1, "name 1", $block1, "ssd1");
         $option2 = new ExamOptionDTO(2, "name 2", $block1, "ssd2");
         $option3 = new ExamOptionDTO(3, "name 3", $block2, "ssd3");

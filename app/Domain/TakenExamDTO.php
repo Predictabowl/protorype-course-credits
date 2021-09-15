@@ -22,14 +22,24 @@ class TakenExamDTO implements ExamDTO, \Serializable{
     private $cfu;
     private $ssd;
     private $actualCfu;
+    private $courseYear;
+    private $grade;
     
-    public function __construct($id, string $examName, string $ssd, 
-            int $maxCfu, ?int $actualCfu = null) {
+    public function __construct(
+            $id,
+            string $examName,
+            string $ssd,
+            int $maxCfu,
+            int $grade,
+            ?int $courseYear = null,
+            ?int $actualCfu = null) {
         $this->id = $id;
         $this->examName = $examName;
         $this->cfu = $maxCfu;
         $this->ssd = strtoupper($ssd);
+        $this->grade = $grade;
         $this->validateAndSetActualCfu($actualCfu);
+        $this->courseYear = $courseYear;
     }
     
     public function getExamName(): string {
@@ -58,6 +68,22 @@ class TakenExamDTO implements ExamDTO, \Serializable{
         return $this;
     }
     
+    public function getCourseYear(): ?int {
+        return $this->courseYear;
+    }
+
+    public function setCourseYear(?int $courseYear): void {
+        $this->courseYear = $courseYear;
+    }
+    
+    public function getGrade(): int {
+        return $this->grade;
+    }
+
+    public function setGrade(int $grade): void {
+        $this->grade = $grade;
+    }
+
     public function split(int $value): TakenExamDTO
     {
         $clone = clone $this;
@@ -86,7 +112,9 @@ class TakenExamDTO implements ExamDTO, \Serializable{
             "examName" => $this->examName,
             "cfu" => $this->cfu,
             "ssd" => $this->ssd,
-            "actualCfu" => $this->actualCfu
+            "actualCfu" => $this->actualCfu,
+            "courseYear" => $this->courseYear,
+            "grade" => $this->grade
         ]);
     }
 
@@ -97,6 +125,8 @@ class TakenExamDTO implements ExamDTO, \Serializable{
         $this->cfu = $array["cfu"];
         $this->ssd = $array["ssd"];
         $this->actualCfu = $array["actualCfu"];
+        $this->courseYear = $array["courseYear"];
+        $this->grade = $array["grade"];
     }
 
 }

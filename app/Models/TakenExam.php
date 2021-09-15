@@ -9,7 +9,7 @@ class TakenExam extends Model
 {
     use HasFactory;
     
-    protected $fillable = ["name","cfu","ssd_id", "front_id"];
+    protected $guarded = [];
 
     public function front()
     {

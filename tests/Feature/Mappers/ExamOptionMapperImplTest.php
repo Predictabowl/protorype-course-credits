@@ -42,7 +42,7 @@ class ExamOptionMapperImplTest extends TestCase{
         ExamBlock::factory()->create();
         ExamBlockOption::factory()->create();
         $option = ExamBlockOption::first();
-        $block = new ExamBlockDTO(1, 2, 9);
+        $block = new ExamBlockDTO(1, 2, 9, null);
         
         $result = $this->mapper->toDTO($option, $block);
         
@@ -69,7 +69,7 @@ class ExamOptionMapperImplTest extends TestCase{
         ExamBlock::factory()->create();
         ExamBlockOption::factory()->create();
         $option = ExamBlockOption::first();
-        $block = new ExamBlockDTO(1, 2, 7);
+        $block = new ExamBlockDTO(1, 2, 7, 1);
         
         $result = $this->mapper->toDTO($option, $block);
         

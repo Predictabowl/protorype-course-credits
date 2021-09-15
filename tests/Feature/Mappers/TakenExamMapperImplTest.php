@@ -30,11 +30,13 @@ class TakenExamMapperImplTest extends TestCase
         $model = TakenExam::factory()->make([
             "name" => "test name",
             "cfu" => 7,
-            "ssd_id" => $ssd
+            "ssd_id" => $ssd,
+            "grade" => 22,
+            "courseYear" => 2
         ]);
         $model->id = 5;
         
-        $exam = new TakenExamDTO(5, "test name", $ssd->code, 7);
+        $exam = new TakenExamDTO(5, "test name", $ssd->code, 7, 22, 2);
 
         $dto = $this->mapper->toDTO($model);
         
@@ -42,7 +44,7 @@ class TakenExamMapperImplTest extends TestCase
     }
     
     public function test_toModel_with_no_Ssd() {
-        $dto = new TakenExamDTO(13, "test name", "IUS/07", 5);
+        $dto = new TakenExamDTO(13, "test name", "IUS/07", 5, 24);
         
         $result = $this->mapper->toModel($dto,1);
         
@@ -62,7 +64,7 @@ class TakenExamMapperImplTest extends TestCase
         $front->save();
         
         
-        $dto = new TakenExamDTO(13, "test name", "IUS/07", 5);
+        $dto = new TakenExamDTO(13, "test name", "IUS/07", 5, 19, 3);
         
         $this->mapper->toModel($dto,3)->save();
         

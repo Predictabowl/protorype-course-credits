@@ -49,7 +49,7 @@ class StudyPlanBuilderImplTest extends TestCase
     }
     
      public function test_getOptionsBySsd_when_no_ssd_associated() {
-        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/01",5);
+        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/01",5,28);
         $option1 = new ExamOptionDTO(1,"test 1", $this->blocks[0], 12, null);
         $this->options = collect([$option1]);
         $this->examDistance->expects($this->never())
@@ -64,7 +64,7 @@ class StudyPlanBuilderImplTest extends TestCase
     }
 
     public function test_getOptionsBySsd() {
-        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/01",5);
+        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/01",5,23);
         $option1 = new ExamOptionDTO(1,"test 1", $this->blocks[0], "IUS/01");
         $option2 = new ExamOptionDTO(2,"test 2", $this->blocks[0], "IUS/09");
         $option3 = new ExamOptionDTO(3,"test 3", $this->blocks[1], "IUS/01");
@@ -85,7 +85,7 @@ class StudyPlanBuilderImplTest extends TestCase
     }
     
     public function test_getOptionsByCompatibility() {
-        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5);
+        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5,25);
         $option1 = new ExamOptionDTO(1,"test 1", $this->blocks[0], null);
         $option2 = new ExamOptionDTO(2,"test 2", $this->blocks[0], "IUS/09");
         $option3 = new ExamOptionDTO(3,"test 3", $this->blocks[1], "IUS/07");
@@ -109,7 +109,7 @@ class StudyPlanBuilderImplTest extends TestCase
     }
     
     public function test_getFreeChoiceOptions() {
-        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5);
+        $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5,22);
         $option1 = new ExamOptionDTO(1,"test 1", $this->blocks[0], null);
         $option2 = new ExamOptionDTO(2,"test 2", $this->blocks[0], "IUS/09");
         $option3 = new ExamOptionDTO(3,"test 3", $this->blocks[1], null);
@@ -134,12 +134,12 @@ class StudyPlanBuilderImplTest extends TestCase
     
     public function test_getStudyPlan_with_free_choice_exam() {
          $this->takenExams = collect([
-            new TakenExamDTO(1,"Diritto Privato","IUS/01",9),
+            new TakenExamDTO(1,"Diritto Privato","IUS/01",9,22),
         ]); 
          
-        $block1 = new ExamBlockDTO(1,1,12);
-        $block2 = new ExamBlockDTO(2,1,12);
-        $block3 = new ExamBlockDTO(3,1,6);
+        $block1 = new ExamBlockDTO(1,1,12,1);
+        $block2 = new ExamBlockDTO(2,1,12,2);
+        $block3 = new ExamBlockDTO(3,1,6,3);
         $this->blocks = [$block1, $block2, $block3];
         
          $this->options = collect([
@@ -234,21 +234,21 @@ class StudyPlanBuilderImplTest extends TestCase
     
     private function setupData() {
         $this->takenExams = collect([
-            new TakenExamDTO(1,"Diritto Privato","IUS/01",9),
-            new TakenExamDTO(2,"Istituzione di diritto","IUS/09",6),
-            new TakenExamDTO(3,"Diritto Commerciale mod I","IUS/04",5),
-            new TakenExamDTO(4,"Diritto Commerciale mod II","IUS/07",5),
-            new TakenExamDTO(5,"Istituzione random","IUS/07",4),
-            new TakenExamDTO(6,"Storia test","IUS/03",6),
-            new TakenExamDTO(7,"Storia test II","IUS/03",6),
-            new TakenExamDTO(8,"Test name 8","IUS/0",9),
+            new TakenExamDTO(1,"Diritto Privato","IUS/01",9, 19),
+            new TakenExamDTO(2,"Istituzione di diritto","IUS/09",6, 20),
+            new TakenExamDTO(3,"Diritto Commerciale mod I","IUS/04",5, 24),
+            new TakenExamDTO(4,"Diritto Commerciale mod II","IUS/07",5, 23),
+            new TakenExamDTO(5,"Istituzione random","IUS/07",4, 26),
+            new TakenExamDTO(6,"Storia test","IUS/03",6, 19),
+            new TakenExamDTO(7,"Storia test II","IUS/03",6, 20),
+            new TakenExamDTO(8,"Test name 8","IUS/0",9, 21),
         ]); 
        
-        $block1 = new ExamBlockDTO(1,2,12);
-        $block2 = new ExamBlockDTO(2,2,9);
-        $block3 = new ExamBlockDTO(3,1,6);
-        $block4 = new ExamBlockDTO(4,1,6);
-        $block5 = new ExamBlockDTO(5,1,9);
+        $block1 = new ExamBlockDTO(1,2,12,2);
+        $block2 = new ExamBlockDTO(2,2,9,3);
+        $block3 = new ExamBlockDTO(3,1,6,1);
+        $block4 = new ExamBlockDTO(4,1,6,2);
+        $block5 = new ExamBlockDTO(5,1,9,3);
         $this->blocks = [$block1, $block2, $block3, $block4,$block5];
         
         $this->options = collect([

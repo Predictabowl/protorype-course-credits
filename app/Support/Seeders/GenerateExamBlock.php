@@ -20,11 +20,19 @@ use App\Models\ExamBlockOptionSsd;
  */
 class GenerateExamBlock {
 
-    public static function generateBlock($courseId, $maxExams, $cfu, $data, $compatibilities = []){
+    public static function generateBlock(
+            $courseId,
+            int $maxExams,
+            int $cfu,
+            int $year,
+            $data,
+            $compatibilities = [])
+    {
         $block = ExamBlock::create([
             "max_exams" => $maxExams,
             "course_id" => $courseId,
-            "cfu" => $cfu
+            "cfu" => $cfu,
+            "courseYear" => $year
         ]);
         
         foreach ($data as $value) {

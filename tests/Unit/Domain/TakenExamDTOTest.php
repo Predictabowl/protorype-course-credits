@@ -13,26 +13,29 @@ class TakenExamDTOTest extends TestCase
 
     public function test_auto_assigned_actual_cfu_when_not_set()
     {
-        $sut = new TakenExamDTO(1,"name1","ssd1", self::FIXTURE_CFU);
-        $this->assertEquals($sut->getActualCfu(),self::FIXTURE_CFU);
+        $sut = new TakenExamDTO(1,"name1","ssd1", self::FIXTURE_CFU, 18, 2);
+        $this->assertEquals(self::FIXTURE_CFU, $sut->getActualCfu());
+        $this->assertEquals(self::FIXTURE_CFU, $sut->getCfu());
+        $this->assertEquals(18, $sut->getGrade());
+        $this->assertEquals(2, $sut->getCourseYear());
     }
 
     public function test_throw_when_actual_cfu_value_exceed_max_value()
     {
         $this->expectException(\InvalidArgumentException::class);
-        new TakenExamDTO(1,"name","ssd",10,11);
+        new TakenExamDTO(1,"name","ssd",10, 20, 1, 11);
     }
     
     public function test_throw_when_actual_cfu_value_is_negative()
     {
         $this->expectException(InvalidArgumentException::class);
-        new TakenExamDTO(3,"name","ssd",10,-1);
+        new TakenExamDTO(3,"name","ssd",10, 20, 2, -1);
     }
 
     public function test_split()
     {
         //$exam = ;
-        $exam1 = new TakenExamDTO(4,"name","ssd", self::FIXTURE_CFU);
+        $exam1 = new TakenExamDTO(4,"name","ssd", self::FIXTURE_CFU, 20, 1);
         $exam2 = $exam1->split(5);
 
         $this->assertNotSame($exam1,$exam2);
@@ -43,7 +46,7 @@ class TakenExamDTOTest extends TestCase
     }
     
     public function test_serialize(){
-        $exam = new TakenExamDTO(7, "taken", "code1", 12);
+        $exam = new TakenExamDTO(7, "taken", "code1", 12, 26, 3);
         
         $string = serialize($exam);
         $result = unserialize($string);

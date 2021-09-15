@@ -102,7 +102,9 @@ class TakenExamRepositoryImplTest extends TestCase {
             "name" => "test name",
             "ssd_id" => $ssd->id,
             "cfu" => 6,
-            "front_id" => $front->id
+            "front_id" => $front->id,
+            "grade" => 19,
+            "courseYear" => 2
         ]);
 
         $result = $this->repository->save($exam);
@@ -112,7 +114,9 @@ class TakenExamRepositoryImplTest extends TestCase {
             "front_id" => $front->id,
             "ssd_id" => $ssd->id,
             "name" => "test name",
-            "cfu" => 6
+            "cfu" => 6,
+            "grade" => 19,
+            "courseYear" => 2
         ]);
     }
     

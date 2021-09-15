@@ -19,6 +19,8 @@ class CreateTakenExamsTable extends Migration
             $table->unsignedTinyInteger("cfu");
             $table->foreignId("ssd_id")->constrained()->cascadeOnDelete();
             $table->foreignId("front_id")->constrained()->cascadeOnDelete();
+            $table->unsignedTinyInteger("grade");
+            $table->unsignedTinyInteger("courseYear")->nullable();
             $table->timestamps();
         });
     }

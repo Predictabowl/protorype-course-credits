@@ -48,8 +48,8 @@ class FrontManagerImplTest extends TestCase{
   
     
     public function test_getTakenExams() {
-        $returned= [new TakenExamDTO(1, "name", "ssd1", 6),
-                new TakenExamDTO(2, "name 2", "ssd2", 9)];
+        $returned= [new TakenExamDTO(1, "name", "ssd1", 6, 25),
+                new TakenExamDTO(2, "name 2", "ssd2", 9, 24)];
         
         $exams = collect([$this->makeTakenExam(1),$this->makeTakenExam(2)]);
         $this->mapper->expects($this->exactly(2))
@@ -71,10 +71,11 @@ class FrontManagerImplTest extends TestCase{
         $attributes = [
             "name" => "nome",
             "ssd" => "ssd2",
-            "cfu" => 9
+            "cfu" => 9,
+            "grade" => 22
         ];
         
-        $dto = new TakenExamDTO(0,"nome","ssd2",9);
+        $dto = new TakenExamDTO(0,"nome","ssd2",9, 22);
         $model = $this->makeTakenExam(13);
         $this->mapper->expects($this->once())
                 ->method("toModel")

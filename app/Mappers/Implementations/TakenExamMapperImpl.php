@@ -27,12 +27,20 @@ class TakenExamMapperImpl implements TakenExamMapper{
             "name" => $dto->getExamName(),
             "cfu" => $dto->getCfu(),
             "ssd_id" => $ssd->id,
-            "front_id" => $frontId
+            "front_id" => $frontId,
+            "courseYear" => $dto->getCourseYear(),
+            "grade" => $dto->getGrade()
         ]);
     }
     
     public function toDTO(TakenExam $model): TakenExamDTO {
-        return new TakenExamDTO($model->id, $model->name, $model->ssd->code, $model->cfu);
+        return new TakenExamDTO(
+                $model->id,
+                $model->name,
+                $model->ssd->code,
+                $model->cfu,
+                $model->grade,
+                $model->courseYear);
     }
     
     

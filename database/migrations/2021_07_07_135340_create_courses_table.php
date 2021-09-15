@@ -18,6 +18,8 @@ class CreateCoursesTable extends Migration
             $table->string("name")->unique();
             $table->unsignedSmallInteger("cfu");
             $table->unsignedSmallInteger("maxRecognizedCfu")->nullable();
+            $table->unsignedTinyInteger("otherActivitiesCfu")->nullable();
+            $table->unsignedTinyInteger("finalExamCfu");
             $table->timestamps();
         });
     }

@@ -21,12 +21,14 @@ class ExamBlockDTO implements \Serializable{
     private $approvedExams;
     private $numExams;
     private $cfu;
+    private $courseYear;
     
-    public function __construct($id, int $numExams, int $cfu) {
+    public function __construct($id, int $numExams, int $cfu, ?int $courseYear) {
         $this->id = $id;
         $this->approvedExams = collect([]);
         $this->numExams = $numExams;
         $this->cfu = $cfu;
+        $this->courseYear = $courseYear;
     }
     
     public function getId() {
@@ -77,7 +79,11 @@ class ExamBlockDTO implements \Serializable{
         return $this->cfu;
     }
     
-    /**
+    public function getCourseYear(): ?int {
+        return $this->courseYear;
+    }
+
+        /**
      * Return the number of exams that can actually be used,
      * which is the maximum number of options minus the ones already taken,
      * even if the taken options are not completely integrated
@@ -94,7 +100,8 @@ class ExamBlockDTO implements \Serializable{
             "id" => $this->id,
             "numExams" => $this->numExams,
             "cfu" => $this->cfu,
-            "approvedExams" => $this->approvedExams
+            "approvedExams" => $this->approvedExams,
+            "courseYear" => $this->courseYear
         ]);
     }
 
@@ -103,6 +110,7 @@ class ExamBlockDTO implements \Serializable{
         $this->id = $array["id"];
         $this->numExams = $array["numExams"];
         $this->cfu = $array["cfu"];
+        $this->courseYear = $array["courseYear"];
         $this->approvedExams = $array["approvedExams"]->map(function (ExamOptionDTO $option){ 
                 $option->setBlock($this);
                 return $option;

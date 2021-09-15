@@ -41,7 +41,8 @@ class FrontManagerImpl implements FrontManager{
     }
     
     public function saveTakenExam($attributes) {        
-        $exam = new TakenExamDTO(0, $attributes["name"], $attributes["ssd"], $attributes["cfu"]);
+        $exam = new TakenExamDTO(0, $attributes["name"], $attributes["ssd"],
+                $attributes["cfu"], $attributes["grade"]);
         $takenExam = $this->mapper->toModel($exam, $this->frontId);
         if(!isset($takenExam)){
             throw new InvalidArgumentException();//message missing

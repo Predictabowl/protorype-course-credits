@@ -19,6 +19,7 @@ class CreateExamBlocksTable extends Migration
             $table->foreignId("course_id")->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->unsignedTinyInteger("cfu"); //cfu value for every exam in this block
+            $table->unsignedTinyInteger("courseYear")->nullable(); //course year for every exam in this block
         });
     }
 

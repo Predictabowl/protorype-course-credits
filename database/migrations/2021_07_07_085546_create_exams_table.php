@@ -18,9 +18,6 @@ class CreateExamsTable extends Migration
             $table->foreignId("ssd_id")->nullable()->constrained()->cascadeOnDelete();
             $table->string("code")->unique()->nullable(); //unused right now, but left for future applications
             $table->string("name");
-            // Keep tracking of the CFU is Block's job, since every exam in a block
-            // should have the same CFU value
-            //$table->unsignedTinyInteger("cfu");
             $table->timestamps();
         });
     }

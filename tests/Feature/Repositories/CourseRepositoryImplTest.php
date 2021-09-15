@@ -42,7 +42,10 @@ class CourseRepositoryImplTest extends TestCase
     public function test_save_success() {
         $attributes = [
             "name" => "test name",
-            "cfu" => 180
+            "cfu" => 180,
+            "finalExamCfu" => 12,
+            "otherActivitiesCfu" => 6,
+            "maxRecognizedCfu" => 120
         ];
         $course = Course::make($attributes);
         
@@ -56,7 +59,8 @@ class CourseRepositoryImplTest extends TestCase
     public function test_save_with_duplicate_name_should_fail() {
         $attributes = [
             "name" => "test name",
-            "cfu" => 180
+            "cfu" => 180,
+            "finalExamCfu" => 9
         ];
         Course::create($attributes);
         $attributes2 = [
@@ -75,7 +79,8 @@ class CourseRepositoryImplTest extends TestCase
     public function test_delete_sucess(){
         $attributes = [
             "name" => "test name 2",
-            "cfu" => 170
+            "cfu" => 170,
+            "finalExamCfu" => 7
         ];
         $course = Course::create($attributes);
         

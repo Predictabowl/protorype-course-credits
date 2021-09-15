@@ -125,8 +125,8 @@ class FrontControllerTest extends TestCase
     public function test_show(){
         $courses = Course::factory(5)->create();
         $exams = collect([
-            new TakenExamDTO(1, "test 1", "ssd1", 8),
-            new TakenExamDTO(2, "test 2", "ssd2", 9)
+            new TakenExamDTO(1, "test 1", "ssd1", 8, 19),
+            new TakenExamDTO(2, "test 2", "ssd2", 9, 20)
         ]);
         $this->be($this->user);
         $this->frontManager->expects($this->once())
