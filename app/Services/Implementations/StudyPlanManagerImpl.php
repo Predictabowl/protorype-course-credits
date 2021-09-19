@@ -13,6 +13,7 @@ use App\Domain\StudyPlan;
 use App\Services\Interfaces\YearCalculator;
 use App\Models\Front;
 use App\Services\Interfaces\UserFrontManager;
+use Carbon\Carbon;
 
 /**
  * Description of StudyPlanManagerImpl
@@ -23,18 +24,19 @@ class StudyPlanManagerImpl implements StudyPlanManager{
     
     private $front;
     private $plan;
+    private $yearCalculator;
     
     public function __construct(Front $front) {
         $this->front = $front;
-        $this->plan = $this->buildStudyPlan();
+        $this->plan = null;
+        $this->yearCalculator = app()->make(YearCalculator::class);
     }
     
     public function getStudyPlan(): ?StudyPlan {
+        if (!isset($this->plan)){
+            $this->plan = $this->buildStudyPlan();
+        }
         return $this->plan;
-    }
-
-    public function getYearCalculator(): YearCalculator {
-        
     }
     
     private function buildStudyPlan(): ?StudyPlan{
@@ -45,6 +47,22 @@ class StudyPlanManagerImpl implements StudyPlanManager{
             return null;
         }
         return $builder->getStudyPlan();
+    }
+
+    public function getAcademicYear(): int {
+        $date = Carbon::now();
+        return $this->yearCalculator->getAcademicYear(
+                $date->format("m"),
+                $date->format("Y")
+            );
+    }
+
+    public function getCourseYear(): ?int {
+        $studyPlan = $this->getStudyPlan();
+        if( $studyPlan == null){
+            return null;
+        }
+        return $this->yearCalculator->getCourseYear($this->front->course,$studyPlan);
     }
 
 }

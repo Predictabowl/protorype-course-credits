@@ -21,7 +21,9 @@ class DatabaseSeederAmministrazioneDigitale extends Seeder
             "cfu" => 180,
             "maxRecognizedCfu" => 120,
             "finalExamCfu" => 6,
-            "otherActivitiesCfu" => 6
+            "otherActivitiesCfu" => 6,
+            "numberOfYears" => 3,
+            "cfuTresholdForYear" => 40
         ]);
         
         $this->generateExams($course->id);

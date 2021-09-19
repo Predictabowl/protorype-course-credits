@@ -32,6 +32,8 @@ class StudyPlanController extends Controller
         return view("studyplan.showplan",[
             "studyPlan" => $studyPlan,
             "front" => $front,
+            "academicYear" => $manager->getAcademicYear(),
+            "courseYear" => $manager->getCourseYear()
         ]);
     }
     

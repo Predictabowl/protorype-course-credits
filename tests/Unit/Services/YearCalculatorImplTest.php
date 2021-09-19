@@ -22,6 +22,7 @@ use Carbon\Carbon;
 class YearCalculatorImplTest extends TestCase{
     
     const FIXTURE_NUM_YEARS = 3;
+    const FIXTURE_TRESHOLD = 40;
 
     
     public function test_getCourseYear(){
@@ -33,6 +34,7 @@ class YearCalculatorImplTest extends TestCase{
         $course = new Course([
             "name" => "test Course",
             "numberOfYears" => self::FIXTURE_NUM_YEARS,
+            "cfuTresholdForYear" => self::FIXTURE_TRESHOLD
         ]);
         
         $calculator = new YearCalculatorImpl();
@@ -49,13 +51,8 @@ class YearCalculatorImplTest extends TestCase{
     public function test_getAcademicYear(){
         $calculator = new YearCalculatorImpl();
         
-        $date = Carbon::createFromFormat("d/m/Y","16/08/2021");
-        $this->assertEquals(2021, $calculator->getAcademicYear($date));
-        
-        $date = Carbon::createFromFormat("d/m/Y","01/04/2022");
-        $this->assertEquals(2022, $calculator->getAcademicYear($date));
-        
-        $date = Carbon::createFromFormat("d/m/Y","31/03/2022");
-        $this->assertEquals(2021, $calculator->getAcademicYear($date));
+        $this->assertEquals(2021, $calculator->getAcademicYear(8,2021));
+        $this->assertEquals(2022, $calculator->getAcademicYear(4,2022));
+        $this->assertEquals(2021, $calculator->getAcademicYear(3,2022));
     }
 }

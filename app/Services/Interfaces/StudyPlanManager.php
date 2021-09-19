@@ -20,5 +20,7 @@ interface StudyPlanManager {
     
     public function getStudyPlan(): ?StudyPlan;
     
-    public function getYearCalculator(): YearCalculator;
+    public function getAcademicYear(): int;
+    
+    public function getCourseYear(): ?int;
 }

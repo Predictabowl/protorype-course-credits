@@ -11,7 +11,6 @@ namespace App\Services\Implementations;
 use App\Services\Interfaces\YearCalculator;
 use App\Models\Course;
 use App\Domain\StudyPlan;
-use Carbon\Carbon;
 
 /**
  * This implementation is based solely on the Recognized CFU
@@ -20,28 +19,12 @@ use Carbon\Carbon;
  */
 class YearCalculatorImpl implements YearCalculator{
     
-    private $treshold;
-    
-    public function __construct(int $treshold = 40) {
-        $this->treshold = $treshold;
-    }
-
     public function getCourseYear(Course $course, StudyPlan $plan): int {
         $cfu = $plan->getRecognizedCredits();
-        return min(($cfu / $this->treshold)+1, $course->numberOfYears);
+        return min(($cfu / $course->cfuTresholdForYear)+1, $course->numberOfYears);
     }
     
-    public function setTreshold(int $treshold): YearCalculatorImpl {
-        $this->treshold = $treshold;
-    }
-    
-    public function getTreshold(): int {
-        return $this->treshold;
-    }
-
-    public function getAcademicYear(Carbon $date): int {
-        $month = $date->format("m");
-        $year = $date->format("Y");
+    public function getAcademicYear(int $month, int $year): int {
         if($month < 4){
             $year--;
         }

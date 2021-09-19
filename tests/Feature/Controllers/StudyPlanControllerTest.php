@@ -6,15 +6,8 @@ namespace Tests\Feature\Controllers;
 use App\Models\Course;
 use App\Models\Front;
 use App\Models\User;
-use App\Domain\TakenExamDTO;
 use App\Domain\StudyPlan;
-use App\Services\Interfaces\StudyPlanBuilder;
-use App\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\Interfaces\FrontManager;
-use App\Services\Interfaces\UserFrontManager;
-use App\Factories\Interfaces\FrontManagerFactory;
-use App\Services\Interfaces\FrontsSearchManager;
 use App\Services\Interfaces\StudyPlanManager;
 use App\Factories\Interfaces\StudyPlanManagerFactory;
 

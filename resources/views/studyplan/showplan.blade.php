@@ -39,16 +39,18 @@
                                 <tr class="border-l border-r {{ !$startBlock ? "border-t" : ""}} border-gray-400">
                                {{--  <tr class="border border-gray-400">  --}}
                                     <td class="text-xs" x-data="{ open: false }">
-                                        <button x-on:click="open = !open" x-show="!open"
-                                            class="rounded-full w-7 items-center bg-blue-100 hover:bg-blue-400 text-lg">
-                                            +
-                                        </button>
-                                        <div x-on:click="open = !open" x-show="open"
-                                            class="cursor-pointer bg-blue-100 hover:bg-blue-400">
-                                            @foreach($option->getCompatibleOptions() as $compatibleOption)
-                                                {{$compatibleOption}}<br>
-                                            @endforeach
-                                        </div>
+                                        @if($option->getCompatibleOptions()->count() > 0)
+                                            <button x-on:click="open = !open" x-show="!open"
+                                                class="rounded-full w-7 items-center bg-blue-100 hover:bg-blue-400 text-lg">
+                                                +
+                                            </button>
+                                            <div x-on:click="open = !open" x-show="open"
+                                                class="cursor-pointer bg-blue-100 hover:bg-blue-400">
+                                                @foreach($option->getCompatibleOptions() as $compatibleOption)
+                                                    {{$compatibleOption}}<br>
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     </td>
                                     <td class="border-r border-gray-400">
                                         {{ html_entity_decode(str_replace("-","&#8209;",$option->getSsd())) }}
@@ -131,13 +133,9 @@
                 </div>
             </div>
             <div class="text-center text-xl">
-                <?php 
-                    $yearCourse = 3;
-                    $year = \Carbon\Carbon::now()->format("Y");
-                ?>
-                <p>Anno di Corso: {{ $yearCourse }}<sup>o</sup></p>
+                <p>Anno di Corso: {{ $courseYear }}<sup>o</sup></p>
                 <p>
-                    Coorte: {{ $year - $yearCourse +1 }}
+                    Coorte: {{ $academicYear - $courseYear +1 }}
                 </p>
             </div>
         </x-panel>

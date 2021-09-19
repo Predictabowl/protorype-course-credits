@@ -8,7 +8,6 @@
 
 namespace App\Services\Interfaces;
 
-use Carbon\Carbon;
 use App\Models\Course;
 use App\Domain\StudyPlan;
 
@@ -20,6 +19,6 @@ interface YearCalculator {
     
     public function getCourseYear(Course $course, StudyPlan $plan): int;
     
-    public function getAcademicYear(Carbon $date): int;
+    public function getAcademicYear(int $month, int $year): int;
     
 }
