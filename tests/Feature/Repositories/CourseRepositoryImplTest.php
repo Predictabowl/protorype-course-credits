@@ -45,7 +45,8 @@ class CourseRepositoryImplTest extends TestCase
             "cfu" => 180,
             "finalExamCfu" => 12,
             "otherActivitiesCfu" => 6,
-            "maxRecognizedCfu" => 120
+            "maxRecognizedCfu" => 120,
+            "numberOfYears" => 3
         ];
         $course = Course::make($attributes);
         
@@ -60,7 +61,8 @@ class CourseRepositoryImplTest extends TestCase
         $attributes = [
             "name" => "test name",
             "cfu" => 180,
-            "finalExamCfu" => 9
+            "finalExamCfu" => 9,
+            "numberOfYears" => 3
         ];
         Course::create($attributes);
         $attributes2 = [
@@ -80,7 +82,8 @@ class CourseRepositoryImplTest extends TestCase
         $attributes = [
             "name" => "test name 2",
             "cfu" => 170,
-            "finalExamCfu" => 7
+            "finalExamCfu" => 7,
+            "numberOfYears" => 3
         ];
         $course = Course::create($attributes);
         

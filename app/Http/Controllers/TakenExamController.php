@@ -24,8 +24,9 @@ class TakenExamController extends Controller
         request()->replace($inputs);
         $attributes = request()->validate([
             "name" => ["required", "string", "max:255"],
-            "cfu" => ["required", "numeric", "min:1", "max:18"],
-            "ssd" => ["required", Rule::exists("ssds", "code")]
+            "cfu" => ["required", "numeric", "min:1", "max:24"],
+            "ssd" => ["required", Rule::exists("ssds", "code")],
+            "grade" => ["required", "numeric", "min:18", "max:30"]
         ]);
         $this->getFrontManager($front)->saveTakenExam($attributes);
         return back()->with("success", "Aggiunto: ".$attributes["name"]);
@@ -34,14 +35,10 @@ class TakenExamController extends Controller
     public function delete(Front $front){
         $this->authorize("delete",$front);
         
-        // This validation is superfluous
-        $attributes = request()->validate([
-            "id" => ["numeric", Rule::exists("taken_exams","id")]
-        ]);
+        $exam = unserialize(request()->get("exam"));
+        $this->getFrontManager($front)->deleteTakenExam($exam->getId());
         
-        $this->getFrontManager($front)->deleteTakenExam($attributes["id"]);
-        
-        return back()->with("success", "Esame Eliminato");
+        return back()->with("success", "Eliminato: ".$exam->getExamName());
     }
     
     

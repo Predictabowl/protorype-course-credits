@@ -8,12 +8,14 @@
 
 namespace App\Factories\Interfaces;
 
-use App\Services\Interfaces\UserManager;
+use App\Models\Front;
+use App\Services\Interfaces\StudyPlanManager;
 
 /**
  *
  * @author piero
  */
-interface userManagerFactory {
-    public function getUserManager($userId): UserManager;
+interface StudyPlanManagerFactory {
+    
+    public function get(Front $front): StudyPlanManager;
 }

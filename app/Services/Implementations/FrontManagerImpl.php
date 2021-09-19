@@ -16,7 +16,6 @@ use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Mappers\Interfaces\TakenExamMapper;
-use Illuminate\Validation\Rule;
 
 /**
  * Description of FrontManagerImpl
@@ -51,11 +50,7 @@ class FrontManagerImpl implements FrontManager{
     }
 
     public function deleteTakenExam($examId) {
-        $repo = $this->getExamRepository();
-        $takenExam = $repo->get($examId);
-        if ($takenExam->front_id === $this->frontId){ //extra check, not strictly needed
-                $repo->delete($examId);
-        }
+        $this->getExamRepository()->delete($examId);
     }
 
     public function setCourse($courseId): bool {

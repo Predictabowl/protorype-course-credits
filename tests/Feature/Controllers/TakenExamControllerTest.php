@@ -7,8 +7,8 @@ use App\Models\TakenExam;
 use App\Models\Front;
 use App\Models\User;
 use App\Models\Ssd;
+use App\Domain\TakenExamDTO;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use App\Services\Interfaces\FrontManager;
 use App\Factories\Interfaces\FrontManagerFactory;
 
@@ -23,6 +23,7 @@ class TakenExamControllerTest extends TestCase
     private $user;
     private $front;
     private $manager;
+    private $createAttributes;
     
     
     protected function setUp(): void {
@@ -30,6 +31,14 @@ class TakenExamControllerTest extends TestCase
         
         $this->user = User::factory()->create();
         $this->front = Front::create(["user_id" => $this->user->id]);
+        
+        $ssd = Ssd::factory()->create();
+        $this->createAttributes = [
+            "name" => "exam 1",
+            "cfu" => 5,
+            "ssd" => $ssd->code,
+            "grade" => 22
+        ];
     }
     
     public function test_access_redirect_without_authentication(){
@@ -43,19 +52,13 @@ class TakenExamControllerTest extends TestCase
     }
     
     public function test_create_successful(){
-        $ssd = Ssd::factory()->create();
-        $attributes = [
-            "name" => "exam 1",
-            "cfu" => 5,
-            "ssd" => $ssd->code
-        ];
         $this->setupMocksAndAuth();
         $this-> manager->expects($this->once())
                 ->method("saveTakenExam")
-                ->with($attributes);
+                ->with($this->createAttributes);
 
         $response = $this->from(self::FIXTURE_START_URI)
-                ->post(route("postTakenExam",[$this->front]), $attributes);
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
         
         $response->assertRedirect(self::FIXTURE_START_URI);
         
@@ -63,134 +66,136 @@ class TakenExamControllerTest extends TestCase
     
     public function test_create_denied_by_policy_when_wrong_user(){
         $user2 = User::factory()->create();
-        $ssd = Ssd::factory()->create();
-        $attributes = [
-            "name" => "exam 1",
-            "cfu" => 5,
-            "ssd" => $ssd->code
-        ];
         $this->setupMocksAndAuth();
         $this-> manager->expects($this->never())
                 ->method("saveTakenExam");
 
         $response = $this->actingAs($user2)
                 ->from(self::FIXTURE_START_URI)
-                ->post(route("postTakenExam",[$this->front]), $attributes);
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
         
         $response->assertStatus(403);
         
     }
     
     public function test_create_validation_name_missing(){
-        $ssd = Ssd::factory()->create();
-        $attributes = [
-            "name" => null,
-            "cfu" => 5,
-            "ssd" => $ssd->code
-        ];
-       $this->setupMocksAndAuth();
+        $this->createAttributes["name"] = null;
+        $this->setupMocksAndAuth();
         
         $this->manager->expects($this->never())
                 ->method("saveTakenExam");
 
         $response = $this->from(self::FIXTURE_START_URI)
-                ->post(route("postTakenExam",[$this->front]), $attributes);
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
         
         $response->assertRedirect(self::FIXTURE_START_URI);
     }
     
     public function test_create_validation_cfu_missing(){
         $ssd = Ssd::factory()->create();
-        $attributes = [
-            "name" => "test",
-            "cfu" => null,
-            "ssd" => $ssd->code
-        ];
-       $this->setupMocksAndAuth();
+        $this->createAttributes["cfu"] = null;
+        $this->setupMocksAndAuth();
         
         $this->manager->expects($this->never())
                 ->method("saveTakenExam");
 
         $response = $this->from(self::FIXTURE_START_URI)
-                ->post(route("postTakenExam",[$this->front]), $attributes);
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
         
         $response->assertRedirect(self::FIXTURE_START_URI);
     }
     
     public function test_create_validation_cfu_not_numeric(){
-        $ssd = Ssd::factory()->create();
-        $attributes = [
-            "name" => "test",
-            "cfu" => "5a",
-            "ssd" => $ssd->code
-        ];
-       $this->setupMocksAndAuth();
+        $this->createAttributes["cfu"] = "5a";
+        $this->setupMocksAndAuth();
         
         $this->manager->expects($this->never())
                 ->method("saveTakenExam");
 
         $response = $this->from(self::FIXTURE_START_URI)
-                ->post(route("postTakenExam",[$this->front]), $attributes);
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
         
         $response->assertRedirect(self::FIXTURE_START_URI);
     }
     
     public function test_create_validation_ssd_missing(){
-        $attributes = [
-            "name" => "null",
-            "cfu" => 6,
-            "ssd" => null
-        ];
-       $this->setupMocksAndAuth();
+        $this->createAttributes["ssd"] = null;
+        $this->setupMocksAndAuth();
         
         $this->manager->expects($this->never())
                 ->method("saveTakenExam");
 
         $response = $this->from(self::FIXTURE_START_URI)
-                ->post(route("postTakenExam",[$this->front]), $attributes);
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
         
         $response->assertRedirect(self::FIXTURE_START_URI);
     }
     
     public function test_create_validation_ssd_not_existing(){
         $ssd = Ssd::factory()->create();
-        $attributes = [
-            "name" => "null",
-            "cfu" => 6,
-            "ssd" => $ssd->id+1
-        ];
+        $this->createAttributes["ssd"]++;
         $this->setupMocksAndAuth();
         
         $this->manager->expects($this->never())
                 ->method("saveTakenExam");
 
         $response = $this->from(self::FIXTURE_START_URI)
-                ->post(route("postTakenExam",[$this->front]), $attributes);
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
         
         $response->assertRedirect(self::FIXTURE_START_URI);
     }
     
-    public function test_delete_validation_with_id_not_present(){
-        $attributes = [
-            "id" => 1
-        ];
+    public function test_create_validation_grade_missing(){
+        $this->createAttributes["grade"] = null;
         $this->setupMocksAndAuth();
         
         $this->manager->expects($this->never())
-                ->method("deleteTakenExam");
+                ->method("saveTakenExam");
 
         $response = $this->from(self::FIXTURE_START_URI)
-                ->delete(route("deleteTakenExam",[$this->front]), $attributes);
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
         
         $response->assertRedirect(self::FIXTURE_START_URI);
+    }
+    
+    public function test_create_validation_grade_not_numeric(){
+        $this->createAttributes["grade"] = "6b";
+        $this->setupMocksAndAuth();
+        
+        $this->manager->expects($this->never())
+                ->method("saveTakenExam");
+
+        $response = $this->from(self::FIXTURE_START_URI)
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
+        
+        $response->assertRedirect(self::FIXTURE_START_URI);
+    }
+    
+    public function test_create_validation_grade_out_of_bounds(){
+        $this->createAttributes["grade"] = 17;
+        $this->setupMocksAndAuth();
+        
+        $this->manager->expects($this->never())
+                ->method("saveTakenExam");
+
+        $this->from(self::FIXTURE_START_URI)
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes)
+                ->assertRedirect(self::FIXTURE_START_URI);
+        
+        $this->createAttributes["grade"] = 31;
+        
+        $this->from(self::FIXTURE_START_URI)
+                ->post(route("postTakenExam",[$this->front]), $this->createAttributes)
+                ->assertRedirect(self::FIXTURE_START_URI);
+        
     }
     
     public function test_delete_success(){
         $exam = TakenExam::factory()->create([
             "ssd_id" => Ssd::factory()->create()
         ]);
-        $attributes = [
-            "id" => $exam->id
+        $attributes2 = [
+            "exam" => serialize(new TakenExamDTO($exam->id,"test name","ssd",5,23))
         ];
         $this->setupMocksAndAuth();
         
@@ -199,7 +204,7 @@ class TakenExamControllerTest extends TestCase
                 ->with($exam->id);
 
         $response = $this->from(self::FIXTURE_START_URI)
-                ->delete(route("deleteTakenExam",[$this->front]), $attributes);
+                ->delete(route("deleteTakenExam",[$this->front]), $attributes2);
         
         $response->assertRedirect(self::FIXTURE_START_URI);
     }
@@ -211,7 +216,7 @@ class TakenExamControllerTest extends TestCase
         $exam = TakenExam::factory()->create([
             "ssd_id" => Ssd::factory()->create()
         ]);
-        $attributes = [
+        $attributes2 = [
             "id" => $exam->id
         ];
         
@@ -219,7 +224,7 @@ class TakenExamControllerTest extends TestCase
                 ->method("deleteTakenExam");
 
         $response = $this->actingAs($user2)
-                ->delete(route("deleteTakenExam",[$this->front]), $attributes);
+                ->delete(route("deleteTakenExam",[$this->front]), $attributes2);
         
         $response->assertStatus(403);
     }

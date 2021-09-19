@@ -26,6 +26,7 @@
                             <th class="p-1">Nome Insegnamento</th>
                             <th class="p-1">Esami Riconosciuti</th>
                             <th class="p-1">CFU</th>
+                            <th class="p-1">Anno</th>
                             <th class="p-1">Mod.</th>
                             <th class="p-1">Integrazione</th>
                         </tr>
@@ -39,11 +40,11 @@
                                {{--  <tr class="border border-gray-400">  --}}
                                     <td class="text-xs" x-data="{ open: false }">
                                         <button x-on:click="open = !open" x-show="!open"
-                                            class="rounded-full w-7 items-center hover:bg-blue-400 text-lg">
+                                            class="rounded-full w-7 items-center bg-blue-100 hover:bg-blue-400 text-lg">
                                             +
                                         </button>
                                         <div x-on:click="open = !open" x-show="open"
-                                            class="cursor-pointer hover:bg-blue-400">
+                                            class="cursor-pointer bg-blue-100 hover:bg-blue-400">
                                             @foreach($option->getCompatibleOptions() as $compatibleOption)
                                                 {{$compatibleOption}}<br>
                                             @endforeach
@@ -63,23 +64,30 @@
                                         @endforeach
                                         </ul>
                                     </td>
-                                    <td class="text-center">{{ $option->getRecognizedCredits() }}</td>
+                                    <td class="text-center {{$option->getRecognizedCredits() > 0 ? 'text-blue-600': ''}}">
+                                        {{ $option->getRecognizedCredits() }}
+                                    </td>
+                                    <td class="text-center">
+                                        {!!$option->getCourseYear() != null ? $option->getCourseYear().'<sup>o</sup>' : '' !!}
+                                    </td>
                                     
                                     @if($startBlock)
                                         <?php $rows = $examBlock->getExamOptions()->count() ?>
                                         <td class="text-center border-l border-gray-400" 
                                             rowspan="{{ $rows }}">
-                                                @if($examBlock->getExamOptions()->count()  == 1)
-                                                    Obbligatorio.
-                                                @else
-                                                    <?php $numOptions = $examBlock->getNumExams() ?>
-                                                    <div class="m-auto" style="max-width: 120px;">
-                                                        {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da 
-                                                        {{ $examBlock->getCfu() }} cfu a scelta.
-                                                    </div>
-                                                @endif
+                                                <div class="m-auto" style="max-width: 120px;">
+                                                    @if($examBlock->getExamOptions()->count()  == 1)
+                                                        {{ $examBlock->getCfu() }} cfu, Obbligatorio
+                                                    @else
+                                                        <?php $numOptions = $examBlock->getNumExams() ?>
+                                                            {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da 
+                                                            {{ $examBlock->getCfu() }} cfu a scelta.
+                                                    @endif
+                                                </div>
                                         </td>
-                                        <td class="text-center font-semibold text-lg border-l border-gray-400" 
+                                        <?php $integration = $option->getBlock()->getIntegrationValue() ?>
+                                        <td class="text-center font-semibold text-lg border-l border-gray-400 
+                                            {{$integration == 0 ? 'text-green-600' : 'text-red-600'}}" 
                                             rowspan="{{ $rows }}">
                                                 {{ $option->getBlock()->getIntegrationValue()}}
                                         </td>
@@ -93,14 +101,10 @@
             </div>
         </x-panel>
         <x-panel>
-            <div class="text-xl pb-2">
-                <?php $cfu = $studyPlan->getRecognizedCredits() ?>
-                <p>Totale CFU riconosciuti: {{ $cfu }}</p>
-                <p>CFU da sostenere: {{ $front->course->cfu - $cfu }}</p>
-            </div>
-            @if($studyPlan->getLeftoverExams()->count() > 0)
-                <div class="border-t border-gray-400 pt-2">
-                    Lista esami con crediti inutilizzati:
+            <div class="sm:flex justify-around">
+                <div>
+                @if($studyPlan->getLeftoverExams()->count() > 0)
+                    <span class="text-lg"> Lista esami con crediti inutilizzati: </span>
                     <ul class="list-disc pl-6">
                         @foreach($studyPlan->getLeftoverExams() as $exam)
                             <li>
@@ -108,8 +112,34 @@
                             </li>
                         @endforeach
                     </ul>
+                @endif
                 </div>
-            @endif
+                <div class="text-xl">
+                    <?php $cfu = $studyPlan->getRecognizedCredits() ?>
+                    <p>Totale CFU riconosciuti: <span class="font-bold text-green-600">{{ $cfu }} </span></p>
+                    <p>CFU da sostenere: <span class="font-bold text-red-600">{{ $front->course->cfu - $cfu }}</span></p>
+                    <div class="pl-4 text-base"> di cui:
+                        <ul class="list-disc pl-6">
+                            <?php $activities = $front->course->otherActivitiesCfu ?>
+                            @if(isset($activities))
+                                <li>Altre attività: {{ $activities }} cfu</li>
+                            @endif
+                            <li>Prova Finale: {{ $front->course->finalExamCfu}} cfu</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <div class="text-center text-xl">
+                <?php 
+                    $yearCourse = 3;
+                    $year = \Carbon\Carbon::now()->format("Y");
+                ?>
+                <p>Anno di Corso: {{ $yearCourse }}<sup>o</sup></p>
+                <p>
+                    Coorte: {{ $year - $yearCourse +1 }}
+                </p>
+            </div>
         </x-panel>
     </x-mainpanel>
 </x-app-layout>

@@ -34,6 +34,10 @@ use App\Factories\Interfaces\CourseManagerFactory;
 use App\Factories\Implementations\CourseManagerFactoryImpl;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Factories\Implementations\StudyPlanBuilderFactoryImpl;
+use App\Services\Interfaces\YearCalculator;
+use App\Services\Implementations\YearCalculatorImpl;
+use App\Factories\Interfaces\StudyPlanManagerFactory;
+use App\Factories\Implementations\StudyPlanManagerFactoryImpl;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -49,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CourseManagerFactory::class, CourseManagerFactoryImpl::class);
         $this->app->bind(FrontManagerFactory::class, FrontManagerFactoryImpl::class);
         $this->app->bind(StudyPlanBuilderFactory::class, StudyPlanBuilderFactoryImpl::class);
+        $this->app->bind(StudyPlanManagerFactory::class, StudyPlanManagerFactoryImpl::class);
         
         //---- Mappers
         $this->app->bind(ExamBlockMapper::class, ExamBlockMapperImpl::class);
@@ -68,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserFrontManager::class, UserFrontManagerImpl::class);
         $this->app->bind(UserManager::class, UserManagerImpl::class);
         $this->app->bind(FrontsSearchManager::class, FrontsSearchManagerImpl::class);
+        $this->app->bind(YearCalculator::class, YearCalculatorImpl::class);
         
     }
 

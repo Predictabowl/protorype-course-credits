@@ -15,6 +15,8 @@ use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\UserFrontManager;
 use App\Factories\Interfaces\FrontManagerFactory;
 use App\Services\Interfaces\FrontsSearchManager;
+use App\Services\Interfaces\StudyPlanManager;
+use App\Factories\Interfaces\StudyPlanManagerFactory;
 
 use Tests\TestCase;
 
@@ -26,6 +28,7 @@ class StudyPlanControllerTest extends TestCase
     
     private $user;
     private $front;
+    private $manager;
     
     
     protected function setUp(): void {
@@ -33,6 +36,13 @@ class StudyPlanControllerTest extends TestCase
         
             $this->user = User::factory()->create();
             $this->front = Front::create(["user_id" => $this->user->id]);
+            
+            $this->manager = $this->createMock(StudyPlanManager::class);
+            $factory = $this->createMock(StudyPlanManagerFactory::class);
+            $factory->expects($this->any())
+                    ->method("get")
+                    ->willReturn($this->manager);
+            app()->instance(StudyPlanManagerFactory::class, $factory);
     }
     
     
@@ -53,16 +63,8 @@ class StudyPlanControllerTest extends TestCase
     }
     
     public function test_show_with_course_not_set(){
-        $userFrontManager = $this->createMock(UserFrontManager::class);
-        app()->instance(UserFrontManager::class, $userFrontManager);
-        
-        $userFrontManager->expects($this->once())
-                ->method("setUserId")
-                ->with($this->user->id)
-                ->willReturn($userFrontManager);
-        
-        $userFrontManager->expects($this->once())
-                ->method("getStudyPlanBuilder")
+        $this->manager->expects($this->once())
+                ->method("getStudyPlan")
                 ->willReturn(null);
         
         $response =  $this->actingAs($this->user)
@@ -73,25 +75,10 @@ class StudyPlanControllerTest extends TestCase
     }
     
     public function test_show(){
-        $course = Course::factory()->create();
-        $this->front->course()->associate($course);
-        $this->front->save();
-        $userFrontManager = $this->createMock(UserFrontManager::class);
-        app()->instance(UserFrontManager::class, $userFrontManager);
-        
-        $userFrontManager->expects($this->once())
-                ->method("setUserId")
-                ->with($this->user->id)
-                ->willReturn($userFrontManager);
-        
-        $builder = $this->createMock(StudyPlanBuilder::class);
+        $this->front->course()->associate(Course::factory()->create())
+                ->save();
         $plan = new StudyPlan(collect([]));
-        
-        $userFrontManager->expects($this->once())
-                ->method("getStudyPlanBuilder")
-                ->willReturn($builder);
-        
-        $builder->expects($this->once())
+        $this->manager->expects($this->once())
                 ->method("getStudyPlan")
                 ->willReturn($plan);
         

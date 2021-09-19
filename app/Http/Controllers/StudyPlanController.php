@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Interfaces\UserFrontManager;
+use App\Factories\Interfaces\StudyPlanManagerFactory;
+use App\Services\Interfaces\StudyPlanManager;
 use App\Models\Front;
 use App\Domain\StudyPlan;
 use Illuminate\Support\Facades\Gate;
@@ -20,18 +21,17 @@ class StudyPlanController extends Controller
     public function show(Front $front){
         Gate::authorize("view-studyPlan", $front);
         
-        $builder = app()->make(UserFrontManager::class)
-                ->setUserId($front->user_id)
-                ->getStudyPlanBuilder();
-        if (!isset($builder)){
+        $manager = app()->make(StudyPlanManagerFactory::class)
+                ->get($front);
+                
+        $studyPlan = $manager->getStudyPlan();
+        if (!isset($studyPlan)){
             return back()->with("studyPlanFailure", __("A degree course must be selected"));
         }
-        
-        $studyPlan = $builder->getStudyPlan();
         request()->session()->put("studyPlan",$studyPlan);
         return view("studyplan.showplan",[
             "studyPlan" => $studyPlan,
-            "front" => $front
+            "front" => $front,
         ]);
     }
     
@@ -39,7 +39,8 @@ class StudyPlanController extends Controller
         Gate::authorize("view-studyPlan", $front);
         
         $plan = session()->get("studyPlan");
-        return $this->setupDomPdf($front, $plan)->stream("prospetto.pdf");
+        return $this->setupDomPdf($front, $plan)
+                ->stream($front->user->name." - Valutazione Carriera.pdf");
     }
     
     private function setupDomPdf(Front $front, StudyPlan $studyPlan){

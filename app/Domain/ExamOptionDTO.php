@@ -122,7 +122,7 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
         if (($this->getIntegrationValue() < 1) || ($exam->getActualCfu() < 1)){
             return false;
         }
-        
+
         if ($this->linkedTakenExams->isEmpty() && 
                 $this->getBlock()->getNumSlotsAvailable() < 1){
             return false;

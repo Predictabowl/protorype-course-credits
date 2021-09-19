@@ -20,6 +20,7 @@ class CreateCoursesTable extends Migration
             $table->unsignedSmallInteger("maxRecognizedCfu")->nullable();
             $table->unsignedTinyInteger("otherActivitiesCfu")->nullable();
             $table->unsignedTinyInteger("finalExamCfu");
+            $table->unsignedTinyInteger("numberOfYears");
             $table->timestamps();
         });
     }

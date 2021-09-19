@@ -26,7 +26,8 @@ class CourseFactory extends Factory
             //"code" => $this->faker->bothify("???-##"),
             "cfu" => 180,
             "finalExamCfu" => $this->faker->numberBetween(6, 12),
-            "otherActivitiesCfu" => $this->faker->numberBetween(0, 9)
+            "otherActivitiesCfu" => $this->faker->numberBetween(0, 9),
+            "numberOfYears" => $this->faker->numberBetween(2,3)
         ];
     }
 }

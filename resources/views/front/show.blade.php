@@ -6,35 +6,42 @@
     </x-slot>
 
     <x-mainpanel>
-        <div class="sm:flex justify-between">
+        <div class="sm:flex sm:justify-between">
             <x-panel class="sm:w-2/3">
                 <div>
                     <form method="POST" action="{{ route("postTakenExam",[$front]) }}">
                         @csrf
-                        <header class="flex items-center">
+                        <header class="flex justify-center">
                             <h2 class="ml-3 text-lg">{{ __("Add Taken Exam") }}</h2>
                         </header>
-                        <div class="mt-3">
-                            <x-input type="text" class="w-full" name="name" :placeholder="__('Teaching name')" 
-                                :value="old('name')"/>
+                        <div class="space-y-3">
+                            <div class="mt-1">
+                                <x-input type="text" class="w-full" name="name" :placeholder="__('Teaching name')" 
+                                    :value="old('name')" required />
 
-                            @error("name")
-                            <span class="text-xs text-red-500">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="flex gap-4 mt-3">
+                                @error("name")
+                                <span class="text-xs text-red-500">{{ $message }}</span>
+                                @enderror
+                            </div>
                             <div>
                                 <x-input class="w-20" type="number" placeholder="cfu" name="cfu" :value="old('cfu')" required autofocus />
                                 @error("cfu")
-                                   <div class="text-xs text-red-500">{{ $message }}</div>
+                                   <span class="text-xs text-red-500">{{ $message }}</span>
                                 @enderror
                              </div>
                             <div>
                                 <x-input class="w-32" type="text" name="ssd" placeholder="SSD" 
-                                    value="{{old('ssd')}}"/>
+                                    value="{{old('ssd')}}" required/>
 
                                 @error("ssd")
-                                <div class="text-xs text-red-500">{{ $message }}</div>
+                                    <span class="text-xs text-red-500">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div>
+                                <x-input class="w-20" type="number" name="grade" placeholder="{{ __('Grade') }}" 
+                                    value="{{old('grade')}}" required/>
+                                @error("grade")
+                                    <span class="text-xs text-red-500">{{ $message }}</span>
                                 @enderror
                             </div>
                         </div>
@@ -93,7 +100,7 @@
 
 
         {{-- Taken exams table --}}
-        <x-panel >
+        <x-panel class="overflow-y-scroll lg:max-h-screen">
             <h1 class="text-lg">{{ __("Exams Taken") }}</h1>
             <div class="place-content-center">
                 <table class="min-w-full rounded-lg">
@@ -101,6 +108,7 @@
                         <tr class="bg-gray-100">
                             <th>ssd</th>
                             <th>{{ __("Name") }}</th>
+                            <th>{{ __("Grade") }}</th>
                             <th>CFU</th>
                         </tr>
                     </thead>
@@ -109,12 +117,13 @@
                         <tr class="hover:bg-blue-100">
                                 <td>{{ $exam->getSsd() }}</td>
                                 <td >{{ $exam->getExamName() }}</td>
+                                <td class="text-center">{{ $exam->getGrade() }}/30</td>
                                 <td class="text-center">{{ $exam->getCfu() }}</td>
                                 <td class="w-10">
                                     <form method="POST" action="{{ route("deleteTakenExam",[$front]) }}">
                                         @csrf
                                         @method("DELETE")
-                                        <x-button-icon width="w-9" height="h-6" name="id" value="{{$exam->getId()}}">
+                                        <x-button-icon width="w-9" height="h-6" name="exam" value="{{serialize($exam)}}">
                                             <img src="/images/delete-icon.svg" alt="Elimina">
                                         </x-button-icon>
                                     </form>                                
