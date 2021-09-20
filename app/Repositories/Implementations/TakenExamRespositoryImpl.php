@@ -50,5 +50,16 @@ class TakenExamRespositoryImpl implements TakenExamRepository{
     public function delete($id): bool {
         return TakenExam::destroy($id);
     }
-    
+
+    public function deleteFromFront($frontId): bool {
+        $front = Front::with("takenExams")->find($frontId);
+        if (!isset($front)){
+            return false;
+        }
+        $front->takenExams->each(function (TakenExam $exam){
+            $exam->delete();
+        });
+        return true;
+    }
+
 }

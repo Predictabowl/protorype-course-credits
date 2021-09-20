@@ -41,6 +41,14 @@ class TakenExamController extends Controller
         return back()->with("success", "Eliminato: ".$exam->getExamName());
     }
     
+    public function deleteFromFront(Front $front){
+        $this->authorize("delete",$front);
+        
+        $this->getFrontManager($front)->deleteAllTakenExams();
+        
+        return back()->with("success", "Eliminati tutti gli esami");
+    }
+    
     
     private function getFrontManager(Front $front): FrontManager {
         $factory = app()->make(FrontManagerFactory::class);

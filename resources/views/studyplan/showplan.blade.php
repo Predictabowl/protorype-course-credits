@@ -70,7 +70,7 @@
                                         {{ $option->getRecognizedCredits() }}
                                     </td>
                                     <td class="text-center">
-                                        {!!$option->getCourseYear() != null ? $option->getCourseYear().'<sup>o</sup>' : '' !!}
+                                        {!!$option->getCourseYear() != null ? $option->getCourseYear().'°' : '' !!}
                                     </td>
                                     
                                     @if($startBlock)
@@ -133,7 +133,7 @@
                 </div>
             </div>
             <div class="text-center text-xl">
-                <p>Anno di Corso: {{ $courseYear }}<sup>o</sup></p>
+                <p>Anno di Corso: {{ $courseYear }}°</p>
                 <p>
                     Coorte: {{ $academicYear - $courseYear +1 }}
                 </p>

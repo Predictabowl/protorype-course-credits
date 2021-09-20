@@ -229,6 +229,30 @@ class TakenExamControllerTest extends TestCase
         $response->assertStatus(403);
     }
     
+    public function test_deleteFromFront_success(){
+        $this->setupMocksAndAuth();
+        $this->manager->expects($this->once())
+                ->method("deleteAllTakenExams");
+
+        $response = $this->from(self::FIXTURE_START_URI)
+                ->delete(route("deleteFrontTakenExam",[$this->front]));
+        
+        $response->assertRedirect(self::FIXTURE_START_URI);
+    }
+    
+    public function test_deleteFromFront_access_policy_with_no_authorized_user(){
+        $user2 = User::factory()->create();
+        $this->setupMocksAndAuth();
+                
+        $this->manager->expects($this->never())
+                ->method("deleteAllTakenExams");
+
+        $response = $this->actingAs($user2)
+                ->delete(route("deleteFrontTakenExam",[$this->front]));
+        
+        $response->assertStatus(403);
+    }
+    
     private function setupMocksAndAuth(){
         $this->be($this->user);
 

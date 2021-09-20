@@ -100,8 +100,20 @@
 
 
         {{-- Taken exams table --}}
-        <x-panel class="overflow-y-scroll lg:max-h-screen">
-            <h1 class="text-lg">{{ __("Exams Taken") }}</h1>
+        <x-panel class="overflow-y-scroll lg:max-h-screen" x-data="{ showConfirmationBox: false, formId: ''}">
+            <div class="flex gap-2">
+                <h1 class="text-lg">
+                    {{ __("Exams Taken") }}
+                </h1>
+                <form method="POST" id="formDeleteExams" action="{{ route("deleteFrontTakenExam",[$front]) }}">
+                    @csrf
+                    @method("DELETE")
+                    <x-button-icon type="button" width="w-10" height="h-6" 
+                            x-on:click="showConfirmationBox = true; formId = 'formDeleteExams'">
+                        <img src="/images/delete-icon.svg" alt="Elimina">
+                    </x-button-icon>
+                </form> 
+            </div>
             <div class="place-content-center">
                 <table class="min-w-full rounded-lg">
                     <thead>
@@ -134,6 +146,11 @@
                 </table>
                 </form>
             </div>
+
+            {{-- Confirmation Box --}}
+            <x-confirmation-box>
+                {{ __("Delete all Exams") }}?
+            </x-confirmation-box>
         </x-panel>
     </x-mainpanel>
 </x-app-layout>

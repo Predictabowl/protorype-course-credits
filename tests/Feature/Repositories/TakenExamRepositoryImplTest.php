@@ -195,5 +195,53 @@ class TakenExamRepositoryImplTest extends TestCase {
         $this->assertFalse($result);
         $this->assertDatabaseCount("taken_exams", 2);
     }
+    
+     public function test_delete_multiple_entries() {
+        $ssd = Ssd::factory()->create();
+        $front = Front::factory()->create([
+            "user_id" => User::factory()->create(),
+            "course_id" => Course::factory()->create()
+        ]);
+        TakenExam::factory(4)->create();
+        $exams = TakenExam::factory(3)->create(["front_id" => $front->id]);
+
+        $examIds = $exams->map(fn(TakenExam $exam) => $exam->id);        
+
+        $result = $this->repository->delete($examIds);
+
+        $this->assertTrue($result);
+        $this->assertDatabaseCount("taken_exams", 4);
+        $exams = $exams->toArray();
+        $this->assertDatabaseMissing("taken_exams", $exams[0]);
+        $this->assertDatabaseMissing("taken_exams", $exams[1]);
+        $this->assertDatabaseMissing("taken_exams", $exams[2]);
+    }
+    
+    public function test_deleteFromFront_success(){
+        $ssd = Ssd::factory()->create();
+        $front = Front::factory()->create([
+            "user_id" => User::factory()->create(),
+            "course_id" => Course::factory()->create()
+        ]);
+        TakenExam::factory(4)->create(["front_id" => Front::factory()->create()]);
+        $exams = TakenExam::factory(3)->create(["front_id" => $front->id]);
+
+        $result = $this->repository->deleteFromFront($front->id);
+
+        $this->assertTrue($result);
+        $this->assertDatabaseCount("taken_exams", 4);
+        $exams = $exams->toArray();
+        $this->assertDatabaseMissing("taken_exams", $exams[0]);
+        $this->assertDatabaseMissing("taken_exams", $exams[1]);
+        $this->assertDatabaseMissing("taken_exams", $exams[2]);
+    }
+    
+    public function test_deleteFromFront_failure(){
+
+        $result = $this->repository->deleteFromFront(5);
+
+        $this->assertFalse($result);
+        $this->assertDatabaseCount("taken_exams", 0);
+    }
 
 }

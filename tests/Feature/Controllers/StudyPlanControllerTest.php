@@ -40,11 +40,11 @@ class StudyPlanControllerTest extends TestCase
     
     
     public function test_authentication_required(){
-        $response =  $this->get(route("studyPlan",[$this->front]));
-        $response->assertRedirect(route("login"));
+        $this->get(route("studyPlan",[$this->front]))
+            ->assertRedirect(route("login"));
         
-        $response =  $this->get(route("studyPlanPdf",[$this->front]));
-        $response->assertRedirect(route("login"));
+        $this->get(route("studyPlanPdf",[$this->front]))
+            ->assertRedirect(route("login"));
     }
 
     public function test_show_authorization(){
@@ -74,6 +74,12 @@ class StudyPlanControllerTest extends TestCase
         $this->manager->expects($this->once())
                 ->method("getStudyPlan")
                 ->willReturn($plan);
+        $this->manager->expects($this->once())
+                ->method("getAcademicYear")
+                ->willReturn(2012);
+        $this->manager->expects($this->once())
+                ->method("getCourseYear")
+                ->willReturn(2);
         
         $response =  $this->actingAs($this->user)
                 ->from(self::FIXTURE_START_URI)
@@ -82,9 +88,15 @@ class StudyPlanControllerTest extends TestCase
         $response->assertOk()
             ->assertViewHas([
                 "front" => $this->front,
-                "studyPlan" => $plan
+                "studyPlan" => $plan,
+                "academicYear" => 2012,
+                "courseYear" => 2
             ])
-            ->assertSessionHas("studyPlan", $plan);
+            ->assertSessionHas([
+                "studyPlan" => $plan,
+                "academicYear" => 2012,
+                "courseYear" => 2
+            ]);
     }
     
     public function test_createPdf_Ok(){

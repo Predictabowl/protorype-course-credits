@@ -25,4 +25,6 @@ interface TakenExamRepository {
     
     public function delete($id): bool;
     
+    public function deleteFromFront($frontId): bool;
+    
 }

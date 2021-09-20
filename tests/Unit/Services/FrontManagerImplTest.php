@@ -133,6 +133,15 @@ class FrontManagerImplTest extends TestCase{
         
         $this->assertSame($courses, $result);
     }
+    
+    public function test_deleteAllTakenExams(){
+        $this->takenRepo->expects($this->once())
+                ->method("deleteFromFront")
+                ->with(self::FIXTURE_FRONT_ID)
+                ->willReturn(true);
+        
+        $this->manager->deleteAllTakenExams();
+    }
 
     
     private function makeTakenExam($id =1): TakenExam{            

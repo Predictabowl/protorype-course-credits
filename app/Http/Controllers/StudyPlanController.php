@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Factories\Interfaces\StudyPlanManagerFactory;
-use App\Services\Interfaces\StudyPlanManager;
 use App\Models\Front;
-use App\Domain\StudyPlan;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Http\Request;
 
 
 class StudyPlanController extends Controller
@@ -28,28 +25,36 @@ class StudyPlanController extends Controller
         if (!isset($studyPlan)){
             return back()->with("studyPlanFailure", __("A degree course must be selected"));
         }
-        request()->session()->put("studyPlan",$studyPlan);
+        $academicYear = $manager->getAcademicYear();
+        $courseYear = $manager->getCourseYear();
+        
+        session([ 
+            "studyPlan" => $studyPlan,
+            "academicYear" => $academicYear,
+            "courseYear" => $courseYear
+        ]);
         return view("studyplan.showplan",[
             "studyPlan" => $studyPlan,
             "front" => $front,
-            "academicYear" => $manager->getAcademicYear(),
-            "courseYear" => $manager->getCourseYear()
+            "academicYear" => $academicYear,
+            "courseYear" => $courseYear
         ]);
     }
     
     public function createPdf(Front $front){
         Gate::authorize("view-studyPlan", $front);
         
-        $plan = session()->get("studyPlan");
-        return $this->setupDomPdf($front, $plan)
+        return $this->setupDomPdf($front)
                 ->stream($front->user->name." - Valutazione Carriera.pdf");
     }
     
-    private function setupDomPdf(Front $front, StudyPlan $studyPlan){
+    private function setupDomPdf(Front $front){
         $pdf = \App::make("dompdf.wrapper");
         $pdf->setPaper("a4","portrait")
             ->loadView("studyplan.showplanPdf",[
-                "studyPlan" => $studyPlan,
+                "studyPlan" => session()->get("studyPlan"),
+                "academicYear" => session()->get("academicYear"),
+                "courseYear" => session()->get("courseYear"),
                 "front" => $front
             ]);
         

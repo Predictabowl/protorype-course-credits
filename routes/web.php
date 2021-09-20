@@ -44,6 +44,7 @@ Route::put("/front/{front}",[FrontController::class,"put"]); //change course for
 
 Route::post("/front/exam/{front}",[TakenExamController::class,"create"])->name("postTakenExam");
 Route::delete("/front/exam/{front}",[TakenExamController::class,"delete"])->name("deleteTakenExam");
+Route::delete("/front/exams/{front}",[TakenExamController::class,"deleteFromFront"])->name("deleteFrontTakenExam");
 
 
 //-------------- Study Plan

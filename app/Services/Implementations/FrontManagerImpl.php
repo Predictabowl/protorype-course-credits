@@ -66,6 +66,10 @@ class FrontManagerImpl implements FrontManager{
         return app()->make(CourseRepository::class)->getAll();
     }
 
+    public function deleteAllTakenExams() {
+        $this->getExamRepository()->deleteFromFront($this->frontId);
+    }
+
     private function getExamRepository(): TakenExamRepository{
         return app()->make(TakenExamRepository::class);
     }
