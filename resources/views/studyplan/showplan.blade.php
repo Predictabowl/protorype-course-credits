@@ -110,7 +110,7 @@
                     <ul class="list-disc pl-6">
                         @foreach($studyPlan->getLeftoverExams() as $exam)
                             <li>
-                                {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu()}}
+                                [{{ $exam->getSsd()}}] {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu()}}
                             </li>
                         @endforeach
                     </ul>

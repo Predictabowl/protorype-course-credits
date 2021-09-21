@@ -206,15 +206,18 @@
 
 
         @if($studyPlan->getLeftoverExams()->count() > 0)
-            <div style="border-top: 1px solid; border-bottom: 1px solid; margin-top: 10px; padding-top: 10px; padding-bottom: 10px;">
+            <div style="border-top: 1px solid; border-bottom: 1px solid; margin-top: 10px; padding-top: 10px;
+                 padding-bottom: 10px;">
                 Lista esami con crediti inutilizzati:
-                <ul class="list-disc pl-6">
-                    @foreach($studyPlan->getLeftoverExams() as $exam)
-                        <li>
-                            {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu() }}
-                        </li>
-                    @endforeach
-                </ul>
+                <div style="font-size: 14px;">
+                    <ul class="list-disc pl-6">
+                        @foreach($studyPlan->getLeftoverExams() as $exam)
+                            <li>
+                                [{{ $exam->getSsd()}}] {{ $exam->getExamName() }}: {{ $exam->getActualCfu() }}/{{ $exam->getCfu() }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
         @endif
 </body>

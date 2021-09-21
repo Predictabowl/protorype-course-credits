@@ -99,9 +99,8 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         
         // Free choice exams are reserved for last
         if($leftover > 0){
-            $this->declaredExams->map(fn($linkedExam) =>
-                $this->linkExam($this->getFreeChoiceOptions($linkedExam)
-                            ,$linkedExam));
+            $this->declaredExams->map(fn (TakenExamDTO $linkedExam) =>
+                    $this->linkFreeChoiceExams($linkedExam));
         }
         
         //setting leftover exams and credit
@@ -162,12 +161,24 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
      * @return int leftover cfu from takenExam
      */
     
-    private function linkExam($options, TakenExamDTO $linkedExam): int{
+    private function linkExam($options, TakenExamDTO $linkedExam, ?bool $isSplittable = true): int{
         foreach ($options as $option) {
-            $this->studyPlan->addExamLink($option, $linkedExam);
+            if ($isSplittable || $linkedExam->getActualCfu() >= $option->getCfu()){
+                $this->studyPlan->addExamLink($option, $linkedExam);
+            }
             if ($linkedExam->getActualCfu() === 0){
                 break;
             }
+        }
+        return $linkedExam->getActualCfu();
+    }
+    
+    private function linkFreeChoiceExams(TakenExamDTO $linkedExam): int{
+        if ($linkedExam->getCfu() == $linkedExam->getActualCfu()){
+            return $this->linkExam(
+                    $this->getFreeChoiceOptions($linkedExam),
+                    $linkedExam,
+                    false);
         }
         return $linkedExam->getActualCfu();
     }
