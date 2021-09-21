@@ -96,14 +96,24 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
                 $this->linkExam($this->getOptionsByCompatibility($linkedExam)
                             ,$linkedExam))->sum();
         }
-        
-        // Free choice exams are reserved for last
+        // -------------- Free choice exams ----------
+        // The first pass only consider taken exams not touched yet
         if($leftover > 0){
-            $this->declaredExams->map(fn (TakenExamDTO $linkedExam) =>
-                    $this->linkFreeChoiceExams($linkedExam));
+            $leftover = $this->declaredExams->map(fn (TakenExamDTO $linkedExam) =>
+                    $this->linkFreeChoiceExams($linkedExam))->sum();
         }
         
-        //setting leftover exams and credit
+        // The second pass consider all exams left that have enough CFU to
+        // cover the whole Free Exam
+        if($leftover > 0){
+            $this->declaredExams->map(fn (TakenExamDTO $linkedExam) => 
+                    $this-> linkExam(
+                        $this->getFreeChoiceOptions($linkedExam),
+                        $linkedExam,
+                        false));
+        }
+        
+        //setting leftover exams and credits
         $this->studyPlan->setLeftoverExams($this->declaredExams->filter(
                 fn(TakenExamDTO $exam) => $exam->getActualCfu() > 0));
 
@@ -173,6 +183,13 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         return $linkedExam->getActualCfu();
     }
     
+    /**
+     * It will call linkExam only if the linkedExam's cfu are not used
+     * anywhere else.
+     * 
+     * @param TakenExamDTO $linkedExam
+     * @return int
+     */
     private function linkFreeChoiceExams(TakenExamDTO $linkedExam): int{
         if ($linkedExam->getCfu() == $linkedExam->getActualCfu()){
             return $this->linkExam(

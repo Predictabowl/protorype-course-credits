@@ -132,9 +132,85 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->assertEquals($option1, $orederedOptions->last());
     }
     
-    public function test_getStudyPlan_with_free_choice_exam() {
+    public function test_getStudyPlan_with_free_choice_exam_with_not_enough_cfu() {
          $this->takenExams = collect([
-            new TakenExamDTO(1,"Diritto Privato","IUS/01",9,22),
+            new TakenExamDTO(1,"Test low CFU","IUS/01",9,22),
+        ]); 
+         
+        $block1 = new ExamBlockDTO(1,1,12,1);
+        $block2 = new ExamBlockDTO(2,1,12,2);
+        $block3 = new ExamBlockDTO(3,1,6,3);
+        $this->blocks = [$block1, $block2, $block3];
+        
+         $this->options = collect([
+            new ExamOptionDTO(1,"Esame a scelta", $block1, null),
+            new ExamOptionDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
+            new ExamOptionDTO(3,"Altro esame", $block3, "IUS/07"),
+        ]);        
+        $this->options[1]->addCompatibleOption("IUS/03");
+        
+        $this->setupMocks();
+        // is called once for each pass in the free choices loops
+        $this->examDistance->expects($this->exactly(2))                
+                ->method("calculateDistance")
+                ->willReturn(1);
+        
+        $studyPlan = $this->planBuilder->getStudyPlan();
+
+        $this->assertEquals(12, $studyPlan->getExam(1)->getIntegrationValue());
+        $this->assertEquals(12, $studyPlan->getExam(2)->getIntegrationValue());
+        $this->assertEquals(6, $studyPlan->getExam(3)->getIntegrationValue());
+        
+        $this->assertCount(0,$studyPlan->getExam(1)->getTakenExams());
+        $this->assertCount(0,$studyPlan->getExam(2)->getTakenExams());
+        $this->assertCount(0, $studyPlan->getExam(3)->getTakenExams());
+        
+    }
+    
+        public function test_getStudyPlan_with_free_choice_exam_should_prioritize_whole_exams() {
+        $testExam = new TakenExamDTO(2,"Test whole CFU","IUS/01",12,22);
+        $this->takenExams = collect([
+            new TakenExamDTO(1,"Test fractioned Cfu","IUS/01",18,22,2,12),
+            $testExam
+        ]); 
+         
+        $block1 = new ExamBlockDTO(1,1,12,1);
+        $block2 = new ExamBlockDTO(2,1,12,2);
+        $block3 = new ExamBlockDTO(3,1,6,3);
+        $this->blocks = [$block1, $block2, $block3];
+        
+         $this->options = collect([
+            new ExamOptionDTO(1,"Esame a scelta", $block1, null),
+            new ExamOptionDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
+            new ExamOptionDTO(3,"Altro esame", $block3, "IUS/07"),
+        ]);        
+        $this->options[1]->addCompatibleOption("IUS/03");
+        
+        $this->setupMocks();
+        // On the first pass the fraction CFU is not considered, and so is called only once
+        // On the second pass they're both called.
+        $this->examDistance->expects($this->exactly(3))                
+                ->method("calculateDistance")
+                ->willReturn(1);
+        
+        $studyPlan = $this->planBuilder->getStudyPlan();
+
+        $this->assertEquals(0, $studyPlan->getExam(1)->getIntegrationValue());
+        $this->assertEquals(12, $studyPlan->getExam(2)->getIntegrationValue());
+        $this->assertEquals(6, $studyPlan->getExam(3)->getIntegrationValue());
+        
+        $this->assertCount(1,$studyPlan->getExam(1)->getTakenExams());
+        $this->assertCount(0,$studyPlan->getExam(2)->getTakenExams());
+        $this->assertCount(0, $studyPlan->getExam(3)->getTakenExams());
+        
+        $this->assertEquals($testExam->getId(), 
+                $studyPlan->getExam(1)->getTakenExams()->first()->getId());
+        
+    }    
+    
+        public function test_getStudyPlan_with_free_choice_will_take_fractioned_if_have_enough_cfu() {
+         $this->takenExams = collect([
+            new TakenExamDTO(1,"Test low CFU","IUS/01",15,22,2,12),
         ]); 
          
         $block1 = new ExamBlockDTO(1,1,12,1);
@@ -156,7 +232,7 @@ class StudyPlanBuilderImplTest extends TestCase
         
         $studyPlan = $this->planBuilder->getStudyPlan();
 
-        $this->assertEquals(3, $studyPlan->getExam(1)->getIntegrationValue());
+        $this->assertEquals(0, $studyPlan->getExam(1)->getIntegrationValue());
         $this->assertEquals(12, $studyPlan->getExam(2)->getIntegrationValue());
         $this->assertEquals(6, $studyPlan->getExam(3)->getIntegrationValue());
         

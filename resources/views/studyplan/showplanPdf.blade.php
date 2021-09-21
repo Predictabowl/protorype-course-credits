@@ -110,10 +110,10 @@
 
                 <?php $cfu = $studyPlan->getRecognizedCredits() ?>
                 <div style="margin-top: 0.75rem;">
-                    Totale CFU riconosciuti: <span style="font-weight: bold;">{{ $cfu }}</span>
+                    Totale CFU riconosciuti: <span style="font-weight: bold; color: green;">{{ $cfu }}</span>
                 </div>
                 <div style="margin-top: 0.5rem;">
-                    CFU da sostenere: <span style="font-weight: bold;">{{ $front->course->cfu - $cfu }}</span>
+                    CFU da sostenere: <span style="font-weight: bold; color: red;">{{ $front->course->cfu - $cfu }}</span>
                 </div>
                 <div style="margin-top: 0.25rem; margin-bottom: 0.75rem; font-size: 15px;">
                     di cui:
@@ -128,7 +128,9 @@
 
             <section style="position: relative; width: 30%; left: 5%;">
                 <div class="signature-label"">Data</div>
-                <div class="signature-underline"/>
+                <div class="signature-underline" style="text-align: center; margin-top: 1rem; font-weight: bold;">
+                    {{ \Carbon\Carbon::now()->format("d/m/Y") }}
+                </div>
             </section>
             <section style="position:relative; width:40%; left: 50%;">
                 <div class="signature-label"> Firma del docente</div>
@@ -194,8 +196,11 @@
                                         {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da {{$examBlock->getCfu()}} CFU a scelta
                                     @endif
                             </td>
-                            <td class="outer-td" style="text-align: center; font-weight: bold; font-size:15px" width="5%">
-                                    {{ $option->getBlock()->getIntegrationValue()}}
+                            <?php $integration = $examBlock->getIntegrationValue() ?>
+                            <td class="outer-td" style="text-align: center; font-weight: bold; font-size:15px;" width="5%">
+                                <span style="color: {{ $integration > 0 ? 'red' : 'green'}};">
+                                    {{ $integration }}
+                                </span>
                             </td>
                         </tr>
                         <tr><td style="border: 1px solid;" colspan="4"></td></tr>
