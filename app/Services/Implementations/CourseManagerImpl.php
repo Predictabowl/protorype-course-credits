@@ -42,14 +42,6 @@ class CourseManagerImpl implements CourseManager {
         }
         return $options;
     }
-
-    public function delExamBlock($id) {
-        if (Gate::allows("edit-courses")){ //redundant, should not be the duty of the manager
-            ddd("Method not implemented yet: admin");
-        } else {
-            ddd("Method not implemented yet: normal user");
-        }
-    }
     
     public function getCourse(): Course {
         return app()->make(CourseRepository::class)->get($this->courseId);

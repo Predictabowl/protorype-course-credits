@@ -12,7 +12,6 @@ use App\Repositories\Interfaces\CourseRepository;
 use App\Models\Course;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Collection;
 
 /**
  * Description of CourseRepositoryImpl
@@ -30,7 +29,7 @@ class CourseRepositoryImpl implements CourseRepository {
     }
 
     public function save(Course $course): bool {
-        if (isset($front->id)){
+        if (isset($course->id)){
             throw new \InvalidArgumentException("The id of a new Course must be null");
         }
         

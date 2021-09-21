@@ -68,9 +68,10 @@ class StudyPlanManagerImplTest extends TestCase{
         $date = Carbon::now();
         $year = $date->format("Y");
         $month = $date->format("m");
+        $day = $date->format("d");
         $calculator->expects($this->once())
                 ->method("getAcademicYear")
-                ->with($month,$year)
+                ->with($day,$month,$year)
                 ->willreturn(1498);
 
         $manager = new StudyPlanManagerImpl($front);

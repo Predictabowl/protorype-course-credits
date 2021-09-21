@@ -18,13 +18,27 @@ use App\Domain\StudyPlan;
  * @author piero
  */
 class YearCalculatorImpl implements YearCalculator{
-    
+    /**
+     * This implementation only use the recognized credits from the study plan.
+     * 
+     * @param Course $course
+     * @param StudyPlan $plan
+     * @return int
+     */
     public function getCourseYear(Course $course, StudyPlan $plan): int {
         $cfu = $plan->getRecognizedCredits();
         return min(($cfu / $course->cfuTresholdForYear)+1, $course->numberOfYears);
     }
     
-    public function getAcademicYear(int $month, int $year): int {
+    /**
+     * This implementation ignores the day.
+     * 
+     * @param int $day
+     * @param int $month
+     * @param int $year
+     * @return int
+     */
+    public function getAcademicYear(int $day, int $month, int $year): int {
         if($month < 4){
             $year--;
         }

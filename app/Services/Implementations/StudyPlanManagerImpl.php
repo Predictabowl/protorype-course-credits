@@ -52,6 +52,7 @@ class StudyPlanManagerImpl implements StudyPlanManager{
     public function getAcademicYear(): int {
         $date = Carbon::now();
         return $this->yearCalculator->getAcademicYear(
+                $date->format("d"),
                 $date->format("m"),
                 $date->format("Y")
             );

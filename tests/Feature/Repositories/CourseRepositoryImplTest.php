@@ -58,6 +58,26 @@ class CourseRepositoryImplTest extends TestCase
         $this->assertDatabaseHas("courses", $attributes);
     }
     
+     public function test_save_with_id_already_set_should_throw() {
+        $attributes = [
+            "name" => "test name",
+            "cfu" => 180,
+            "finalExamCfu" => 12,
+            "otherActivitiesCfu" => 6,
+            "maxRecognizedCfu" => 120,
+            "numberOfYears" => 3,
+            "cfuTresholdForYear" => 40,
+            "id" => 2
+        ];
+        $course = Course::make($attributes);
+        
+        $this->expectException(\InvalidArgumentException::class);
+        
+        $this->repository->save($course);
+        
+        $this->assertDatabaseCount("courses", 0);
+    }
+    
     public function test_save_with_duplicate_name_should_fail() {
         $attributes = [
             "name" => "test name",

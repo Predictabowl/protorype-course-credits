@@ -22,7 +22,7 @@ use Illuminate\Support\Collection;
      * 
      * Let's say we want integrate 2 exams with SSD IUS/01 and IUS/02
      * 1) Exam1 IUS/01
-     * 2 Exam2 ISU/02
+     * 2 Exam2 IUS/02
      *               
      * The study plan have the following blocks       
      * |Block1 | obligatory | IUS/01 | 
@@ -36,7 +36,9 @@ use Illuminate\Support\Collection;
      * If we decided to take the block 1, both exam1 and exam2 would have been
      * integrated.
      * 
-     * Problem is not this simple, here some critical points:
+     * Solution is not obvious, mostly because I'd reckon is not worth to
+     * consider it a serious problem.
+     * Here's some critical points:
      * - The name of the exam matter, shouldn't be better to choose the closest 
      *   name regardless?
      * - Study Plans are not a random list of exams with random SSD, most 
@@ -84,7 +86,9 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         )->sum();
         
         //we could actually interrupt the search if the course's allotted credits are
-        //exhuasted, but this is only an optimization, will think about when is finished.
+        //exhuasted, but this is only an optimization.
+        // For these kind of computations there's no need for such optimization,
+        // and will think about it when is finished.
         
         // If there's credits left to assign it checks the option's compatibility list
         if($leftover > 0){

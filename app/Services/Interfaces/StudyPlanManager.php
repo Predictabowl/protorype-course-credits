@@ -8,9 +8,7 @@
 
 namespace App\Services\Interfaces;
 
-use App\Models\Front;
 use App\Domain\StudyPlan;
-use App\Services\Interfaces\YearCalculator;
 
 /**
  *

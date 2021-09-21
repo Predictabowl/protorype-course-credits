@@ -9,8 +9,6 @@ use App\Models\ExamBlockOption;
 use App\Models\Course;
 use App\Models\Ssd;
 use App\Models\Exam;
-use App\Models\Front;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -34,7 +32,7 @@ class ExamBlockRepositoryImplTest extends TestCase
     }
   
     /*
-     * Thios doesn't actually test the eager load, so the added options are
+     * This doesn't actually test the eager load, so the added options are
      * bloat.
      */
     public function test_get_block_with_options()

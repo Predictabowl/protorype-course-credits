@@ -41,7 +41,7 @@ class FrontsSearchManagerImpl implements FrontsSearchManager{
                     $course->id == $request->get("course"));
         };
         
-        return $currentCourse = null;
+        return null;
     }
 
     public function getFilteredFronts(Request $request, int $pageSize = 50): Paginator {

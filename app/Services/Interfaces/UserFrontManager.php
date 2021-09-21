@@ -2,7 +2,6 @@
 
 namespace App\Services\Interfaces;
 
-use App\Models\User;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Models\Front;
 

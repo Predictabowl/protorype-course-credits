@@ -2,11 +2,9 @@
 
 namespace App\Services\Implementations;
 
-use App\Models\User;
 use \App\Models\Front;
 use App\Factories\Interfaces\FrontManagerFactory;
 use App\Repositories\Interfaces\FrontRepository;
-use App\Repositories\Interfaces\CourseRepository;
 use \App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\StudyPlanBuilder;
