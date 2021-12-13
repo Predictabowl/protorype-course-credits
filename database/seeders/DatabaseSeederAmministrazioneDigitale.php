@@ -132,7 +132,7 @@ class DatabaseSeederAmministrazioneDigitale extends Seeder
         );
         
         GenerateExamBlock::generateBlock($courseId, 1, 9, 3, [
-            ["Istituzioni di diritto e procedura penale (a distanza)","IUS/07"]],
+            ["Istituzioni di diritto e procedura penale (a distanza)","IUS/17"]],
             ["INF/01","IUS/01","IUS/05","IUS/07","IUS/10","IUS/12","IUS/14","IUS/16","IUS/17","M-STO/02","M-STO/04","SECS-S/04","SPS/02","SPS/03","SPS/04","SPS/08","SPS/09","SPS/12"]
         );
         

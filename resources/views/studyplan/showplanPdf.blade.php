@@ -148,7 +148,7 @@
                     <tr>
                         <th width="66%">Insegnamento e corrispondenti Esami Riconosciuti </th>
                         <th width="5%">Anno</th>
-                        <th width="29%" colspan="2">Integrazione</th>
+                        <th width="29%" colspan="2">CFU a Debito</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -157,6 +157,10 @@
                             <td>
                                 <?php $startBlock = true; ?>
                                 @foreach($examBlock->getExamOptions() as $option)
+                                    <?php
+                                        $bOptionCleared  = $option->getRecognizedCredits() == $examBlock->getCfu();
+                                        $bOptionPartial = $option->getRecognizedCredits() > 0 && !$bOptionCleared;
+                                    ?>
                                     <table class="table-prospetto no-break-table">
                                         <tr>
                                             <td class={{!$startBlock ? "border-t" : ""}}>
@@ -164,6 +168,15 @@
                                                     [{{$option->getSsd()}}]
                                                 @endif
                                                 {{ $option->getExamName() }}
+                                                @if($bOptionCleared)
+                                                    <span style="color: green;">
+                                                        - Esame Riconosciuto
+                                                    </span>
+                                                @elseif($bOptionPartial)
+                                                    <span style="color: red;">
+                                                        - Dovuta Integrazione
+                                                    </span>
+                                                @endif
                                             </td>
                                         </tr>
                                         <tr>         

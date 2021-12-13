@@ -28,7 +28,7 @@
                             <th class="p-1">CFU</th>
                             <th class="p-1">Anno</th>
                             <th class="p-1">Mod.</th>
-                            <th class="p-1">Integrazione</th>
+                            <th class="p-1">CFU a Debito</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -36,6 +36,17 @@
                             <tr class = "border-b-4 border-black"/>
                             <?php $startBlock = true; ?>
                             @foreach($examBlock->getExamOptions() as $option)
+                                <?php
+                                    $bOptionCleared  = $option->getRecognizedCredits() == $examBlock->getCfu();
+                                    $bOptionPartial = $option->getRecognizedCredits() > 0 && !$bOptionCleared;
+                                    $optionColorClass = "";
+                                    if ($bOptionCleared){
+                                        $optionColorClass = "text-green-600";
+                                    }
+                                    if ($bOptionPartial){
+                                        $optionColorClass = "text-red-600";
+                                    }
+                                ?>
                                 <tr class="border-l border-r {{ !$startBlock ? "border-t" : ""}} border-gray-400">
                                {{--  <tr class="border border-gray-400">  --}}
                                     <td class="text-xs" x-data="{ open: false }">
@@ -55,7 +66,10 @@
                                     <td class="border-r border-gray-400">
                                         {{ html_entity_decode(str_replace("-","&#8209;",$option->getSsd())) }}
                                     </td>
-                                    <td>{{ $option->getExamName() }}</td>
+                                    <td class="{{$optionColorClass}}">
+                                        {{ $option->getExamName() }}
+                                        <span class="{{$optionColorClass}}">{{ $bOptionCleared ? '[Esame Riconosciuto]' : ''}}</span>
+                                    </td>
                                     <td class="text-sm">
                                         <ul class="list-disc">
                                         @foreach($option->getTakenExams() as $taken)
@@ -66,7 +80,7 @@
                                         @endforeach
                                         </ul>
                                     </td>
-                                    <td class="text-center {{$option->getRecognizedCredits() > 0 ? 'text-blue-600': ''}}">
+                                    <td class="text-center {{$optionColorClass}}">
                                         {{ $option->getRecognizedCredits() }}
                                     </td>
                                     <td class="text-center">
