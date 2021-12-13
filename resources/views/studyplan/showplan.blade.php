@@ -66,9 +66,12 @@
                                     <td class="border-r border-gray-400">
                                         {{ html_entity_decode(str_replace("-","&#8209;",$option->getSsd())) }}
                                     </td>
-                                    <td class="{{$optionColorClass}}">
+                                    <td>
                                         {{ $option->getExamName() }}
-                                        <span class="{{$optionColorClass}}">{{ $bOptionCleared ? '[Esame Riconosciuto]' : ''}}</span>
+                                        <span class="{{$optionColorClass}}">
+                                            {{ $bOptionCleared ? '[Esame Riconosciuto]' : ''}}
+                                            {{ $bOptionPartial ? '[Dovuta Integarzione]' : ''}}
+                                        </span>
                                     </td>
                                     <td class="text-sm">
                                         <ul class="list-disc">

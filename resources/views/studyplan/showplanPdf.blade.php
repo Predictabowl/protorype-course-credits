@@ -165,21 +165,21 @@
                                         <tr>
                                             <td class={{!$startBlock ? "border-t" : ""}}>
                                                 @if($option->getSsd() != null) 
-                                                    [{{$option->getSsd()}}]
+                                                    {{$option->getSsd()}} |
                                                 @endif
                                                 {{ $option->getExamName() }}
                                                 @if($bOptionCleared)
                                                     <span style="color: green;">
-                                                        - Esame Riconosciuto
+                                                        [Esame Riconosciuto]
                                                     </span>
                                                 @elseif($bOptionPartial)
                                                     <span style="color: red;">
-                                                        - Dovuta Integrazione
+                                                        [Dovuta Integrazione]
                                                     </span>
                                                 @endif
                                             </td>
                                         </tr>
-                                        <tr>         
+                                        <tr>   
                                             <td style="font-size: 12px;">
                                                 <ul>
                                                     @foreach($option->getTakenExams() as $taken)
