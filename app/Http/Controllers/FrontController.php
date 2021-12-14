@@ -40,7 +40,7 @@ class FrontController extends Controller
         return view("front.show",[
             "exams" => $manager->getTakenExams(),
             "front" => $front,
-            "courses" => $manager->getCourses()
+            "courses" => $manager->getCourses()->sortBy("name")
         ]);
     }
     

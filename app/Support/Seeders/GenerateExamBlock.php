@@ -24,7 +24,7 @@ class GenerateExamBlock {
             $courseId,
             int $maxExams,
             int $cfu,
-            int $year,
+            ?int $year,
             $data,
             $compatibilities = [])
     {
