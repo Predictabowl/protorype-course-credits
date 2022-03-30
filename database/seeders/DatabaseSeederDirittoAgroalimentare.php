@@ -117,7 +117,7 @@ class DatabaseSeederDirittoAgroalimentare extends Seeder
         );
         
         GenerateExamBlock::generateBlock($courseId, 1, 6, null, [
-            ["Diritto vitinvinicolo (a distanza)","IUS/09"]],
+            ["Diritto vitinvinicolo (a distanza)","IUS/10"]],
             $tafC_A12_SSDs
         );
         
