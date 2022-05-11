@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use App\Models\User;
 use Tests\TestCase;
 
-class DashBoardTest extends TestCase
+class DashboardTest extends TestCase
 {
     use RefreshDatabase;
     
