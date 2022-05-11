@@ -12,7 +12,7 @@ interface UserFrontManager {
      * Will create a new front.
      * If the front already exist it won't create a new one, but will use
      * the existing one.
-     * If the course is specified it ill be set in the front if exists.
+     * If the course is specified it will be set in the front if exists.
      * If the course is not found it will fail and return null.
      * 
      * @param type $courseId

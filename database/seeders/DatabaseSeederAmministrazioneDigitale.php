@@ -16,7 +16,7 @@ class DatabaseSeederAmministrazioneDigitale extends Seeder
     public function run()
     {
         
-        $course = Course::create([
+        $course = Course::create(  [
             "name" => "Scienze dell'Amministazione Digitale",
             "cfu" => 180,
             "maxRecognizedCfu" => 120,
