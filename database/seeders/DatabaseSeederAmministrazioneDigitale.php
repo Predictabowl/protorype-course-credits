@@ -121,7 +121,7 @@ class DatabaseSeederAmministrazioneDigitale extends Seeder
         
         GenerateExamBlock::generateBlock($courseId, 1, 6, 3, [
             ["Diritto dei consumatori (a distanza)","IUS/01"],
-            ["Diritto della devianza (a distanza) / Sociologia del diritto (a distanza)","SPS/12"],
+            ["Sociologia del diritto e della devianza","SPS/12"],
             ["Diritto della previdenza sociale (a distanza)","IUS/07"],
             ["Diritto dei beni culturali (a distanza)","IUS/10"],
             ["Big data e diritti fondamentali II (a distanza)","IUS/01"],

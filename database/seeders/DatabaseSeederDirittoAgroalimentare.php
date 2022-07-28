@@ -125,8 +125,7 @@ class DatabaseSeederDirittoAgroalimentare extends Seeder
             ["Diritto dei mercati agroalimentari I (a distanza)","IUS/10"],
             ["Diritto dei mercati agroalimentari II (a distanza)","IUS/01"],
             ["Diritto amministrativo europeo dell'ambiente (a distanza)","IUS/10"],
-            ["Diritto dei consumatori (a distanza)","IUS/01"],
-            ["Diritto costituzionale II: diritto costituzionale dell'ambiente e del paesaggio (a distanza)","IUS/08"]],
+            ["Diritto dei consumatori (a distanza)","IUS/01"]],
             []
         );
         
