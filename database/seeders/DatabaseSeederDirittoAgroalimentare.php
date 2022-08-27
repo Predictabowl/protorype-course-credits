@@ -83,7 +83,7 @@ class DatabaseSeederDirittoAgroalimentare extends Seeder
         );
         
         GenerateExamBlock::generateBlock($courseId, 1, 9, 3, [
-            ["Diritto internazionale (a distanza)","IUS/14"]],
+            ["Diritto internazionale (a distanza)","IUS/13"]],
             $ambitoGiurisprudenzaSSDs
         );
 
