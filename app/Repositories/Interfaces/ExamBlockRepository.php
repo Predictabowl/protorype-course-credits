@@ -13,4 +13,5 @@ interface ExamBlockRepository {
     
     public function get($id): ?ExamBlock;
     public function getFilteredByCourse($courseId): Collection;
+    public function save(ExamBlock $examBlock): bool;
 }

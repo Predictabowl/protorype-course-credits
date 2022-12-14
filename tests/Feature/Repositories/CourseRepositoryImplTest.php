@@ -2,12 +2,11 @@
 
 namespace Tests\Feature\Repositories;
 
-
-use App\Repositories\Implementations\CourseRepositoryImpl;
+use App\Exceptions\Custom\CourseNotFoundException;
 use App\Models\Course;
+use App\Repositories\Implementations\CourseRepositoryImpl;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-
+use InvalidArgumentException;
 use Tests\TestCase;
 
 class CourseRepositoryImplTest extends TestCase
@@ -71,7 +70,7 @@ class CourseRepositoryImplTest extends TestCase
         ];
         $course = Course::make($attributes);
         
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         
         $this->repository->save($course);
         
@@ -121,5 +120,26 @@ class CourseRepositoryImplTest extends TestCase
         
         $this->assertFalse($result);
         $this->assertDatabaseCount("courses", 0);
+    }
+    
+    public function test_update_whenCourseNotPresent_shouldThrow(){
+        $course = Course::factory()->make();
+        
+        $this->expectException(CourseNotFoundException::class);
+        $this->repository->update($course);
+    }
+    
+    public function test_update_success(){
+        $course = Course::factory()->create([
+            "name" => "old name"
+        ]);
+        $course->name = "new name";
+        
+        $bResult = $this->repository->update($course);
+  
+        $this->assertTrue($bResult);
+        $modified = Course::find($course->id);
+        $this->assertEquals("new name",$modified->name);
+//        $this->repository->update($course);
     }
 }

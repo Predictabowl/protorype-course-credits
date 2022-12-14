@@ -9,6 +9,7 @@ use \App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
+use Illuminate\Support\Facades\DB;
 
 
 class UserFrontManagerImpl implements UserFrontManager{
@@ -24,22 +25,25 @@ class UserFrontManagerImpl implements UserFrontManager{
     }
 
     public function getOrCreateFront($courseId = null): ?Front{
-        $frontRepo = $this->getFrontRepository();
-        $front = $frontRepo->getFromUser($this->userId);
-        if (isset($front)){
-            if (isset($courseId) && $front->course_id != $courseId){
-                $front = $frontRepo->updateCourse($front->id, $courseId);
+        $transaction = DB::transaction(function() use($courseId){
+            $frontRepo = $this->getFrontRepository();
+            $front = $frontRepo->getFromUser($this->userId);
+            if (isset($front)){
+                if (isset($courseId) && $front->course_id != $courseId){
+                    $front = $frontRepo->updateCourse($front->id, $courseId);
+                }
+                return $front;
             }
-            return $front;
-        }
-        
-        $front = new Front([
-            "user_id" => $this->userId,
-            "course_id" => $courseId
-        ]);       
-        
-        $front = $frontRepo->save($front);
-        return isset($front) ? $front : null;
+
+            $front = new Front([
+                "user_id" => $this->userId,
+                "course_id" => $courseId
+            ]);       
+
+            $front = $frontRepo->save($front);
+            return isset($front) ? $front : null;
+        });
+        return $transaction;
     }
 
     public function getFront(): ?Front {

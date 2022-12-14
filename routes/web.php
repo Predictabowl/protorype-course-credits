@@ -29,10 +29,6 @@ Route::get('/dashboard', function () {
 require __DIR__.'/auth.php';
 
 
-Route::get('/test', function () {
-    return view('welcome2');
-});
-
 //-------------- Front
 
 Route::get("/front",[FrontController::class,"index"])->name("frontIndex");

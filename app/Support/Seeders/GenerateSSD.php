@@ -68,17 +68,6 @@ class GenerateSSD {
         GenerateSSD::createAll();
     }
     
-//    public static function getSSDId(string $ssd): int{
-//        $array = self::getGeneratorArray();
-//        $i = 0;
-//        foreach ($array as $key => $value) {
-//            if (str_starts_with($ssd, $key)){
-//                return $i + intval(substr($ssd, strlen($key)+1)); //it also counts the slash
-//            }
-//            $i += $value;
-//        }
-//    }
-    
     public static function getSSDId(string $ssd): int{
         return Ssd::where("code", $ssd)->first()->id;
     }

@@ -83,7 +83,7 @@ class DatabaseSeederDirittoAgroalimentare extends Seeder
         );
         
         GenerateExamBlock::generateBlock($courseId, 1, 9, 3, [
-            ["Diritto internazionale (a distanza)","IUS/14"]],
+            ["Diritto internazionale (a distanza)","IUS/13"]],
             $ambitoGiurisprudenzaSSDs
         );
 
@@ -117,7 +117,7 @@ class DatabaseSeederDirittoAgroalimentare extends Seeder
         );
         
         GenerateExamBlock::generateBlock($courseId, 1, 6, null, [
-            ["Diritto vitinvinicolo (a distanza)","IUS/09"]],
+            ["Diritto vitinvinicolo (a distanza)","IUS/10"]],
             $tafC_A12_SSDs
         );
         
@@ -125,8 +125,7 @@ class DatabaseSeederDirittoAgroalimentare extends Seeder
             ["Diritto dei mercati agroalimentari I (a distanza)","IUS/10"],
             ["Diritto dei mercati agroalimentari II (a distanza)","IUS/01"],
             ["Diritto amministrativo europeo dell'ambiente (a distanza)","IUS/10"],
-            ["Diritto dei consumatori (a distanza)","IUS/01"],
-            ["Diritto costituzionale II: diritto costituzionale dell'ambiente e del paesaggio (a distanza)","IUS/08"]],
+            ["Diritto dei consumatori (a distanza)","IUS/01"]],
             []
         );
         

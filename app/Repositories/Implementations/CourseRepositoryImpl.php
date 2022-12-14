@@ -8,10 +8,12 @@
 
 namespace App\Repositories\Implementations;
 
-use App\Repositories\Interfaces\CourseRepository;
+use App\Exceptions\Custom\CourseNotFoundException;
 use App\Models\Course;
-use Illuminate\Support\Facades\Log;
+use App\Repositories\Interfaces\CourseRepository;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 
 /**
  * Description of CourseRepositoryImpl
@@ -30,7 +32,7 @@ class CourseRepositoryImpl implements CourseRepository {
 
     public function save(Course $course): bool {
         if (isset($course->id)){
-            throw new \InvalidArgumentException("The id of a new Course must be null");
+            throw new InvalidArgumentException("The id of a new Course must be null");
         }
         
         try{
@@ -43,6 +45,19 @@ class CourseRepositoryImpl implements CourseRepository {
 
     public function getAll() {
         return Course::all();
+    }
+
+    public function update(Course $course): bool {
+        $oldCourse = Course::find($course->id);
+        if(!isset($oldCourse)){
+            throw new CourseNotFoundException("Course not found with id: ".$course->id);
+        }
+        try{
+            return $course->save();
+        } catch (QueryException $exc){
+            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
+            return false;
+        }
     }
 
 }

@@ -117,4 +117,57 @@ class ExamBlockRepositoryImplTest extends TestCase
         // incomplete test
     }
 
+    public function test_save_withNoCourse_shoulThrow(){
+        $attributes = [
+            "max_exams" => 1,
+            "course_id" => 2,
+            "cfu" => 6
+        ];
+        
+        $examBlock = ExamBlock::make($attributes);
+        
+        $this->expectException(\InvalidArgumentException::class);
+        $this->repository->save($examBlock);
+        
+        $this->assertDatabaseCount("exam_blocks",0);
+        
+    } 
+    
+    public function test_saveWithId_notNull_ShouldThrow(){
+        $course = Course::factory()->make();
+        $course->save();
+        
+        $attributes = [
+            "id" => 2,
+            "max_exams" => 1,
+            "course_id" => $course->id,
+            "cfu" => 6
+        ];
+        $examBlock = ExamBlock::make($attributes);
+        
+        $this->expectException(\InvalidArgumentException::class);
+        $this->repository->save($examBlock);
+        
+        $this->assertDatabaseCount("exam_blocks",0);
+    }
+   
+    public function test_save_newExamBlock_Success(){
+        $course = Course::factory()->make();
+        $course->save();
+        
+        $attributes = [
+            "max_exams" => 1,
+            "course_id" => $course->id,
+            "cfu" => 6
+        ];
+        
+        $examBlock = ExamBlock::make($attributes);
+        
+        $bResult = $this->repository->save($examBlock);
+        
+        $this->assertTrue($bResult);
+        $this->assertDatabaseCount("exam_blocks", 1);
+        $this->assertDatabaseHas("exam_blocks", $attributes);
+    }
+    
 }
