@@ -22,5 +22,7 @@ interface CourseRepository {
     
     public function save(Course $course): bool;
     
+    public function update(Course $course): bool;
+    
     public function delete($id): bool;
 }
