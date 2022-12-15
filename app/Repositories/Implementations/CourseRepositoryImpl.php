@@ -32,7 +32,7 @@ class CourseRepositoryImpl implements CourseRepository {
 
     public function save(Course $course): bool {
         if (isset($course->id)){
-            throw new InvalidArgumentException("The id of a new Course must be null");
+            throw new InvalidArgumentException("The id of a new Course must be empty");
         }
         
         try{

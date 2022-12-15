@@ -55,6 +55,9 @@ Route::delete("/user/{user}",[UserController::class,"delete"])->name("userDelete
 Route::get("/userUpdate/{user}",[UserController::class,"updateView"])->name("userUpdate");
 Route::put("/userUpdate/{user}",[UserController::class,"put"]);
 
+//-------------- Course
+Route::get("/course",[CourseController::class,"index"])->name("courseIndex");
+
 //-------------- User Roles
 Route::put("/userRole/{user}",[UserController::class,"putRoles"])->name("userRoleUpdate");
 
