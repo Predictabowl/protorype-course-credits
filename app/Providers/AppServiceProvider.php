@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Routing\UrlGenerator;
 use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Implementations\FrontRepositoryImpl;
 use App\Repositories\Interfaces\TakenExamRepository;
@@ -82,8 +83,12 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    
+//    public function boot(UrlGenerator $url)
+    public function boot()    
     {
-        //
+//        if (env('APP_ENV') == 'production') {
+//            $url->forceScheme('https');
+//        }
     }
 }
