@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Role;
 use App\Support\Seeders\GenerateSSD;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,5 +26,8 @@ class DatabaseSeeder extends Seeder
         ]);
         
         GenerateSSD::createAll();
+        
+        $this->call(DatabaseSeederAmministrazioneDigitale::class);
+        $this->call(DatabaseSeederDirittoAgroalimentare::class);
     }
 }
