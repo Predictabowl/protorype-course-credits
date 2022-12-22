@@ -4,7 +4,7 @@
 version: "3.9"
 
 services:
-   database:
+    database:
       image: postgres:15
       environment:
          - POSTGRES_USER=sail
@@ -14,30 +14,11 @@ services:
          - database-data:/var/lib/postresql/data/
       ports:
          - "5432:5432"
-   mailserver: #Will auto generate new users upon receiving mails
-      image: greenmail/standalone:1.6.11
-      environment:
-         - JAVA_OPTS=-Dgreenmail.verbose
+    mailhog:
+      image: 'mailhog/mailhog:latest'
       ports:
-         - 3025:3025 # SMTP
-         - 3110:3110 # POP3
-         - 3143:3143 # IMAP
-         - 3465:3465 # SMTPS
-         - 3993:3993 # IMAPS
-         - 3995:3995 # POP3S
-         - 8081:8080 # API
-   mailclient: #base user is "username" "password" for credentials
-      image: roundcube/roundcubemail:1.6.0-apache
-      depends_on:
-         - mailserver
-      ports:
-         - 8001:80
-      environment:
-         - ROUNDCUBEMAIL_DEFAULT_HOST=mailserver  # IMAP server - tls:// prefix for STARTTLS, ssl:// for SSL/TLS
-         - ROUNDCUBEMAIL_DEFAULT_PORT=3143       # IMAP port
-         - ROUNDCUBEMAIL_SMTP_SERVER=mailserver   # SMTP server - tls:// prefix for STARTTLS, ssl:// for SSL/TLS
-         - ROUNDCUBEMAIL_SMTP_PORT=3025          # SMTP port - standard should be 3025
+         - 1025:1025
+         - 8025:8025
 
-         
 volumes:
    database-data:

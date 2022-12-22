@@ -2,11 +2,14 @@
 
 namespace App\Domain;
 
-use Illuminate\Support\Collection;
 use App\Domain\ExamBlockDTO;
 use App\Domain\ExamOptionDTO;
+use Illuminate\Support\Collection;
+use InvalidArgumentException;
+use Serializable;
+use function collect;
 
-class StudyPlan implements \Serializable{
+class StudyPlan implements Serializable{
 
     private $examBlocks;
     private $leftovers;
@@ -36,7 +39,7 @@ class StudyPlan implements \Serializable{
         $id = $option->getId();
         $appExam = $this->getExam($id);
         if (!isset($appExam)){
-            throw new \InvalidArgumentException(__METHOD__.": could not find exam option with id :".$id);
+            throw new InvalidArgumentException(__METHOD__.": could not find exam option with id :".$id);
         }
         $linkInserted = $appExam->addTakenExam($taken, $this->getLeftoverAllottedCfu());
         $this->setExam($appExam);
@@ -97,4 +100,17 @@ class StudyPlan implements \Serializable{
         $this->leftovers = $array["leftovers"];
     }
 
+    public function __serialize(): array{
+        return [
+          "examBlocks" => $this->examBlocks,
+          "leftovers" => $this->leftovers,
+          "maxCfu" => $this->maxCfu
+        ];
+    }
+    
+    public function __unserialize(array $data): void {
+        $this->examBlocks = $data["examBlocks"];
+        $this->leftovers = $data["leftovers"];
+        $this->maxCfu = $data["maxCfu"];
+    }
 }
