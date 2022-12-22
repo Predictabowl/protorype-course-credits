@@ -1,5 +1,6 @@
 # docker-compose-db.yml
-# This docker compose is meant to be used to test the full application manually.
+# This docker compose is meant to be used to test the application manually.
+# It uses mailhog to verify new registered accounts
 
 version: "3.9"
 
