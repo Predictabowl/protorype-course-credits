@@ -38,9 +38,7 @@ use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\UserManager;
 use App\Services\Interfaces\YearCalculator;
-use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
-use function env;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -85,10 +83,7 @@ class AppServiceProvider extends ServiceProvider
      * @return void
      */
     
-    public function boot(UrlGenerator $url)
+    public function boot()
     {
-        if (env('APP_ENV') == 'production') {
-            $url->forceScheme('https');
-        }
     }
 }
