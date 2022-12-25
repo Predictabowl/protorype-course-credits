@@ -7,6 +7,8 @@
 
 namespace App\Services\Interfaces;
 
+use App\Models\Exam;
+use App\Models\ExamBlock;
 use Illuminate\Support\Collection;
 
 /**
@@ -16,4 +18,6 @@ use Illuminate\Support\Collection;
 interface CourseAdminManager {
     
     public function getAll(): Collection;
+    public function saveExamBlock(ExamBlock $examBlock): bool;
+    public function saveExam(Exam $exam, $examBlockId): bool;
 }

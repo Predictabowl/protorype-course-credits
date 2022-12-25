@@ -9,15 +9,17 @@
 namespace App\Domain;
 
 use App\Domain\Interfaces\ExamDTO;
-use Illuminate\Support\Collection;
 use App\Exceptions\Custom\InvalidStateException;
+use Illuminate\Support\Collection;
+use Serializable;
+use function collect;
 
 /**
  * Description of ExamOptionDTO
  *
  * @author piero
  */
-class ExamOptionDTO implements ExamDTO, \Serializable{
+class ExamOptionDTO implements ExamDTO, Serializable{
 
     private $id;
     private $examName;
@@ -149,25 +151,32 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
     }
     
     public function serialize(): string {
-        return serialize([
+        return serialize($this->__serialize());
+    }
+
+    public function unserialize(string $serialized): void {
+        $this->__unserialize(unserialize($serialized));
+    }
+    
+    public function __serialize(): array {
+        return [
             "id" => $this->id,
             "examName" => $this->examName,
             "ssd" => $this->ssd,
             "compatibleOptions" => $this->compatibleOptions,
             "linkedTakenExams" => $this->linkedTakenExams,
             "recognizedCredits" => $this->recognizedCredits,
-        ]);
+        ];
     }
-
-    public function unserialize(string $serialized): void {
-        $array = unserialize($serialized);
-        $this->id = $array["id"];
-        $this->examName = $array["examName"];
+    
+    public function __unserialize(array $data) {
+        $this->id = $data["id"];
+        $this->examName = $data["examName"];
         $this->block = null;
-        $this->ssd = $array["ssd"];
-        $this->compatibleOptions = $array["compatibleOptions"];
-        $this->linkedTakenExams = $array["linkedTakenExams"];
-        $this->recognizedCredits = $array["recognizedCredits"];
+        $this->ssd = $data["ssd"];
+        $this->compatibleOptions = $data["compatibleOptions"];
+        $this->linkedTakenExams = $data["linkedTakenExams"];
+        $this->recognizedCredits = $data["recognizedCredits"];
     }
 
     public function getCourseYear(): ?int {

@@ -107,7 +107,15 @@ class TakenExamDTO implements ExamDTO, \Serializable{
     }
 
     public function serialize(): string {
-        return serialize([
+        return serialize($this->__serialize());
+    }
+
+    public function unserialize(string $serialized): void {
+        $this->__unserialize(unserialize($serialized));
+    }
+    
+    public function __serialize(): array {
+        return [
             "id" => $this->id,
             "examName" => $this->examName,
             "cfu" => $this->cfu,
@@ -115,18 +123,17 @@ class TakenExamDTO implements ExamDTO, \Serializable{
             "actualCfu" => $this->actualCfu,
             "courseYear" => $this->courseYear,
             "grade" => $this->grade
-        ]);
+        ];
     }
-
-    public function unserialize(string $serialized): void {
-        $array = unserialize($serialized);
-        $this->id = $array["id"];
-        $this->examName = $array["examName"];
-        $this->cfu = $array["cfu"];
-        $this->ssd = $array["ssd"];
-        $this->actualCfu = $array["actualCfu"];
-        $this->courseYear = $array["courseYear"];
-        $this->grade = $array["grade"];
+    
+    public function __unserialize(array $data) {
+        $this->id = $data["id"];
+        $this->examName = $data["examName"];
+        $this->cfu = $data["cfu"];
+        $this->ssd = $data["ssd"];
+        $this->actualCfu = $data["actualCfu"];
+        $this->courseYear = $data["courseYear"];
+        $this->grade = $data["grade"];
     }
 
 }

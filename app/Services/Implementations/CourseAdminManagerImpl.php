@@ -29,5 +29,13 @@ class CourseAdminManagerImpl implements CourseAdminManager{
     public function getAll(): Collection {
         return collect($this->courseRepo->getAll());
     }
-    
+
+    public function saveExam(\App\Models\Exam $exam, $examBlockId): bool {
+        throw new Exception("Method not yet implemented");
+    }
+
+    public function saveExamBlock(\App\Models\ExamBlock $examBlock): bool {
+        throw new Exception("Method not yet implemented");
+    }
+
 }

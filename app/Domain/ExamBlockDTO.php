@@ -9,13 +9,15 @@
 namespace App\Domain;
 
 use App\Domain\ExamOptionDTO;
+use Serializable;
+use function collect;
 
 /**
  * Description of ExamBlockDTO
  *
  * @author piero
  */
-class ExamBlockDTO implements \Serializable{
+class ExamBlockDTO implements Serializable{
     
     private $id;
     private $approvedExams;
@@ -112,6 +114,27 @@ class ExamBlockDTO implements \Serializable{
         $this->cfu = $array["cfu"];
         $this->courseYear = $array["courseYear"];
         $this->approvedExams = $array["approvedExams"]->map(function (ExamOptionDTO $option){ 
+                $option->setBlock($this);
+                return $option;
+            });
+    }
+    
+    public function __serialize(): array {
+        return [
+            "id" => $this->id,
+            "numExams" => $this->numExams,
+            "cfu" => $this->cfu,
+            "approvedExams" => $this->approvedExams,
+            "courseYear" => $this->courseYear
+        ];
+    }
+    
+    public function __unserialize(array $data) {
+        $this->id = $data["id"];
+        $this->numExams = $data["numExams"];
+        $this->cfu = $data["cfu"];
+        $this->courseYear = $data["courseYear"];
+        $this->approvedExams = $data["approvedExams"]->map(function (ExamOptionDTO $option){ 
                 $option->setBlock($this);
                 return $option;
             });
