@@ -25,16 +25,23 @@ use App\Mappers\Interfaces\TakenExamMapper;
 class FrontManagerImpl implements FrontManager{
     
     private $frontId;
-    private $mapper;
+    private TakenExamMapper $mapper;
+    private TakenExamRepository $takenExamRepo;
+    private FrontRepository $frontRepo;
+    private CourseRepository $courseRepo;
 
-    function __construct($frontId) {
-        $this->mapper = app()->make(TakenExamMapper::class);
+    function __construct($frontId, TakenExamMapper $mapper, 
+            TakenExamRepository $takenExamRepo, FrontRepository $frontRepo,
+            CourseRepository $courseRepo) {
+        $this->mapper = $mapper;
+        $this->takenExamRepo = $takenExamRepo;
+        $this->frontRepo = $frontRepo;
+        $this->courseRepo = $courseRepo;
         $this->frontId = $frontId;
     }
 
     public function getTakenExams(): Collection {
-        $exams = $this->getExamRepository()
-                ->getFromFront($this->frontId);
+        $exams = $this->takenExamRepo->getFromFront($this->frontId);
         return $exams->map(
                 fn($exam) => $this->mapper->toDTO($exam));
     }
@@ -46,35 +53,28 @@ class FrontManagerImpl implements FrontManager{
         if(!isset($takenExam)){
             throw new InvalidArgumentException();//message missing
         }
-        $this->getExamRepository()->save($takenExam);
+        $this->takenExamRepo->save($takenExam);
     }
 
     public function deleteTakenExam($examId) {
-        $this->getExamRepository()->delete($examId);
+        $this->takenExamRepo->delete($examId);
     }
 
     public function setCourse($courseId): bool {
-        $front = $this->getFrontRepository()->updateCourse($this->frontId, $courseId);
+        $front = $this->frontRepo->updateCourse($this->frontId, $courseId);
         return isset($front) ? true : false;
     }
 
     public function getFront(): Front {
-        return $this->getFrontRepository()->get($this->frontId);
+        return $this->frontRepo->get($this->frontId);
     }
 
     public function getCourses(): Collection {
-        return app()->make(CourseRepository::class)->getAll();
+        return $this->courseRepo->getAll()->collect();
     }
 
     public function deleteAllTakenExams() {
-        $this->getExamRepository()->deleteFromFront($this->frontId);
+        $this->takenExamRepo->deleteFromFront($this->frontId);
     }
 
-    private function getExamRepository(): TakenExamRepository{
-        return app()->make(TakenExamRepository::class);
-    }
-    
-    private function getFrontRepository(): FrontRepository{
-        return app()->make(FrontRepository::class);
-    }
 }

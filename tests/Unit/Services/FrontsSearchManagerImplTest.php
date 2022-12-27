@@ -3,13 +3,14 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Course;
-use App\Services\Implementations\FrontsSearchManagerImpl;
-use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Interfaces\CourseRepository;
+use App\Repositories\Interfaces\FrontRepository;
+use App\Services\Implementations\FrontsSearchManagerImpl;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-
 use PHPUnit\Framework\TestCase;
+use function app;
 
 class FrontsSearchManagerImplTest extends TestCase
 {
@@ -37,7 +38,7 @@ class FrontsSearchManagerImplTest extends TestCase
         
         $this->courseRepo->expects($this->once())
                 ->method("getAll")
-                ->willReturn(collect([$course]));
+                ->willReturn(new Collection([$course]));
         
         $manager = new FrontsSearchManagerImpl();
         $result = $manager->getCurrentCourse($request);

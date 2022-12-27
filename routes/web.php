@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\TakenExamController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudyPlanController;
+use App\Http\Controllers\TakenExamController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 

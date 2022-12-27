@@ -39,8 +39,7 @@ class CourseManagerImplTest extends TestCase{
         $this->mapper = $this->createMock(ExamBlockMapper::class);
         
         app()->instance(ExamBlockRepository::class, $this->blockRepo);
-        app()->instance(ExamBlockMapper::class, $this->mapper);
-        $this->manager = new CourseManagerImpl(self::FIXTURE_COURSE_ID);
+        $this->manager = new CourseManagerImpl(self::FIXTURE_COURSE_ID, $this->mapper);
     }
   
     

@@ -11,6 +11,7 @@ namespace App\Repositories\Implementations;
 use App\Exceptions\Custom\CourseNotFoundException;
 use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
@@ -43,7 +44,7 @@ class CourseRepositoryImpl implements CourseRepository {
         }
     }
 
-    public function getAll() {
+    public function getAll(): Collection {
         return Course::all();
     }
 

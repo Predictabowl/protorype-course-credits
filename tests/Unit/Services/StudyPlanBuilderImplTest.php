@@ -2,22 +2,23 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\Course;
-use App\Domain\ExamOptionDTO;
 use App\Domain\ExamBlockDTO;
+use App\Domain\ExamOptionDTO;
 use App\Domain\TakenExamDTO;
+use App\Models\Course;
 use App\Services\Implementations\StudyPlanBuilderImpl;
+use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Interfaces\FrontManager;
-use App\Services\Interfaces\CourseManager;
 use PHPUnit\Framework\TestCase;
+use function collect;
 
 class StudyPlanBuilderImplTest extends TestCase
 {
-    private $frontManager;
-    private $courseManager;
-    private $examDistance;
-    private $planBuilder;
+    private FrontManager $frontManager;
+    private CourseManager $courseManager;
+    private ExamDistance $examDistance;
+    private StudyPlanBuilderImpl $planBuilder;
     private $takenExams;
     private $blocks;
     private $options;
@@ -29,8 +30,9 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->examDistance = $this->createMock(ExamDistance::class);
         $this->setupData();
         
-        app()->instance(ExamDistance::class, $this->examDistance);
-        $this->planBuilder = new StudyPlanBuilderImpl($this->frontManager, $this->courseManager);
+        $this->planBuilder = new StudyPlanBuilderImpl($this->frontManager,
+                $this->courseManager,
+                $this->examDistance);
     }
     
     

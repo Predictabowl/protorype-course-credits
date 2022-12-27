@@ -10,8 +10,10 @@ namespace Tests\Unit\Services;
 use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Services\Implementations\CourseAdminManagerImpl;
+use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\Framework\TestCase;
 use function app;
+use function collect;
 
 /**
  * Description of CourseAdminManagerImpl
@@ -26,9 +28,8 @@ class CourseAdminManagerImplTest extends TestCase{
     protected function setUp(): void {
         parent::setUp();
         $this->courseRepo = $this->createMock(CourseRepository::class);
-        app()->instance(CourseRepository::class, $this->courseRepo);
         
-        $this->sut = new CourseAdminManagerImpl();
+        $this->sut = new CourseAdminManagerImpl($this->courseRepo);
     }
 
     public function test_getAll(){
@@ -39,7 +40,7 @@ class CourseAdminManagerImplTest extends TestCase{
         
         $this->courseRepo->expects($this->once())
                 ->method("getAll")
-                ->willReturn($courses);
+                ->willReturn(new Collection($courses));
         
         $result = $this->sut->getAll();
         

@@ -21,9 +21,9 @@ class CourseManagerImpl implements CourseManager {
     private $blockMapper;
     private $courseId;
     
-    public function __construct($courseId) {
+    public function __construct($courseId, $blockMapper) {
         $this->courseId = $courseId;
-        $this->blockMapper = app()->make(ExamBlockMapper::class);
+        $this->blockMapper = $blockMapper;
     }
 
     public function getExamBlocks(): Collection {
@@ -50,6 +50,5 @@ class CourseManagerImpl implements CourseManager {
     private function getBlockRepository(): ExamBlockRepository {
         return app()->make(ExamBlockRepository::class);
     }
-
 
 }

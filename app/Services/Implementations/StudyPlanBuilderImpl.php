@@ -48,18 +48,19 @@ use Illuminate\Support\Collection;
      */
 class StudyPlanBuilderImpl implements StudyPlanBuilder {
 
-    private $frontManager;
-    private $courseManager;
-    private $studyPlan;
-    private $eDistance;
-    public $declaredExams;
-    private $examOptions;
+    private FrontManager $frontManager;
+    private CourseManager $courseManager;
+    private StudyPlan $studyPlan;
+    private ExamDistance $eDistance;
+    public Collection $declaredExams;
+    private Collection $examOptions;
 
-    function __construct(FrontManager $frontManager, CourseManager $courseManager) {
+    function __construct(FrontManager $frontManager, CourseManager $courseManager,
+            ExamDistance $eDistance) {
         $this->frontManager = $frontManager;
         $this->courseManager = $courseManager;
-        $this->eDistance = app()->make(ExamDistance::class);
-        $this->examOptions = [];
+        $this->eDistance = $eDistance;
+        $this->examOptions = collect([]);
     }
 
     public function getStudyPlan(): StudyPlan {

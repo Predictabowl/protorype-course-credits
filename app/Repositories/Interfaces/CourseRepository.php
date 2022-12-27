@@ -9,6 +9,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\Course;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  *
@@ -18,7 +19,7 @@ interface CourseRepository {
     
     public function get($id): ?Course;
     
-    public function getAll();
+    public function getAll(): Collection;
     
     public function save(Course $course): bool;
     

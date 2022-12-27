@@ -15,8 +15,8 @@ use App\Domain\TakenExamDTO;
  */
 class ExamDistanceByNameTest extends TestCase{
     
-    private $eDistance;
-    private $block;
+    private ExamDistanceByName $eDistance;
+    private ExamBlockDTO $block;
     
     protected function setUp(): void {
         $this->eDistance = new ExamDistanceByName();

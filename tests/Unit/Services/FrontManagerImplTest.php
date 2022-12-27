@@ -8,15 +8,17 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\TakenExam;
-use App\Models\Front;
 use App\Domain\TakenExamDTO;
-use App\Repositories\Interfaces\TakenExamRepository;
-use App\Repositories\Interfaces\FrontRepository;
-use App\Repositories\Interfaces\CourseRepository;
-use App\Services\Implementations\FrontManagerImpl;
 use App\Mappers\Interfaces\TakenExamMapper;
+use App\Models\Front;
+use App\Models\TakenExam;
+use App\Repositories\Interfaces\CourseRepository;
+use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Interfaces\TakenExamRepository;
+use App\Services\Implementations\FrontManagerImpl;
+use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\Framework\TestCase;
+use function collect;
 
 /**
  * Description of FrontManagerImplTest
@@ -27,10 +29,11 @@ class FrontManagerImplTest extends TestCase{
 
     private const FIXTURE_FRONT_ID = 7;    
     
-    private $takenRepo;
-    private $frontRepo;
-    private $manager;
-    private $mapper;
+    private TakenExamRepository $takenRepo;
+    private FrontRepository $frontRepo;
+    private FrontManagerImpl $manager;
+    private TakenExamMapper $mapper;
+    private CourseRepository $courseRepo;
 
     
     protected function setUp():void
@@ -39,11 +42,10 @@ class FrontManagerImplTest extends TestCase{
         $this->takenRepo = $this->createMock(TakenExamRepository::class);
         $this->frontRepo = $this->createMock(FrontRepository::class);
         $this->mapper = $this->createMock(TakenExamMapper::class);
+        $this->courseRepo = $this->createMock(CourseRepository::class);
         
-        app()->instance(TakenExamRepository::class, $this->takenRepo);
-        app()->instance(TakenExamMapper::class, $this->mapper);
-        app()->instance(FrontRepository::class, $this->frontRepo);
-        $this->manager = new FrontManagerImpl(self::FIXTURE_FRONT_ID);
+        $this->manager = new FrontManagerImpl(self::FIXTURE_FRONT_ID, $this->mapper,
+                $this->takenRepo, $this->frontRepo, $this->courseRepo);
     }
   
     
@@ -122,16 +124,14 @@ class FrontManagerImplTest extends TestCase{
     }
 
     public function test_getCourses(){
-        $courses = collect([]);
-        $courseRepo = $this->createMock(CourseRepository::class);
-        $courseRepo->expects($this->once())
+        $courses = new Collection(["element"]);
+        $this->courseRepo->expects($this->once())
                 ->method("getAll")
                 ->willReturn($courses);
-        app()->instance(CourseRepository::class, $courseRepo);
         
         $result = $this->manager->getCourses();
         
-        $this->assertSame($courses, $result);
+        $this->assertEquals(collect(["element"]), $result);
     }
     
     public function test_deleteAllTakenExams(){

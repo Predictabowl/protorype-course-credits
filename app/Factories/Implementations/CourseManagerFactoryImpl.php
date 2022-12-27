@@ -8,10 +8,11 @@
 
 namespace App\Factories\Implementations;
 
-use App\Models\Course;
 use App\Factories\Interfaces\CourseManagerFactory;
-use App\Services\Interfaces\CourseManager;
+use App\Mappers\Interfaces\ExamBlockMapper;
 use App\Services\Implementations\CourseManagerImpl;
+use App\Services\Interfaces\CourseManager;
+use function app;
 
 /**
  * Description of ManagersFactoryImpl
@@ -21,6 +22,6 @@ use App\Services\Implementations\CourseManagerImpl;
 class CourseManagerFactoryImpl implements CourseManagerFactory{
     
     public function getCourseManager($courseId): CourseManager {
-        return new CourseManagerImpl($courseId);
+        return new CourseManagerImpl($courseId, app()->make(ExamBlockMapper::class));
     }
 }
