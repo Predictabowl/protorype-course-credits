@@ -17,7 +17,7 @@ use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Services\Implementations\FrontManagerImpl;
 use Illuminate\Database\Eloquent\Collection;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 use function collect;
 
 /**

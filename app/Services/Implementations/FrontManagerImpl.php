@@ -8,14 +8,16 @@
 
 namespace App\Services\Implementations;
 
-use App\Models\Front;
-use App\Services\Interfaces\FrontManager;
 use App\Domain\TakenExamDTO;
-use Illuminate\Support\Collection;
+use App\Mappers\Interfaces\TakenExamMapper;
+use App\Models\Front;
+use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
-use App\Repositories\Interfaces\CourseRepository;
-use App\Mappers\Interfaces\TakenExamMapper;
+use App\Services\Interfaces\FrontManager;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Description of FrontManagerImpl
@@ -53,11 +55,15 @@ class FrontManagerImpl implements FrontManager{
         if(!isset($takenExam)){
             throw new InvalidArgumentException();//message missing
         }
-        $this->takenExamRepo->save($takenExam);
+        DB::transaction(function() use($takenExam){
+            $this->takenExamRepo->save($takenExam);
+        });
     }
 
     public function deleteTakenExam($examId) {
-        $this->takenExamRepo->delete($examId);
+        DB::transaction(function() use($examId){
+            $this->takenExamRepo->delete($examId);
+        });
     }
 
     public function setCourse($courseId): bool {
@@ -74,7 +80,9 @@ class FrontManagerImpl implements FrontManager{
     }
 
     public function deleteAllTakenExams() {
-        $this->takenExamRepo->deleteFromFront($this->frontId);
+        DB::transaction(function(){
+            $this->takenExamRepo->deleteFromFront($this->frontId);
+        });
     }
 
 }
