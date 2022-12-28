@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Services;
+namespace Tests\Unit\Factory;
 
 use App\Factories\Implementations\FrontManagerFactoryImpl;
 use App\Services\Implementations\FrontManagerImpl;

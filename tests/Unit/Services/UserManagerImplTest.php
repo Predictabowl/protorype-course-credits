@@ -9,10 +9,11 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Role;
-use \App\Models\User;
-use PHPUnit\Framework\TestCase;
-use App\Services\Implementations\UserManagerImpl;
+use App\Models\User;
 use App\Repositories\Interfaces\UserRepository;
+use App\Services\Implementations\UserManagerImpl;
+use Illuminate\Contracts\Pagination\Paginator;
+use Tests\TestCase;
 
 /**
  * Description of UserManagerImplTest
@@ -21,16 +22,14 @@ use App\Repositories\Interfaces\UserRepository;
  */
 class UserManagerImplTest extends TestCase{
     
-    private $manager;
-    private $userRepo;
+    private UserManagerImpl $sut;
+    private UserRepository $userRepo;
     
     protected function setUp(): void {
         parent::setUp();
         
         $this->userRepo = $this->createMock(UserRepository::class);
-        
-        app()->instance(UserRepository::class, $this->userRepo);
-        $this->manager = new UserManagerImpl();
+        $this->sut = new UserManagerImpl($this->userRepo);
     }
 
     
@@ -47,7 +46,7 @@ class UserManagerImplTest extends TestCase{
                 ->with(1, Role::SUPERVISOR)
                 ->willReturn(true);
         
-        $this->manager->modRole(1, $attributes);
+        $this->sut->modRole(1, $attributes);
     }
     
     public function test_add_supervisor_role() {
@@ -63,7 +62,7 @@ class UserManagerImplTest extends TestCase{
                 ->with(1, Role::SUPERVISOR)
                 ->willReturn(true);
         
-        $this->manager->modRole(1, $attributes);
+        $this->sut->modRole(1, $attributes);
     }
     
     public function test_remove_both_roles() {
@@ -74,7 +73,7 @@ class UserManagerImplTest extends TestCase{
                 ->withConsecutive([1, Role::ADMIN], [1, Role::SUPERVISOR])
                 ->willReturn(true);
         
-        $this->manager->modRole(1, $attributes);
+        $this->sut->modRole(1, $attributes);
     }
     
     public function test_add_both_roles() {
@@ -88,17 +87,17 @@ class UserManagerImplTest extends TestCase{
                 ->withConsecutive([1, Role::ADMIN], [1, Role::SUPERVISOR])
                 ->willReturn(true);
         
-        $this->manager->modRole(1, $attributes);
+        $this->sut->modRole(1, $attributes);
     }
     
     public function test_getAll(){
-        $collection = $this->createMock(\Illuminate\Contracts\Pagination\Paginator::class);
+        $collection = $this->createMock(Paginator::class);
         $this->userRepo->expects($this->once())
                 ->method("getAll")
                 ->with([])
                 ->willReturn($collection);
         
-        $result = $this->manager->getAll([]);
+        $result = $this->sut->getAll([]);
         
         $this->assertSame($collection, $result);
     }
@@ -123,7 +122,7 @@ class UserManagerImplTest extends TestCase{
                 ->method("update")
                 ->with($changedUser);
         
-        $this->manager->setName($userId, $newName);
+        $this->sut->setName($userId, $newName);
     }
     
     public function test_deleteUser_failure(){
@@ -133,7 +132,7 @@ class UserManagerImplTest extends TestCase{
                 ->with($userId)
                 ->willReturn(false);
         
-        $result = $this->manager->deleteUser($userId);
+        $result = $this->sut->deleteUser($userId);
         
         $this->assertFalse($result);
     }
@@ -145,7 +144,7 @@ class UserManagerImplTest extends TestCase{
                 ->with($userId)
                 ->willReturn(true);
         
-        $result = $this->manager->deleteUser($userId);
+        $result = $this->sut->deleteUser($userId);
         
         $this->assertTrue($result);
     }

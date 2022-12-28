@@ -78,6 +78,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(YearCalculator::class, YearCalculatorImpl::class);
         $this->app->bind(CourseAdminManager::class, CourseAdminManagerImpl::class);
         
+        
+//        $this->app->register(\Laravel\Dusk\DuskServiceProvider::class);
     }
 
     /**
