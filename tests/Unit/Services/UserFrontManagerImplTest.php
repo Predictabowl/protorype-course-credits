@@ -2,17 +2,13 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\Front;
-use App\Models\User;
-use App\Models\Course;
 use App\Factories\Interfaces\FrontManagerFactory;
-use App\Factories\Interfaces\CourseManagerFactory;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
-use App\Services\Interfaces\StudyPlanBuilder;
-use App\Services\Interfaces\FrontManager;
-use App\Services\Implementations\UserFrontManagerImpl;
+use App\Models\Front;
 use App\Repositories\Interfaces\FrontRepository;
-use App\Repositories\Interfaces\CourseRepository;
+use App\Services\Implementations\UserFrontManagerImpl;
+use App\Services\Interfaces\FrontManager;
+use App\Services\Interfaces\StudyPlanBuilder;
 use Tests\TestCase;
 
 class UserFrontManagerImplTest extends TestCase
@@ -20,10 +16,10 @@ class UserFrontManagerImplTest extends TestCase
     private const FIXTURE_USER_ID = 2;
     private const FIXTURE_FRONT_ID = 27;
     
-    private $frontRepo;
-    private $sut;
-    private $frontFactory;
-    private $courseFactory;
+    private FrontRepository $frontRepo;
+    private UserFrontManagerImpl $sut;
+    private FrontManagerFactory $frontFactory;
+    private StudyPlanBuilderFactory $spbFactory;
 //    private $authUser;
     
 
@@ -33,13 +29,10 @@ class UserFrontManagerImplTest extends TestCase
         
         $this->frontRepo = $this->frontRepo = $this->createMock(FrontRepository::class);
         $this->frontFactory = $this->createMock(FrontManagerFactory::class);
-        $this->courseFactory = $this->createMock(CourseManagerFactory::class);
+        $this->spbFactory = $this->createMock(StudyPlanBuilderFactory::class);
         
-        app()->instance(FrontRepository::class, $this->frontRepo);
-        app()->instance(FrontManagerFactory::class, $this->frontFactory);
-        app()->instance(CourseManagerFactory::class, $this->courseFactory);
-        
-        $this->sut = new UserFrontManagerImpl(self::FIXTURE_USER_ID);
+        $this->sut = new UserFrontManagerImpl($this->frontRepo,
+                $this->frontFactory, $this->spbFactory, self::FIXTURE_USER_ID);
     }
 
     public function test_getOrCreateFront_when_Front_not_present(){
@@ -67,10 +60,6 @@ class UserFrontManagerImplTest extends TestCase
     }
     
     public function test_getOrCreateFront_when_Front_exists_but_course_not_found(){
-        $toSave = new Front([
-            "user_id" => self::FIXTURE_USER_ID,
-            "course_id" => 3
-        ]);
         $saved = new Front([
             "user_id" => self::FIXTURE_USER_ID,
         ]);
@@ -238,16 +227,14 @@ class UserFrontManagerImplTest extends TestCase
     }
     
     public function test_getStudyPlanBuilder_success(){
-        $studyFactory = $this->createMock(StudyPlanBuilderFactory::class);
         $studyPlanBuilder = $this->createMock(StudyPlanBuilder::class);
-        app()->instance(StudyPlanBuilderFactory::class, $studyFactory);
         $front = new Front(["course_id" => 5]);
         $front->id = self::FIXTURE_FRONT_ID;
         $this->frontRepo->expects($this->once())
                 ->method("getFromUser")
                 ->with(self::FIXTURE_USER_ID)
                 ->willReturn($front);
-        $studyFactory->expects($this->once())
+        $this->spbFactory->expects($this->once())
                 ->method("getStudyPlanBuilder")
                 ->with(self::FIXTURE_FRONT_ID,5)
                 ->willReturn($studyPlanBuilder);
@@ -258,12 +245,10 @@ class UserFrontManagerImplTest extends TestCase
     }
     
     public function test_getStudyPlanBuilder_when_course_not_set(){
-        $studyFactory = $this->createMock(StudyPlanBuilderFactory::class);
-        app()->instance(StudyPlanBuilderFactory::class, $studyFactory);
         $front = new Front();
         $front->id = self::FIXTURE_FRONT_ID;
         
-        $studyFactory->expects($this->never())
+        $this->spbFactory->expects($this->never())
                 ->method("getStudyPlanBuilder");
         $this->frontRepo->expects($this->once())
                 ->method("getFromUser")
@@ -276,15 +261,13 @@ class UserFrontManagerImplTest extends TestCase
     }
     
     public function test_getStudyPlanBuilder_when_front_cannot_be_created(){
-        $studyFactory = $this->createMock(StudyPlanBuilderFactory::class);
-        app()->instance(StudyPlanBuilderFactory::class, $studyFactory);
         $front = new Front([
             "user_id" => self::FIXTURE_USER_ID,
             "course_id" => null
             ]);
         
         
-        $studyFactory->expects($this->never())
+        $this->spbFactory->expects($this->never())
                 ->method("getStudyPlanBuilder");
         $this->frontRepo->expects($this->once())
                 ->method("getFromUser")
