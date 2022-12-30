@@ -140,7 +140,6 @@
                                         value="{{serialize($exam)}}"
                                         title="{{__('Delete')}}">
                                             <x-heroicon-s-trash class="h-5 w-5"/>
-                                            {{-- <img src="/images/delete-icon.svg" alt="Elimina"> --}}
                                         </x-button-icon>
                                     </form>
                                 </td>
