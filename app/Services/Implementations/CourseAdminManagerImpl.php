@@ -21,13 +21,13 @@ use function collect;
  * @author piero
  */
 class CourseAdminManagerImpl implements CourseAdminManager{
-    
+
     private CourseRepository $courseRepo;
-    
+
     public function __construct(CourseRepository $courseRepo) {
         $this->courseRepo = $courseRepo;
     }
-    
+
     public function getAll(): Collection {
         return collect($this->courseRepo->getAll());
     }

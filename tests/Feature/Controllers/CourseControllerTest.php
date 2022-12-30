@@ -52,7 +52,7 @@ class CourseControllerTest extends TestCase
         ]);
         $this->be($admin);
         
-        //$response = $this->get(route("courseIndex"));
-        //$response->assertStatus(200);
+        $response = $this->get(route("courseIndex"));
+        $response->assertStatus(200);
     }
 }
