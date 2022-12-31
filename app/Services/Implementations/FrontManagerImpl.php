@@ -25,14 +25,14 @@ use Webmozart\Assert\InvalidArgumentException;
  * @author piero
  */
 class FrontManagerImpl implements FrontManager{
-    
+
     private $frontId;
     private TakenExamMapper $mapper;
     private TakenExamRepository $takenExamRepo;
     private FrontRepository $frontRepo;
     private CourseRepository $courseRepo;
 
-    function __construct($frontId, TakenExamMapper $mapper, 
+    public function __construct($frontId, TakenExamMapper $mapper,
             TakenExamRepository $takenExamRepo, FrontRepository $frontRepo,
             CourseRepository $courseRepo) {
         $this->mapper = $mapper;
@@ -47,8 +47,8 @@ class FrontManagerImpl implements FrontManager{
         return $exams->map(
                 fn($exam) => $this->mapper->toDTO($exam));
     }
-    
-    public function saveTakenExam($attributes) {        
+
+    public function saveTakenExam($attributes) {
         $exam = new TakenExamDTO(0, $attributes["name"], $attributes["ssd"],
                 $attributes["cfu"], $attributes["grade"]);
         $takenExam = $this->mapper->toModel($exam, $this->frontId);
@@ -76,7 +76,7 @@ class FrontManagerImpl implements FrontManager{
     }
 
     public function getCourses(): Collection {
-        return $this->courseRepo->getAll()->collect();
+        return $this->courseRepo->getAll()->sortBy("name")->values()->collect();
     }
 
     public function deleteAllTakenExams() {

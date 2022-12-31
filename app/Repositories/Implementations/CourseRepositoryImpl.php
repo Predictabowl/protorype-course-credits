@@ -28,14 +28,14 @@ class CourseRepositoryImpl implements CourseRepository {
     }
 
     public function get($id): ?Course {
-        return Course::find($id);        
+        return Course::find($id);
     }
 
     public function save(Course $course): bool {
         if (isset($course->id)){
             throw new InvalidArgumentException("The id of a new Course must be empty");
         }
-        
+
         try{
             return $course->save();
         } catch (QueryException $exc){

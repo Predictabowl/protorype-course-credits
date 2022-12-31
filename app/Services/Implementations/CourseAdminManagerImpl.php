@@ -29,7 +29,7 @@ class CourseAdminManagerImpl implements CourseAdminManager{
     }
 
     public function getAll(): Collection {
-        return collect($this->courseRepo->getAll());
+        return $this->courseRepo->getAll()->sortBy("name")->values()->collect();
     }
 
     public function saveExam(Exam $exam, $examBlockId): bool {

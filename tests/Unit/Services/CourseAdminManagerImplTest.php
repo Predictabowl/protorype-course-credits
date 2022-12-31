@@ -32,25 +32,27 @@ class CourseAdminManagerImplTest extends TestCase{
         $this->sut = new CourseAdminManagerImpl($this->courseRepo);
     }
 
-    public function test_getAll(){
-        $courses = [
-            new Course([
-                "id" => 1,
-                "name" => "Zorro"
-            ]),
-            new Course([
-                "id" => 2,
-                "name" => "Abele"
-            ])
-        ];
+    public function test_getAll_shouldSortByName(){
+        $course1 = new Course([
+            "id" => 1,
+            "name" => "Zorro"
+        ]);
+        $course2 = new Course([
+            "id" => 2,
+            "name" => "Abele"
+        ]);
+
+        $courses = new Collection([$course1, $course2]);
 
         $this->courseRepo->expects($this->once())
                 ->method("getAll")
-                ->willReturn(new Collection($courses));
+                ->willReturn($courses);
 
         $result = $this->sut->getAll();
 
-        $this->assertEquals(collect($courses),$result);
+        // var_dump($result);
+
+        $this->assertEquals(collect([$course2, $course1]),$result);
     }
 
 }
