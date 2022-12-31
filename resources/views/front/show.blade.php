@@ -139,7 +139,7 @@
                                         <x-button-icon name="exam"
                                         value="{{serialize($exam)}}"
                                         title="{{__('Delete')}}">
-                                            <x-heroicon-s-trash class="h-5 w-5"/>
+                                            <x-heroicon-m-trash class="h-5 w-5"/>
                                         </x-button-icon>
                                     </form>
                                 </td>

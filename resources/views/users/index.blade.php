@@ -34,8 +34,8 @@
                             <td class="text-center"> {{ $user->created_at->isoFormat("DD MMMM YYYY") }}</td>
                             <td class="w-10">
                                 <a href="{{route("userShow",[$user])}}">
-                                    <x-button-icon width="w-9" height="h-6" name="id">
-                                        <img src="/images/edit-icon.svg" alt="Elimina">
+                                    <x-button-icon name="id" title="{{__('Edit')}}">
+                                        <x-heroicon-m-pencil-square class="w-5 h-5"/>
                                     </x-button-icon>
                                 </a>
                             </td>
@@ -47,8 +47,8 @@
                                         x-on:click="
                                             showConfirmationBox = true;
                                             $refs.boxName.innerHTML = '{{$user->name}}';
-                                            formId = 'form-{{ $user->id }}'" name="id" >
-                                        <x-heroicon-o-trash class="h-6 w-6"/>
+                                            formId = 'form-{{ $user->id }}'" name="id" title="{{__('Delete')}}">
+                                        <x-heroicon-m-trash class="h-5 w-5"/>
                                     </x-button-icon>
                                 </form>
                             </td>

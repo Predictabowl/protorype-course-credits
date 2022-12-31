@@ -24,27 +24,33 @@ class CourseAdminManagerImplTest extends TestCase{
 
     private CourseAdminManagerImpl $sut;
     private $courseRepo;
-    
+
     protected function setUp(): void {
         parent::setUp();
         $this->courseRepo = $this->createMock(CourseRepository::class);
-        
+
         $this->sut = new CourseAdminManagerImpl($this->courseRepo);
     }
 
     public function test_getAll(){
         $courses = [
-            new Course(["id" => 1]),
-            new Course(["id" => 2])
+            new Course([
+                "id" => 1,
+                "name" => "Zorro"
+            ]),
+            new Course([
+                "id" => 2,
+                "name" => "Abele"
+            ])
         ];
-        
+
         $this->courseRepo->expects($this->once())
                 ->method("getAll")
                 ->willReturn(new Collection($courses));
-        
+
         $result = $this->sut->getAll();
-        
+
         $this->assertEquals(collect($courses),$result);
     }
-    
+
 }

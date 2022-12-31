@@ -39,19 +39,19 @@ class ExamOptionDTO implements ExamDTO, Serializable{
         $this->linkedTakenExams = collect([]);
         $this->calculateRecognizedCredits();
     }
-    
+
     public function getExamName(): string {
         return $this->examName;
     }
 
     public function getBlock(): ExamBlockDTO {
         if(!isset($this->block)){
-            throw new InvalidStateException(__METHOD__ . " " 
+            throw new InvalidStateException(__METHOD__ . " "
                     ."Exam Block null value, likely was not set after unserialization.");
         }
         return $this->block;
     }
-    
+
     public function setBlock(ExamBlockDTO $block): void {
         $this->block = $block;
     }
@@ -63,7 +63,7 @@ class ExamOptionDTO implements ExamDTO, Serializable{
     public function getSsd(): ?string {
         return $this->ssd;
     }
-    
+
     public function getId(){
         return $this->id;
     }
@@ -75,11 +75,11 @@ class ExamOptionDTO implements ExamDTO, Serializable{
     public function addCompatibleOption(string $ssd){
         $this->compatibleOptions->push($ssd);
     }
-    
+
     public function setCompatibleOptions(Collection $ssds){
         $this->compatibleOptions = $ssds;
     }
-    
+
         /**
      * @return mixed
      */
@@ -87,15 +87,15 @@ class ExamOptionDTO implements ExamDTO, Serializable{
     {
         return $this->linkedTakenExams;
     }
-    
+
     public function getTakenExam($id): TakenExamDTO{
         return $this->linkedTakenExams[$id];
     }
-    
+
      /**
      * The object will be added only if there's no decifit in the
      * Integration value.
-     * 
+     *
      * @param DeclaredExam $declaredExams
      *
      * @return Integration Value decifit.
@@ -118,14 +118,14 @@ class ExamOptionDTO implements ExamDTO, Serializable{
         $this->calculateRecognizedCredits();
         return $exam;
     }
-    
+
     public function isTakenExamAddable(TakenExamDTO $exam): bool
     {
         if (($this->getIntegrationValue() < 1) || ($exam->getActualCfu() < 1)){
             return false;
         }
 
-        if ($this->linkedTakenExams->isEmpty() && 
+        if ($this->linkedTakenExams->isEmpty() &&
                 $this->getBlock()->getNumSlotsAvailable() < 1){
             return false;
         }
@@ -133,23 +133,23 @@ class ExamOptionDTO implements ExamDTO, Serializable{
         return true;
     }
 
-    
+
     public function getIntegrationValue(): int
     {
         return $this->getCfu() -
             $this->getRecognizedCredits();
     }
-    
+
     public function getRecognizedCredits(): int{
         return $this->recognizedCredits;
     }
-    
+
     private function calculateRecognizedCredits(){
         $this->recognizedCredits = collect($this->linkedTakenExams)
                 ->map(fn ($item) => $item->getActualCfu())
                 ->sum();
     }
-    
+
     public function serialize(): string {
         return serialize($this->__serialize());
     }
@@ -157,7 +157,7 @@ class ExamOptionDTO implements ExamDTO, Serializable{
     public function unserialize(string $serialized): void {
         $this->__unserialize(unserialize($serialized));
     }
-    
+
     public function __serialize(): array {
         return [
             "id" => $this->id,
@@ -168,7 +168,7 @@ class ExamOptionDTO implements ExamDTO, Serializable{
             "recognizedCredits" => $this->recognizedCredits,
         ];
     }
-    
+
     public function __unserialize(array $data) {
         $this->id = $data["id"];
         $this->examName = $data["examName"];

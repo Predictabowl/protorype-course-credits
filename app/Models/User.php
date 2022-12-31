@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    
+
     use HasFactory, Notifiable;
 
 
@@ -52,20 +52,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(Front::class);
     }
-    
+
     public function roles(){
         return $this->belongsToMany(Role::class);
     }
-    
-    
+
+
     //---------- Defined Roles
-    // 
-    
+    //
     // And admin can modify everything and change other users roles
     public function isAdmin(): bool{
         return $this->roles()->get()->contains("name",Role::ADMIN);
     }
-    
+
     /*
      *  A supervisor can:
      *  - See all registered users, read-only
@@ -75,12 +74,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isSupervisor(): bool{
         return $this->roles()->get()->contains("name",Role::SUPERVISOR);
     }
-    
+
     public function isStudent(): bool{
         return $this->roles()->get()->isEmpty();
     }
-    
-    
+
+
     /* $roles can be empty, while $roleNames is never empty.
      * So it makes sense to iterate over $roles to avoid useless cycles.
      */
@@ -94,8 +93,8 @@ class User extends Authenticatable implements MustVerifyEmail
         }
         return false;
     }
-    
-    //------------- Scopes 
+
+    //------------- Scopes
     public function scopeFilter($query, array $filters) {
         if (isset($filters["search"])){
            $query->where(fn ($query) => $query

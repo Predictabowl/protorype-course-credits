@@ -7,15 +7,13 @@
 
     <x-mainpanel width="max-w-full">
         <x-panel>
-            <div class="flex justify-start mb-4">
-                <div>
+            <div class="flex justify-start mb-4 items-center">
                     <a href="{{route("studyPlanPdf",[$front])}}">
-                        <x-button-icon width="w-14" height="h-14" name="id">
-                            <img src="/images/print-icon.svg" alt="Stampa">
+                        <x-button-icon name="id" title='{{__("Download PDF")}}'>
+                            <x-heroicon-o-printer class="w-8 h-8"/>
                         </x-button-icon>
                     </a>
-                    {{ __("Download PDF") }}
-                </div>
+                    <span> {{ __("Download PDF") }}</span>
             </div>
             <div class="place-content-center">
                 <table class="table-auto w-full border-4 border-black">
@@ -77,7 +75,7 @@
                                         <ul class="list-disc">
                                         @foreach($option->getTakenExams() as $taken)
                                             <li>
-                                                {{ $taken->getExamName() }}({{ $taken->getSsd() }}): 
+                                                {{ $taken->getExamName() }}({{ $taken->getSsd() }}):
                                                 {{ $taken->getActualCfu()}}/{{$taken->getCfu()}}
                                             </li>
                                         @endforeach
@@ -89,24 +87,24 @@
                                     <td class="text-center">
                                         {!!$option->getCourseYear() != null ? $option->getCourseYear().'°' : '' !!}
                                     </td>
-                                    
+
                                     @if($startBlock)
                                         <?php $rows = $examBlock->getExamOptions()->count() ?>
-                                        <td class="text-center border-l border-gray-400" 
+                                        <td class="text-center border-l border-gray-400"
                                             rowspan="{{ $rows }}">
                                                 <div class="m-auto" style="max-width: 120px;">
                                                     @if($examBlock->getExamOptions()->count()  == 1)
                                                         {{ $examBlock->getCfu() }} cfu, Obbligatorio
                                                     @else
                                                         <?php $numOptions = $examBlock->getNumExams() ?>
-                                                            {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da 
+                                                            {{ $numOptions }} esam{{ $numOptions == 1 ? "e" : "i"}} da
                                                             {{ $examBlock->getCfu() }} cfu a scelta.
                                                     @endif
                                                 </div>
                                         </td>
                                         <?php $integration = $option->getBlock()->getIntegrationValue() ?>
-                                        <td class="text-center font-semibold text-lg border-l border-gray-400 
-                                            {{$integration == 0 ? 'text-green-600' : 'text-red-600'}}" 
+                                        <td class="text-center font-semibold text-lg border-l border-gray-400
+                                            {{$integration == 0 ? 'text-green-600' : 'text-red-600'}}"
                                             rowspan="{{ $rows }}">
                                                 {{ $option->getBlock()->getIntegrationValue()}}
                                         </td>

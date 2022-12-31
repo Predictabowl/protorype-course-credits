@@ -18,13 +18,13 @@ use function collect;
  * @author piero
  */
 class ExamBlockDTO implements Serializable{
-    
+
     private $id;
     private $approvedExams;
     private $numExams;
     private $cfu;
     private $courseYear;
-    
+
     public function __construct($id, int $numExams, int $cfu, ?int $courseYear) {
         $this->id = $id;
         $this->approvedExams = collect([]);
@@ -32,7 +32,7 @@ class ExamBlockDTO implements Serializable{
         $this->cfu = $cfu;
         $this->courseYear = $courseYear;
     }
-    
+
     public function getId() {
         return $this->id;
     }
@@ -41,7 +41,7 @@ class ExamBlockDTO implements Serializable{
         $this->approvedExams[$option->getId()] = $option;
         return $this;
     }
-    
+
     public function removeOption(ExamOptionDTO $option) {
         unset($this->approvedExams[$option->getId()]);
         return $this;
@@ -54,33 +54,33 @@ class ExamBlockDTO implements Serializable{
     public function getExamOptions() {
         return $this->approvedExams;
     }
-    
+
     public function getExamOption($id): ExamOptionDTO {
         return $this->approvedExams[$id];
     }
-    
+
     public function getIntegrationValue(): int{
-        
+
         return $this->getTotalCfu() - $this->getRecognizedCredits();
     }
-    
+
     public function getRecognizedCredits(): int{
-        
-        return $this->approvedExams->map(fn(ExamOptionDTO $exam) => 
-                    $exam->getTakenExams()->map(fn(TakenExamDTO $taken)=> 
+
+        return $this->approvedExams->map(fn(ExamOptionDTO $exam) =>
+                    $exam->getTakenExams()->map(fn(TakenExamDTO $taken)=>
                         $taken->getActualCfu()
                     )
                 )->flatten()->sum();
     }
-    
+
     public function getTotalCfu(): int {
         return $this->cfu * $this->numExams;
     }
-    
+
     public function getCfu(): int {
         return $this->cfu;
     }
-    
+
     public function getCourseYear(): ?int {
         return $this->courseYear;
     }
@@ -91,7 +91,7 @@ class ExamBlockDTO implements Serializable{
      * even if the taken options are not completely integrated
      */
     public function getNumSlotsAvailable(): int{
-        return $this->getNumExams() - 
+        return $this->getNumExams() -
                 $this->approvedExams->map(fn(ExamOptionDTO $exam) =>
                         $exam->getTakenExams()->isEmpty() ? 0 : 1)
                 ->sum();
@@ -113,12 +113,12 @@ class ExamBlockDTO implements Serializable{
         $this->numExams = $array["numExams"];
         $this->cfu = $array["cfu"];
         $this->courseYear = $array["courseYear"];
-        $this->approvedExams = $array["approvedExams"]->map(function (ExamOptionDTO $option){ 
+        $this->approvedExams = $array["approvedExams"]->map(function (ExamOptionDTO $option){
                 $option->setBlock($this);
                 return $option;
             });
     }
-    
+
     public function __serialize(): array {
         return [
             "id" => $this->id,
@@ -128,13 +128,13 @@ class ExamBlockDTO implements Serializable{
             "courseYear" => $this->courseYear
         ];
     }
-    
+
     public function __unserialize(array $data) {
         $this->id = $data["id"];
         $this->numExams = $data["numExams"];
         $this->cfu = $data["cfu"];
         $this->courseYear = $data["courseYear"];
-        $this->approvedExams = $data["approvedExams"]->map(function (ExamOptionDTO $option){ 
+        $this->approvedExams = $data["approvedExams"]->map(function (ExamOptionDTO $option){
                 $option->setBlock($this);
                 return $option;
             });
