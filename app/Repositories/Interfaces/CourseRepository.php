@@ -16,14 +16,14 @@ use Illuminate\Database\Eloquent\Collection;
  * @author piero
  */
 interface CourseRepository {
-    
+
     public function get($id): ?Course;
-    
-    public function getAll(): Collection;
-    
+
+    public function getAll(array $filters = []): Collection;
+
     public function save(Course $course): bool;
-    
+
     public function update(Course $course): bool;
-    
+
     public function delete($id): bool;
 }

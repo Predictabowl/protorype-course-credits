@@ -7,12 +7,16 @@
 
 namespace Tests\Unit\Services;
 
+use App\Domain\NewExamInfo;
 use App\Models\Course;
+use App\Models\Exam;
 use App\Repositories\Interfaces\CourseRepository;
+use App\Repositories\Interfaces\ExamBlockRepository;
+use App\Repositories\Interfaces\ExamRepository;
 use App\Services\Implementations\CourseAdminManagerImpl;
+use App\Services\Interfaces\SSDRepository;
 use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\Framework\TestCase;
-use function app;
 use function collect;
 
 /**
@@ -23,13 +27,20 @@ use function collect;
 class CourseAdminManagerImplTest extends TestCase{
 
     private CourseAdminManagerImpl $sut;
-    private $courseRepo;
+    private CourseRepository $courseRepo;
+    private ExamBlockRepository $ebRepo;
+    private ExamRepository $examRepo;
+    private SSDRepository $ssdRepo;
 
     protected function setUp(): void {
         parent::setUp();
         $this->courseRepo = $this->createMock(CourseRepository::class);
+        $this->ebRepo = $this->createMock(ExamBlockRepository::class);
+        $this->examRepo = $this->createMock(ExamRepository::class);
+        $this->ssdRepo = $this->createMock(SSDRepository::class);
 
-        $this->sut = new CourseAdminManagerImpl($this->courseRepo);
+        $this->sut = new CourseAdminManagerImpl($this->courseRepo, $this->ebRepo, 
+                $this->examRepo, $this->ssdRepo);
     }
 
     public function test_getAll_shouldSortByName(){
@@ -50,9 +61,43 @@ class CourseAdminManagerImplTest extends TestCase{
 
         $result = $this->sut->getAll();
 
-        // var_dump($result);
-
         $this->assertEquals(collect([$course2, $course1]),$result);
+    }
+    
+    public function test_saveExam_withMissingSsd(){
+        $examInfo = new NewExamInfo("test name", "inf/02");
+        $this->ssdRepo->expects($this->once())
+                ->method("getSsdFromCode")
+                ->with("INF/02")
+                ->willReturn(null);
+        
+        $result = $this->sut->saveExam($examInfo,2);
+        
+        $this->assertNull($result);
+    }
+
+    public function test_saveExam(){
+        $examInfo = new NewExamInfo("test name", "inf/02");
+        $exam = new Exam([
+            "id" => null,
+            "name" => "test name",
+            "ssd" => "INF/02"
+        ]);
+        $ssd = new Ssd();
+        
+        $this->ssdRepo->expects($this->once())
+                ->method("getSsdFromCode")
+                ->with("INF/02")
+                ->willReturn($ssd);
+        
+        $this->examRepo->expects($this->once())
+            ->method("save")
+            ->with($exam)
+            ->willReturn(true);
+
+        $result = $this->sut->saveExam($examInfo,2);
+
+        $this->assertEquals($result, $exam);
     }
 
 }

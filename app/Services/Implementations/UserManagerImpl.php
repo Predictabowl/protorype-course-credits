@@ -20,16 +20,16 @@ use Illuminate\Support\Facades\DB;
  * @author piero
  */
 class UserManagerImpl implements UserManager{
-    
+
     private UserRepository $userRepo;
-    
+
     public function __construct(UserRepository $userRepo) {
         $this->userRepo = $userRepo;
     }
-    
+
     public function modRole($userId, array $attributes) {
         DB::transaction(function() use($userId, $attributes){
-            if (array_key_exists(Role::ADMIN, $attributes)){            
+            if (array_key_exists(Role::ADMIN, $attributes)){
                 $this->userRepo->addRole($userId, Role::ADMIN);
             } else {
                 $this->userRepo->removeRole($userId, Role::ADMIN);
@@ -45,7 +45,7 @@ class UserManagerImpl implements UserManager{
     public function getAll($filters): Paginator{
         return $this->userRepo->getAll($filters,25);
     }
-    
+
     public function setName($userId, string $name) {
         DB::transaction(function() use($userId, $name){
             $user = $this->userRepo->get($userId);
@@ -53,11 +53,11 @@ class UserManagerImpl implements UserManager{
             $this->userRepo->update($user);
         });
     }
-    
+
     public function deleteUser($userId): bool {
         return DB::transaction(function() use($userId){
             return $this->userRepo->delete($userId);
         });
     }
-    
+
 }

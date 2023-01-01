@@ -14,24 +14,24 @@ class CourseRepositoryImplTest extends TestCase
 {
     use RefreshDatabase;
 
-    private CourseRepositoryImpl $repository;
+    private CourseRepositoryImpl $sut;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->repository = new CourseRepositoryImpl();
+        $this->sut = new CourseRepositoryImpl();
     }
 
     public function test_get_when_not_present() {
-        $sut = $this->repository->get(2);
+        $get = $this->sut->get(2);
 
-        $this->assertNull($sut);
+        $this->assertNull($get);
     }
 
     public function test_get_success()
     {
         $course = Course::factory()->create();
 
-        $found = $this->repository->get(1);
+        $found = $this->sut->get(1);
 
         $this->assertEquals(
                 [$course->id, $course->name, $course->cfu],
@@ -51,7 +51,7 @@ class CourseRepositoryImplTest extends TestCase
         ];
         $course = Course::make($attributes);
 
-        $result = $this->repository->save($course);
+        $result = $this->sut->save($course);
 
         $this->assertTrue($result);
         $this->assertDatabaseCount("courses", 1);
@@ -73,9 +73,10 @@ class CourseRepositoryImplTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
 
-        $this->repository->save($course);
+        $saved = $this->sut->save($course);
 
         $this->assertDatabaseCount("courses", 0);
+        $this->assertFalse($saved);
     }
 
     public function test_save_with_duplicate_name_should_fail() {
@@ -93,7 +94,7 @@ class CourseRepositoryImplTest extends TestCase
         ];
         $course = Course::make($attributes2);
 
-        $result = $this->repository->save($course);
+        $result = $this->sut->save($course);
 
         $this->assertFalse($result);
         $this->assertDatabaseCount("courses", 1);
@@ -110,14 +111,14 @@ class CourseRepositoryImplTest extends TestCase
         ];
         $course = Course::create($attributes);
 
-        $result = $this->repository->delete($course->id);
+        $result = $this->sut->delete($course->id);
 
         $this->assertTrue($result);
         $this->assertDatabaseCount("courses", 0);
     }
 
     public function test_delete_failure(){
-        $result = $this->repository->delete(17);
+        $result = $this->sut->delete(17);
 
         $this->assertFalse($result);
         $this->assertDatabaseCount("courses", 0);
@@ -127,7 +128,7 @@ class CourseRepositoryImplTest extends TestCase
         $course = Course::factory()->make();
 
         $this->expectException(CourseNotFoundException::class);
-        $this->repository->update($course);
+        $this->sut->update($course);
     }
 
     public function test_update_success(){
@@ -136,17 +137,41 @@ class CourseRepositoryImplTest extends TestCase
         ]);
         $course->name = "new name";
 
-        $bResult = $this->repository->update($course);
+        $result = $this->sut->update($course);
 
-        $this->assertTrue($bResult);
+        $this->assertTrue($result);
         $modified = Course::find($course->id);
         $this->assertEquals("new name",$modified->name);
 //        $this->repository->update($course);
     }
 
     public function test_getAll_whenEmpty(){
-        $courses = $this->repository->getAll();
+        $courses = $this->sut->getAll();
 
         $this->assertEmpty($courses);
     }
+
+    public function test_getAll_noFilters_success(){
+        Course::factory(2)->create();
+        $courses = Course::all();
+
+        $all = $this->sut->getAll();
+
+        $this->assertEquals($courses, $all);
+    }
+
+    public function test_getAll_withFilters_success(){
+        $course1 = Course::factory()->create(["name" => "test name"]);
+        Course::factory()->create(["name" => "normal name"]);
+        $course3 = Course::factory()->create(["name" => "another test"]);
+        $course1 = Course::find($course1->id);
+        $course3 = Course::find($course3->id);
+
+        $all = $this->sut->getAll(["search" => "test"]);
+
+
+        $this->assertEquals($course1, $all->get(0));
+        $this->assertEquals($course3, $all->get(1));
+    }
+
 }

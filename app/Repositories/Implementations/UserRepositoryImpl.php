@@ -43,7 +43,7 @@ class UserRepositoryImpl implements UserRepository {
         if(!isset($role)){
             return false;
         }
-        
+
         try{
             RoleUser::FirstOrCreate([
                 "role_id" => $role->id,
@@ -62,7 +62,7 @@ class UserRepositoryImpl implements UserRepository {
             Log::error(__CLASS__ . "::" . __METHOD__ . ". Could not find User model with id: " . $userId);
             return false;
         }
-        $user->roles()->where("name",$roleName)->get()->map(fn($role) => 
+        $user->roles()->where("name",$roleName)->get()->map(fn($role) =>
                 $user->roles()->detach($role));
         return true;
     }

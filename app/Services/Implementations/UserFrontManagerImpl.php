@@ -45,7 +45,7 @@ class UserFrontManagerImpl implements UserFrontManager{
             $front = new Front([
                 "user_id" => $this->userId,
                 "course_id" => $courseId
-            ]);       
+            ]);
 
             $front = $this->frontRepo->save($front);
             return isset($front) ? $front : null;
@@ -56,7 +56,7 @@ class UserFrontManagerImpl implements UserFrontManager{
     public function getFront(): ?Front {
         return $this->frontRepo->getFromUser($this->userId);
     }
-    
+
     public function getFrontManager(): ?FrontManager {
         $front = $this->getOrCreateFront();
         if(!isset($front)){
@@ -78,7 +78,7 @@ class UserFrontManagerImpl implements UserFrontManager{
         $this->userId = $userId;
         return $this;
     }
-    
+
     private function getUpdatedFront(Front $front, $courseId): ?Front{
         if (isset($courseId) && $front->course_id != $courseId){
             $front = $this->frontRepo->updateCourse($front->id, $courseId);

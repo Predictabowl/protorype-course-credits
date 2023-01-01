@@ -44,8 +44,8 @@ class CourseRepositoryImpl implements CourseRepository {
         }
     }
 
-    public function getAll(): Collection {
-        return Course::all();
+    public function getAll(array $filters = []): Collection {
+        return Course::filter($filters)->get();
     }
 
     public function update(Course $course): bool {

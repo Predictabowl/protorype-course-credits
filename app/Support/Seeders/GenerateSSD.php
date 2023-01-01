@@ -71,4 +71,9 @@ class GenerateSSD {
     public static function getSSDId(string $ssd): int{
         return Ssd::where("code", $ssd)->first()->id;
     }
+    
+    public static function isPossibleSSD(string $ssd): bool{
+        $rgx = "/\b([A-Z]+(-[A-Z]+)?\/[0-5][0-9])\b/";
+        return preg_match($rgx, $ssd);
+    }
 }
