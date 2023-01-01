@@ -31,7 +31,7 @@ class ExamRepositoryImpl implements ExamRepository{
      * very deliberate, as such we don't want to be called by mistake when
      * someone want to update.
     */
-    public function save(Exam $exam): bool{
+    public function save(Exam $exam): Exam{
         if(isset($exam->id)){
             throw new InvalidArgumentException("New exam id must not be set");
         }
@@ -40,10 +40,11 @@ class ExamRepositoryImpl implements ExamRepository{
         if(!isset($ssd)){
             throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
         }
-        return $exam->save();
+        $exam->save();
+        return $exam;
     }
 
-    public function update(Exam $exam): bool {
+    public function update(Exam $exam): Exam{
         $loaded = Exam::find($exam->id);
         if(!isset($loaded)){
             throw new ExamNotFoundException("Exam not found with id: ".$exam->id);
@@ -54,7 +55,8 @@ class ExamRepositoryImpl implements ExamRepository{
             throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
         }
 
-        return $exam->save();
+        $exam->save();
+        return $exam;
     }
 
 }

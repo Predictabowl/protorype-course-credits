@@ -77,7 +77,7 @@ class ExamRepositoryImplTest extends TestCase{
         
         $bSaved = $this->repository->save($toSave);
         
-        $this->assertTrue($bSaved);
+        $this->assertEquals($bSaved,$toSave);
         $this->assertDatabaseCount("exams",1);
         $found = Exam::first();
         $this->assertEquals("test name", $found->name);
@@ -114,9 +114,10 @@ class ExamRepositoryImplTest extends TestCase{
         
         $bResult = $this->repository->update($exam);
         
-        $this->assertTrue($bResult);
+        $this->assertEquals($bResult,$exam);
         $this->assertDatabaseCount("exams",1);
         $modified = Exam::first();
         $this->assertEquals("new name",$modified->name);
     }
+    
 }

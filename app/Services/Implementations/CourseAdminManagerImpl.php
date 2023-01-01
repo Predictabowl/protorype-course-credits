@@ -9,6 +9,8 @@ namespace App\Services\Implementations;
 
 use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
+use App\Exceptions\Custom\ExamBlockNotFoundException;
+use App\Exceptions\Custom\SsdNotFoundException;
 use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Repositories\Interfaces\CourseRepository;
@@ -17,6 +19,7 @@ use App\Repositories\Interfaces\ExamRepository;
 use App\Services\Interfaces\CourseAdminManager;
 use App\Services\Interfaces\SSDRepository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use TheSeer\Tokenizer\Exception;
 use function PHPUnit\Framework\isNull;
 
@@ -58,18 +61,28 @@ class CourseAdminManagerImpl implements CourseAdminManager {
         throw new Exception("Method not yet implemented");
     }
 
-    public function saveExam(NewExamInfo $exam, $examBlockId): ?Exam {
-        $ssd = $this->ssdRepo->getSsdFromCode($exam->getSsd());
-        if (isNull($ssd)){
-            return null;
-        }
-        $exam = new Exam([
-            "name" => $exam->getName()
-        ]);
-//        $this->examRepo->save($exam)
+    public function saveExam(NewExamInfo $exam, $examBlockId): Exam {
+        return DB::transaction(function() use($exam, $examBlockId){
+            $ssd = $this->ssdRepo->getSsdFromCode($exam->getSsd());
+            if (is_null($ssd)){
+                throw new SsdNotFoundException(
+                        "Ssd not found with code: ".$exam->getSsd());
+            }
+            $examBlock = $this->ebRepo->get($examBlockId);
+            if(is_null($examBlock)){
+                throw new ExamBlockNotFoundException(
+                        "Exam Block not found with id: ".$examBlockId);
+            }
+            $modelExam = new Exam([
+                "name" => $exam->getName(),
+                "ssd_id" => $ssd->id]);
+            $savedExam = $this->examRepo->save($modelExam);
+            $this->ebRepo->attachExam($examBlock->id, $savedExam->id);
+            return $savedExam;
+        });
     }
 
-    public function saveExamBlock(NewExamBlockInfo $examBlock, $courseId): ?ExamBlock {
+    public function saveExamBlock(NewExamBlockInfo $examBlock, $courseId): ExamBlock {
         throw new Exception("Method not yet implemented");
     }
 

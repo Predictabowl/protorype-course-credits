@@ -9,6 +9,8 @@ class ExamBlockOption extends Model
 {
     use HasFactory;
 
+    protected $fillable = ["exam_id", "exam_block_id"];
+    
     public function examBlock()
     {
         return $this->belongsTo(ExamBlock::class);

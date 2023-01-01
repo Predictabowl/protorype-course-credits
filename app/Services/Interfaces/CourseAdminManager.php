@@ -21,9 +21,9 @@ interface CourseAdminManager {
 
     public function getAllCourses(): Collection;
     public function getCourseBlocks($courseId): Collection;
-    public function saveExamBlock(NewExamBlockInfo $examBlock, $courseId): ?ExamBlock;
+    public function saveExamBlock(NewExamBlockInfo $examBlock, $courseId): ExamBlock;
     public function updateExamBlock(ExamBlock $examBlock): bool;
-    public function saveExam(NewExamInfo $exam, $examBlockId): ?Exam;
+    public function saveExam(NewExamInfo $exam, $examBlockId): Exam;
     public function updateExam(Exam $exam): bool;
     public function addExamOfChoice($examBlockId): bool;
 }

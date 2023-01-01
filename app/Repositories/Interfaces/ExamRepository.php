@@ -15,6 +15,6 @@ use App\Models\Exam;
  */
 interface ExamRepository {
     public function get($id): ?Exam;
-    public function save(Exam $exam): bool;
-    public function update(Exam $exam): bool;
+    public function save(Exam $exam): Exam;
+    public function update(Exam $exam): Exam;
 }
