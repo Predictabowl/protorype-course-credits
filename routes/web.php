@@ -58,6 +58,9 @@ Route::put("/userUpdate/{user}",[UserController::class,"put"]);
 
 //-------------- Course
 Route::get("/course",[CourseController::class,"index"])->name("courseIndex");
+Route::post("/course",[CourseController::class,"post"])->name("courseCreate");
+Route::delete("/course/{course}",[CourseController::class,"delete"])->name("courseDelete");
+Route::put("/course/{course}",[CourseController::class,"put"])->name("courseUpdate");
 
 //-------------- User Roles
 Route::put("/userRole/{user}",[UserController::class,"putRoles"])->name("userRoleUpdate");

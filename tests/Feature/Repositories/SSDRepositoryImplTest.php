@@ -8,8 +8,7 @@
 namespace Tests\Feature\Repositories;
 
 use App\Models\Ssd;
-use App\Services\Implementations\SSDRepositoryImpl;
-use App\Services\Interfaces\SSDRepository;
+use App\Repositories\Implementations\SSDRepositoryImpl;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -22,7 +21,7 @@ class SSDRepositoryImplTest extends TestCase{
     
     use RefreshDatabase;
     
-    private SSDRepository $sut;
+    private SSDRepositoryImpl $sut;
     
     protected function setUp(): void {
         parent::setUp();

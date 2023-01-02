@@ -16,12 +16,11 @@ use App\Models\ExamBlock;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\ExamRepository;
+use App\Repositories\Interfaces\SSDRepository;
 use App\Services\Interfaces\CourseAdminManager;
-use App\Services\Interfaces\SSDRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use TheSeer\Tokenizer\Exception;
-use function PHPUnit\Framework\isNull;
 
 /**
  * Description of CourseAdminManagerImpl
@@ -45,15 +44,7 @@ class CourseAdminManagerImpl implements CourseAdminManager {
         $this->ssdRepo = $ssdRepo;
     }
 
-    public function getAll(): Collection {
-        return $this->courseRepo->getAll()->sortBy("name")->values()->collect();
-    }
-
     public function addExamOfChoice($examBlockId): bool {
-        throw new Exception("Method not yet implemented");
-    }
-
-    public function getAllCourses(): Collection {
         throw new Exception("Method not yet implemented");
     }
 

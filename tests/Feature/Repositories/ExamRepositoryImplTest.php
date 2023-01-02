@@ -12,6 +12,7 @@ use App\Exceptions\Custom\SsdNotFoundException;
 use App\Models\Exam;
 use App\Models\Ssd;
 use App\Repositories\Implementations\ExamRepositoryImpl;
+use App\Support\Seeders\ExamSupport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
@@ -25,15 +26,15 @@ class ExamRepositoryImplTest extends TestCase{
     
     use RefreshDatabase;
     
-    private ExamRepositoryImpl $repository;
+    private ExamRepositoryImpl $sut;
     
     protected function setUp(): void {
         parent::setUp();
-        $this->repository = new ExamRepositoryImpl();
+        $this->sut = new ExamRepositoryImpl();
     }
     
     public function test_get_whenNotPresent(){
-        $get = $this->repository->get(3);
+        $get = $this->sut->get(3);
         
         $this->assertNull($get);
     }
@@ -45,7 +46,7 @@ class ExamRepositoryImplTest extends TestCase{
             "code" => null
         ]);
         
-        $get = $this->repository->get(2);
+        $get = $this->sut->get(2);
         
         $this->assertEquals($fixture->attributesToArray(), $get->attributesToArray());
     }
@@ -56,7 +57,7 @@ class ExamRepositoryImplTest extends TestCase{
         ]);
         
         $this->expectException(SsdNotFoundException::class);
-        $this->repository->save($fixture);
+        $this->sut->save($fixture);
     }
     
     public function test_save_whenIdIsSet_shouldThrow(){
@@ -64,7 +65,7 @@ class ExamRepositoryImplTest extends TestCase{
         $fixture->id = 10;
                 
         $this->expectException(InvalidArgumentException::class);
-        $this->repository->save($fixture);
+        $this->sut->save($fixture);
     }
     
     public function test_save_successfull(){
@@ -75,7 +76,7 @@ class ExamRepositoryImplTest extends TestCase{
             "name" => "test name"
         ]);
         
-        $bSaved = $this->repository->save($toSave);
+        $bSaved = $this->sut->save($toSave);
         
         $this->assertEquals($bSaved,$toSave);
         $this->assertDatabaseCount("exams",1);
@@ -90,7 +91,7 @@ class ExamRepositoryImplTest extends TestCase{
         $exam->ssd_id += 1;
         
         $this->expectException(SsdNotFoundException::class);
-        $this->repository->update($exam);
+        $this->sut->update($exam);
     }
     
     public function test_update_withInvalId_shouldThrow(){
@@ -98,7 +99,7 @@ class ExamRepositoryImplTest extends TestCase{
         $exam->id = 10;
         
         $this->expectException(ExamNotFoundException::class);
-        $this->repository->update($exam);
+        $this->sut->update($exam);
     }
     
     public function test_update_success(){
@@ -112,12 +113,57 @@ class ExamRepositoryImplTest extends TestCase{
         
         $exam->name = "new name";
         
-        $bResult = $this->repository->update($exam);
+        $bResult = $this->sut->update($exam);
         
         $this->assertEquals($bResult,$exam);
         $this->assertDatabaseCount("exams",1);
         $modified = Exam::first();
         $this->assertEquals("new name",$modified->name);
+    }
+    
+    public function test_deleteNormalExam(){
+        Ssd::factory()->create();
+        $exam = Exam::factory()->create();
+        
+        $this->sut->delete($exam->id);
+        
+        $loaded = Exam::find($exam->id);
+        $this->assertNull($loaded);
+    }
+    
+    public function test_delete_shouldIgnoreFreeChoiceExam(){
+        $exam = ExamSupport::getFreeChoiceExam();
+        
+        $this->sut->delete($exam->id);
+        
+        $this->assertDatabaseCount("exams", 1);
+    }
+    
+    public function test_deleteFreeChoice(){
+        Ssd::factory()->create();
+        $exam = Exam::factory()->create();
+        ExamSupport::getFreeChoiceExam();
+        
+        $this->sut->deleteFreeChoice();
+        
+        $this->assertDatabaseCount("exams", 1);
+        $loaded = Exam::find($exam->id);
+        $this->assertNotNull($loaded);
+    }
+    
+    public function test_deleteBatch_shouldIgnoreFreeChoiceExam(){
+        Ssd::factory(3)->create();
+        $exams = Exam::factory(2)->create();
+        $freeChoice = ExamSupport::getFreeChoiceExam();
+        $ids = $exams->map(function ($item){
+                return $item->id;
+            });
+        
+        $this->sut->deleteBatch($ids);
+        
+        $this->assertDatabaseCount("exams", 1);
+        $this->assertDatabaseCount("ssds", 3);
+        $this->assertTrue(ExamSupport::isFreeChoiceExam(Exam::first()->id));
     }
     
 }

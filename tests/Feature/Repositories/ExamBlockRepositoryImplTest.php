@@ -10,26 +10,32 @@ use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
 use App\Models\Ssd;
 use App\Repositories\Implementations\ExamBlockRepositoryImpl;
+use App\Repositories\Interfaces\ExamRepository;
+use App\Support\Seeders\ExamSupport;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
+use function collect;
 
 class ExamBlockRepositoryImplTest extends TestCase
 {
     use RefreshDatabase;
     
-    private $sut;
+    private ExamBlockRepositoryImpl $sut;
+    private ExamRepository $examRepo;
     
     protected function setUp(): void {
         parent::setUp();
-        $this->sut = new ExamBlockRepositoryImpl();
+        $this->examRepo = $this->createMock(ExamRepository::class);
+        
+        $this->sut = new ExamBlockRepositoryImpl($this->examRepo);
     }
     
     public function test_get_when_not_present(){
-        $sut = $this->sut->get(2);
+        $result = $this->sut->get(2);
         
-        $this->assertNull($sut);
+        $this->assertNull($result);
     }
   
     /*
@@ -51,10 +57,10 @@ class ExamBlockRepositoryImplTest extends TestCase
         ]);
         $option->ssds()->attach($ssds);
         
-        $sut = $this->sut->get(1);
+        $result = $this->sut->get(1);
         
         $block = ExamBlock::find(1);
-        $this->assertEquals($block->attributesToArray(), $sut->attributesToArray());
+        $this->assertEquals($block->attributesToArray(), $result->attributesToArray());
     }
     
     public function test_getFilteredByCourse_when_course_not_present() {
@@ -254,5 +260,46 @@ class ExamBlockRepositoryImplTest extends TestCase
         
         $this->assertFalse($return);
         $this->assertDatabaseCount("exam_block_options", 1);
+    }
+    
+    public function test_delete_whenMissing(){       
+        $return = $this->sut->delete(2);
+        
+        $this->assertFalse($return);
+    }
+    
+    public function test_delete_examsOnCascade(){
+        Ssd::factory(5)->create();
+        Course::factory()->create();
+        ExamBlock::factory()->create();
+        $examBlock = ExamBlock::first();
+        Exam::factory(3)->create();
+        $exams = Exam::all();
+        foreach($exams as $exam){
+            ExamBlockOption::create([
+                "exam_id" => $exam->id,
+                "exam_block_id" => $examBlock->id
+            ]);
+        }
+        $freeChoice = ExamSupport::getFreeChoiceExam();
+        ExamBlockOption::create([
+            "exam_id" => $freeChoice->id,
+            "exam_block_id" => $examBlock->id
+        ]);
+        
+        $this->examRepo->expects($this->once())
+                ->method("deleteBatch")
+                ->with(collect([
+                    $exams->get(0)->id,
+                    $exams->get(1)->id,
+                    $exams->get(2)->id,
+                    $freeChoice->id
+                ]));
+        
+        $result = $this->sut->delete($examBlock->id);
+        
+        $this->assertTrue($result);
+        $this->assertDatabaseCount("exam_block_options", 0);
+        $this->assertDatabaseCount("exam_blocks", 0);
     }
 }

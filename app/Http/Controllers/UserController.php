@@ -7,15 +7,18 @@ use App\Services\Interfaces\UserManager;
 
 class UserController extends Controller
 {
-    public function __construct() {
+    private UserManager $userManager;
+    
+    public function __construct(UserManager $userManager) {
         $this->middleware(["auth","verified"]);
+        $this->userManager = $userManager;
     }
 
     public function index() {
         $this->authorize("viewAny", auth()->user());
         
         return view("users.index", [
-            "users" => $this->getUserManager()->getAll(request(["search"]))
+            "users" => $this->userManager->getAll(request(["search"]))
         ]);
     }
     
@@ -34,7 +37,7 @@ class UserController extends Controller
             "name" => ["required","string","max:255"],
         ]);
         
-        $this->getUserManager()->setName($user->id, $attributes["name"]);
+        $this->userManager->setName($user->id, $attributes["name"]);
         
         return redirect()->route("dashboard");
     }
@@ -50,7 +53,7 @@ class UserController extends Controller
     public function putRoles(User $user) {
         $this->authorize("updateRole", $user);
         
-        $this->getUserManager()->modRole($user->id, request()->all());
+        $this->userManager->modRole($user->id, request()->all());
         
         return redirect()->route("userIndex");
     }
@@ -58,7 +61,7 @@ class UserController extends Controller
     public function delete(User $user){
         $this->authorize("delete", $user);
         
-        $this->getUserManager()->deleteUser($user->id);
+        $this->userManager->deleteUser($user->id);
         return back()->with("success", "Eliminato utente: ".$user->name);
     }
     
@@ -68,10 +71,5 @@ class UserController extends Controller
         return view("users.show",[
             "user" => $user
         ]);
-    }
-
-    
-    private function getUserManager(): UserManager{
-        return app()->make(UserManager::class);
     }
 }

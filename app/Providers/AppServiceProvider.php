@@ -18,15 +18,20 @@ use App\Mappers\Interfaces\ExamOptionMapper;
 use App\Mappers\Interfaces\TakenExamMapper;
 use App\Repositories\Implementations\CourseRepositoryImpl;
 use App\Repositories\Implementations\ExamBlockRepositoryImpl;
+use App\Repositories\Implementations\ExamRepositoryImpl;
 use App\Repositories\Implementations\FrontRepositoryImpl;
+use App\Repositories\Implementations\SSDRepositoryImpl;
 use App\Repositories\Implementations\TakenExamRespositoryImpl;
 use App\Repositories\Implementations\UserRepositoryImpl;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
+use App\Repositories\Interfaces\ExamRepository;
 use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Interfaces\SSDRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Interfaces\UserRepository;
 use App\Services\Implementations\CourseAdminManagerImpl;
+use App\Services\Implementations\CoursesAdminManagerImpl;
 use App\Services\Implementations\ExamDistanceByName;
 use App\Services\Implementations\FrontsSearchManagerImpl;
 use App\Services\Implementations\StudyPlanBuilderImpl;
@@ -34,6 +39,7 @@ use App\Services\Implementations\UserFrontManagerImpl;
 use App\Services\Implementations\UserManagerImpl;
 use App\Services\Implementations\YearCalculatorImpl;
 use App\Services\Interfaces\CourseAdminManager;
+use App\Services\Interfaces\CoursesAdminManager;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Interfaces\FrontsSearchManager;
 use App\Services\Interfaces\StudyPlanBuilder;
@@ -63,8 +69,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TakenExamMapper::class, TakenExamMapperImpl::class);
         
         //---- Repositories
-        $this->app->bind(CourseRepository::class, CourseRepositoryImpl::class);
+        $this->app->bind(SSDRepository::class, SSDRepositoryImpl::class);
+        $this->app->bind(ExamRepository::class, ExamRepositoryImpl::class);
         $this->app->bind(ExamBlockRepository::class, ExamBlockRepositoryImpl::class);
+        $this->app->bind(CourseRepository::class, CourseRepositoryImpl::class);
         $this->app->bind(FrontRepository::class, FrontRepositoryImpl::class);
         $this->app->bind(TakenExamRepository::class, TakenExamRespositoryImpl::class);
         $this->app->bind(UserRepository::class, UserRepositoryImpl::class);
@@ -77,9 +85,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(FrontsSearchManager::class, FrontsSearchManagerImpl::class);
         $this->app->bind(YearCalculator::class, YearCalculatorImpl::class);
         $this->app->bind(CourseAdminManager::class, CourseAdminManagerImpl::class);
+        $this->app->bind(CoursesAdminManager::class, CoursesAdminManagerImpl::class);
         
-        
-//        $this->app->register(\Laravel\Dusk\DuskServiceProvider::class);
     }
 
     /**

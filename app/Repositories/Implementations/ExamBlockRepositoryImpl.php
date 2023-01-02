@@ -9,6 +9,7 @@ use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
 use App\Repositories\Interfaces\ExamBlockRepository;
+use App\Repositories\Interfaces\ExamRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
@@ -22,12 +23,18 @@ use InvalidArgumentException;
  */
 class ExamBlockRepositoryImpl implements ExamBlockRepository{
     
-    public function get($id): ?ExamBlock {
+    private ExamRepository $examRepo;
+    
+    public function __construct(ExamRepository $examRepo) {
+        $this->examRepo = $examRepo;
+    }
+
+    public function get(int $id): ?ExamBlock {
         return ExamBlock::with("examBlockOptions.exam.ssd",
                 "examBlockOptions.ssds")->find($id);
     }
 
-    public function getFilteredByCourse($courseId): Collection {
+    public function getFilteredByCourse(int $courseId): Collection {
         $course = Course::with("examBlocks.examBlockOptions.exam.ssd",
                 "examBlocks.examBlockOptions.ssds")->find($courseId);
         if (!isset($course)){
@@ -63,7 +70,7 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         $examBlock->save();
     }
 
-    public function attachExam($examBlockId, $examId): bool {
+    public function attachExam(int $examBlockId, int $examId): bool {
         $examBlock = ExamBlock::find($examBlockId);
         if(is_null($examBlock)){
             throw new ExamBlockNotFoundException("Couldn't find ExamBlock with id: ".$examBlockId);
@@ -84,8 +91,22 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         return false;
     }
 
-    public function detachExam($examBlockId, $examId): bool {
-        return false;
+    public function detachExam(int $examBlockId, int $examId): bool {
+        throw new Exception("Method not yet implemented");
+    }
+
+    public function delete(int $id): bool {
+        $examBlock = ExamBlock::with("examBlockOptions.exam")->find($id);
+        if(is_null($examBlock)){
+            return false;
+        }
+        $options = $examBlock->examBlockOptions;
+        $examIds = $options->map(function ($item){
+            return $item->exam->id;
+        });
+        $this->examRepo->deleteBatch($examIds);
+        ExamBlock::destroy($id);
+        return true;
     }
 
 }

@@ -9,7 +9,17 @@
 
         <x-panel>
             <div class="flex justify-between">
-                <x-searchUserBar class="mb-4" filter="course" placeholder="Cerca per nome o email"/>
+                <x-searchUserBar class="mb-4" filter="course" placeholder="Cerca per nome"/>
+                <x-panel>
+                    <form method="POST">
+                        @csrf
+                        <header>
+                            <h2 class="text-lg">
+                                {{__("Create New Course")}}
+                            </h2>
+                        </header>
+                    </form>
+                </x-panel>
             </div>
 
             <div class="place-content-center">

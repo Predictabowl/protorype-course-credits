@@ -12,6 +12,8 @@ use App\Exceptions\Custom\SsdNotFoundException;
 use App\Models\Exam;
 use App\Models\Ssd;
 use App\Repositories\Interfaces\ExamRepository;
+use App\Support\Seeders\ExamSupport;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 /**
@@ -57,6 +59,27 @@ class ExamRepositoryImpl implements ExamRepository{
 
         $exam->save();
         return $exam;
+    }
+
+    public function delete(int $id): void {
+        if(!ExamSupport::isFreeChoiceExam($id)){
+            Exam::destroy($id);
+        }
+    }
+
+    public function deleteFreeChoice(): void {
+        $exam = ExamSupport::findFreeChoiceExam();
+        if(!is_null($exam)){
+            Exam::destroy($exam->id);
+        }
+    }
+
+    public function deleteBatch(Collection $ids): void {
+        $freeChoice = ExamSupport::findFreeChoiceExam();
+        if(!is_null($freeChoice)){
+            $ids = $ids->except(["id",$freeChoice->id]);
+        }
+        Exam::destroy($ids);
     }
 
 }

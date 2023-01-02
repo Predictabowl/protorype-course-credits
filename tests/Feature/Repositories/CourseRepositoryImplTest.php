@@ -4,8 +4,9 @@ namespace Tests\Feature\Repositories;
 
 use App\Exceptions\Custom\CourseNotFoundException;
 use App\Models\Course;
-use App\Models\Exam;
+use App\Models\ExamBlock;
 use App\Repositories\Implementations\CourseRepositoryImpl;
+use App\Repositories\Interfaces\ExamBlockRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
@@ -15,10 +16,13 @@ class CourseRepositoryImplTest extends TestCase
     use RefreshDatabase;
 
     private CourseRepositoryImpl $sut;
+    private ExamBlockRepository $ebRepo;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->sut = new CourseRepositoryImpl();
+        $this->ebRepo = $this->createMock(ExamBlockRepository::class);
+        
+        $this->sut = new CourseRepositoryImpl($this->ebRepo);
     }
 
     public function test_get_when_not_present() {
@@ -101,6 +105,12 @@ class CourseRepositoryImplTest extends TestCase
         $this->assertDatabaseMissing("courses", $attributes2);
     }
 
+    public function test_delete_whenMissing(){
+        $result = $this->sut->delete(3);
+        
+        $this->assertFalse($result);
+    }
+    
     public function test_delete_sucess(){
         $attributes = [
             "name" => "test name 2",
@@ -109,7 +119,21 @@ class CourseRepositoryImplTest extends TestCase
             "numberOfYears" => 3,
             "cfuTresholdForYear" => 40
         ];
-        $course = Course::create($attributes);
+        Course::create($attributes);
+        $course = Course::first();
+        ExamBlock::factory(3)->create();
+        $examBlocks = ExamBlock::all();
+        foreach($examBlocks as $examBlock){
+            $course->examBlocks()->save($examBlock);
+        }
+        
+        $this->ebRepo->expects($this->exactly(3))
+                ->method("delete")
+                ->withConsecutive(
+                        [$this->equalTo($examBlocks->get(0)->id)],
+                        [$this->equalTo($examBlocks->get(1)->id)],
+                        [$this->equalTo($examBlocks->get(2)->id)]
+                );
 
         $result = $this->sut->delete($course->id);
 
@@ -172,6 +196,21 @@ class CourseRepositoryImplTest extends TestCase
 
         $this->assertEquals($course1, $all->get(0));
         $this->assertEquals($course3, $all->get(1));
+    }
+    
+    public function test_getFromName_whenMissing(){
+        $course = $this->sut->getFromName("test name");
+        
+        $this->assertNull($course);
+    }
+    
+    public function test_getFromName_success(){
+        Course::factory()->create(["name" => "test name"]);
+        $course = Course::all()->first();
+        
+        $result = $this->sut->getFromName("test name");
+        
+        $this->assertEquals($course, $result);
     }
 
 }

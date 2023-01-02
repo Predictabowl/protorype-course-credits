@@ -10,18 +10,15 @@ namespace Tests\Unit\Services;
 use App\Domain\NewExamInfo;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
-use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Models\Ssd;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\ExamRepository;
+use App\Repositories\Interfaces\SSDRepository;
 use App\Services\Implementations\CourseAdminManagerImpl;
-use App\Services\Interfaces\SSDRepository;
-use Illuminate\Database\Eloquent\Collection;
 use Tests\TestCase;
-use function collect;
 
 /**
  * Description of CourseAdminManagerImpl
@@ -47,27 +44,6 @@ class CourseAdminManagerImplTest extends TestCase{
                 $this->examRepo, $this->ssdRepo);
     }
 
-    public function test_getAll_shouldSortByName(){
-        $course1 = new Course([
-            "id" => 1,
-            "name" => "Zorro"
-        ]);
-        $course2 = new Course([
-            "id" => 2,
-            "name" => "Abele"
-        ]);
-
-        $courses = new Collection([$course1, $course2]);
-
-        $this->courseRepo->expects($this->once())
-                ->method("getAll")
-                ->willReturn($courses);
-
-        $result = $this->sut->getAll();
-
-        $this->assertEquals(collect([$course2, $course1]),$result);
-    }
-    
     public function test_saveExam_withMissingSsd(){
         $examInfo = new NewExamInfo("test name", "inf/02");
         $this->ssdRepo->expects($this->once())

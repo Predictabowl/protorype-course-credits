@@ -19,7 +19,6 @@ use Illuminate\Support\Collection;
  */
 interface CourseAdminManager {
 
-    public function getAllCourses(): Collection;
     public function getCourseBlocks($courseId): Collection;
     public function saveExamBlock(NewExamBlockInfo $examBlock, $courseId): ExamBlock;
     public function updateExamBlock(ExamBlock $examBlock): bool;

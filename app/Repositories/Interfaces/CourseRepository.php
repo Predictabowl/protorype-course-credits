@@ -17,7 +17,9 @@ use Illuminate\Database\Eloquent\Collection;
  */
 interface CourseRepository {
 
-    public function get($id): ?Course;
+    public function get(int $id): ?Course;
+    
+    public function getFromName(string $name): ?Course;
 
     public function getAll(array $filters = []): Collection;
 
@@ -25,5 +27,5 @@ interface CourseRepository {
 
     public function update(Course $course): bool;
 
-    public function delete($id): bool;
+    public function delete(int $id): bool;
 }

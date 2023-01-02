@@ -11,10 +11,11 @@ use Illuminate\Support\Collection;
  */
 interface ExamBlockRepository {
     
-    public function get($id): ?ExamBlock;
-    public function getFilteredByCourse($courseId): Collection;
+    public function get(int $id): ?ExamBlock;
+    public function getFilteredByCourse(int $courseId): Collection;
     public function save(ExamBlock $examBlock): bool;
     public function update(ExamBlock $examBlock);
-    public function attachExam($examBlockId, $examId): bool;
-    public function detachExam($examBlockId, $examId): bool;
+    public function attachExam(int $examBlockId,  int $examId): bool;
+    public function detachExam(int $examBlockId, int $examId): bool;
+    public function delete(int $id): bool;
 }
