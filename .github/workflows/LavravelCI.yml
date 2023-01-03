@@ -8,8 +8,8 @@ jobs:
     container:
       image: kirschbaumdevelopment/laravel-test-runner:8.2
     services:
-      mysql:
-        image: postgresql:15
+      pgsql:
+        image: postgres:15
         env:
           POSTGRES_USER: sail
           POSTGRES_PASSWORD: password
