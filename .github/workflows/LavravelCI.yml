@@ -16,7 +16,7 @@ jobs:
           POSTGRES_DB: prototype_course_credits
         ports:
           - 5432:5432
-        ## options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - uses: actions/checkout@v1
       with:
@@ -24,9 +24,10 @@ jobs:
     - name: Install composer dependencies
       run: |
         composer install --no-scripts
-    - name: Installing Dusk
+    - name: Install front-end dependencies
       run: |
-        php artisan dusk:install
+        npm install
+        npm run dev
     - name: Prepare Laravel Application
       run: |
         cp .env.ci .env
