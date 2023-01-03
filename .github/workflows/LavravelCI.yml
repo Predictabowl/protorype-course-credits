@@ -24,10 +24,10 @@ jobs:
     - name: Install composer dependencies
       run: |
         composer install --no-scripts
-    - name: Install front-end dependencies
-      run: |
-        npm install
-        npm run dev
+#    - name: Install front-end dependencies
+#      run: |
+#        npm install
+#        npm run dev
     - name: Prepare Laravel Application
       run: |
         cp .env.ci .env
