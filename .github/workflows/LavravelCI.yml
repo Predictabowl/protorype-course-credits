@@ -7,30 +7,45 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: kirschbaumdevelopment/laravel-test-runner:8.2
-    services:
-      pgsql:
-        image: postgres:15
-        env:
-          POSTGRES_USER: sail
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: prototype_course_credits
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+#    services:
+#      postgres:
+#        image: postgres:15
+#        env:
+#          POSTGRES_USER: sail
+#          POSTGRES_PASSWORD: password
+#          POSTGRES_DB: prototype_course_credits
+#        ports:
+#          - 5432:5432
+#        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1
+#    - name: Install other dependencies
+#      run: apt install libatk1.0-0 libatk-bridge2.0-0
+#    - uses: browser-actions/setup-chrome@latest
+#    - run: chrome --version
+#    - name: Install browser
+#    - run: apt-get update 
+#    - run: apt-get upgrade -y 
+#    - run: apt-get install -y libnss3 chromium-browser
     - name: Install composer dependencies
       run: |
         composer install --no-scripts
-#    - name: Install front-end dependencies
+#    - name: Install Dusk
 #      run: |
-#        npm install
-#        npm run dev
+#        php artisan dusk:install
     - name: Prepare Laravel Application
       run: |
         cp .env.ci .env
         php artisan key:generate
-    - name: Run Testsuite
-      run: vendor/bin/phpunit tests/
+#    - name: Run Testsuite
+#      run: vendor/bin/phpunit tests/
+    - name: Run Backend Tests
+      run: php artisan test
+#    - name: Check chromedriver
+#      run: vendor/laravel/dusk/bin/chromedriver-linux &
+#    - name: Run Laravel Server
+#      run: php artisan serve &
+#    - name: Run Frontend Tests
+#      run: php artisan dusk
