@@ -27,9 +27,10 @@ class CourseManagerImplTest extends TestCase{
 
     private const FIXTURE_COURSE_ID = 7;
     
-    private $blockRepo;
-    private $manager;
-    private $mapper;
+    private ExamBlockRepository $blockRepo;
+    private CourseManagerImpl $sut;
+    private ExamBlockMapper $mapper;
+    private CourseRepository $courseRepo;
 
     
     protected function setUp():void
@@ -37,10 +38,10 @@ class CourseManagerImplTest extends TestCase{
         parent::setUp();
         $this->blockRepo = $this->createMock(ExamBlockRepository::class);
         $this->mapper = $this->createMock(ExamBlockMapper::class);
+        $this->courseRepo = $this->createMock(CourseRepository::class);
         
-        app()->instance(ExamBlockRepository::class, $this->blockRepo);
-        app()->instance(ExamBlockMapper::class, $this->mapper);
-        $this->manager = new CourseManagerImpl(self::FIXTURE_COURSE_ID);
+        $this->sut = new CourseManagerImpl(self::FIXTURE_COURSE_ID, $this->mapper,
+                $this->blockRepo, $this->courseRepo);
     }
   
     
@@ -58,7 +59,7 @@ class CourseManagerImplTest extends TestCase{
                 ->withConsecutive([$models[0]], [$models[1]])
                 ->willReturnOnConsecutiveCalls($blocks[0],$blocks[1]);
         
-        $sut = $this->manager->getExamBlocks();
+        $sut = $this->sut->getExamBlocks();
         
         $this->assertEquals($blocks, $sut);
     }
@@ -68,7 +69,7 @@ class CourseManagerImplTest extends TestCase{
                 ->method("getFilteredByCourse")
                 ->willReturn(collect([]));
         
-        $sut = $this->manager->getExamBlocks();
+        $sut = $this->sut->getExamBlocks();
         
         $this->assertEmpty($sut);
     }
@@ -93,7 +94,7 @@ class CourseManagerImplTest extends TestCase{
                 ->withConsecutive([$models[0]], [$models[1]])
                 ->willReturnOnConsecutiveCalls($block1,$block2);
         
-        $result = $this->manager->getExamOptions();
+        $result = $this->sut->getExamOptions();
         
         $this->assertEquals(collect([$option1,$option2,$option3]), $result);
         
@@ -101,14 +102,12 @@ class CourseManagerImplTest extends TestCase{
     
     public function test_getCourse(){
         $course = new Course();
-        $courseRepo = $this->createMock(CourseRepository::class);
-        $courseRepo->expects($this->once())
+        $this->courseRepo->expects($this->once())
                 ->method("get")
                 ->with(self::FIXTURE_COURSE_ID)
                 ->willReturn($course);
-        app()->instance(CourseRepository::class, $courseRepo);
         
-        $result = $this->manager->getCourse();
+        $result = $this->sut->getCourse();
         
         $this->assertSame($course, $result);
     }

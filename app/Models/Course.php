@@ -10,7 +10,7 @@ class Course extends Model
     use HasFactory;
 
     protected $guarded = [];
-    
+
     public function examBlocks()
     {
         return $this->hasMany(ExamBlock::class);
@@ -18,5 +18,13 @@ class Course extends Model
 
     public function fronts(){
         return $this->hasMany(Front::class);
+    }
+
+    //------------- Scopes
+    public function scopeFilter($query, array $filters) {
+        if (isset($filters["search"])){
+            $query->where(fn ($query) => $query
+                ->where("name", "like", "%".$filters["search"]."%"));
+        }
     }
 }

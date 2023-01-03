@@ -9,20 +9,23 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\Course;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  *
  * @author piero
  */
 interface CourseRepository {
+
+    public function get(int $id): ?Course;
     
-    public function get($id): ?Course;
-    
-    public function getAll();
-    
+    public function getFromName(string $name): ?Course;
+
+    public function getAll(array $filters = []): Collection;
+
     public function save(Course $course): bool;
-    
+
     public function update(Course $course): bool;
-    
-    public function delete($id): bool;
+
+    public function delete(int $id): bool;
 }

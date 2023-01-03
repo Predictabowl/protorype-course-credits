@@ -8,14 +8,16 @@
 
 namespace App\Services\Implementations;
 
-use App\Models\Front;
-use App\Services\Interfaces\FrontManager;
 use App\Domain\TakenExamDTO;
-use Illuminate\Support\Collection;
+use App\Mappers\Interfaces\TakenExamMapper;
+use App\Models\Front;
+use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
-use App\Repositories\Interfaces\CourseRepository;
-use App\Mappers\Interfaces\TakenExamMapper;
+use App\Services\Interfaces\FrontManager;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Description of FrontManagerImpl
@@ -23,58 +25,64 @@ use App\Mappers\Interfaces\TakenExamMapper;
  * @author piero
  */
 class FrontManagerImpl implements FrontManager{
-    
-    private $frontId;
-    private $mapper;
 
-    function __construct($frontId) {
-        $this->mapper = app()->make(TakenExamMapper::class);
+    private $frontId;
+    private TakenExamMapper $mapper;
+    private TakenExamRepository $takenExamRepo;
+    private FrontRepository $frontRepo;
+    private CourseRepository $courseRepo;
+
+    public function __construct($frontId, TakenExamMapper $mapper,
+            TakenExamRepository $takenExamRepo, FrontRepository $frontRepo,
+            CourseRepository $courseRepo) {
+        $this->mapper = $mapper;
+        $this->takenExamRepo = $takenExamRepo;
+        $this->frontRepo = $frontRepo;
+        $this->courseRepo = $courseRepo;
         $this->frontId = $frontId;
     }
 
     public function getTakenExams(): Collection {
-        $exams = $this->getExamRepository()
-                ->getFromFront($this->frontId);
+        $exams = $this->takenExamRepo->getFromFront($this->frontId);
         return $exams->map(
                 fn($exam) => $this->mapper->toDTO($exam));
     }
-    
-    public function saveTakenExam($attributes) {        
+
+    public function saveTakenExam($attributes) {
         $exam = new TakenExamDTO(0, $attributes["name"], $attributes["ssd"],
                 $attributes["cfu"], $attributes["grade"]);
         $takenExam = $this->mapper->toModel($exam, $this->frontId);
         if(!isset($takenExam)){
             throw new InvalidArgumentException();//message missing
         }
-        $this->getExamRepository()->save($takenExam);
+        DB::transaction(function() use($takenExam){
+            $this->takenExamRepo->save($takenExam);
+        });
     }
 
     public function deleteTakenExam($examId) {
-        $this->getExamRepository()->delete($examId);
+        DB::transaction(function() use($examId){
+            $this->takenExamRepo->delete($examId);
+        });
     }
 
     public function setCourse($courseId): bool {
-        $front = $this->getFrontRepository()->updateCourse($this->frontId, $courseId);
+        $front = $this->frontRepo->updateCourse($this->frontId, $courseId);
         return isset($front) ? true : false;
     }
 
     public function getFront(): Front {
-        return $this->getFrontRepository()->get($this->frontId);
+        return $this->frontRepo->get($this->frontId);
     }
 
     public function getCourses(): Collection {
-        return app()->make(CourseRepository::class)->getAll();
+        return $this->courseRepo->getAll()->sortBy("name")->values()->collect();
     }
 
     public function deleteAllTakenExams() {
-        $this->getExamRepository()->deleteFromFront($this->frontId);
+        DB::transaction(function(){
+            $this->takenExamRepo->deleteFromFront($this->frontId);
+        });
     }
 
-    private function getExamRepository(): TakenExamRepository{
-        return app()->make(TakenExamRepository::class);
-    }
-    
-    private function getFrontRepository(): FrontRepository{
-        return app()->make(FrontRepository::class);
-    }
 }

@@ -8,6 +8,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\Exam;
+use Illuminate\Support\Collection;
 
 /**
  *
@@ -15,6 +16,9 @@ use App\Models\Exam;
  */
 interface ExamRepository {
     public function get($id): ?Exam;
-    public function save(Exam $exam): bool;
-    public function update(Exam $exam): bool;
+    public function save(Exam $exam): Exam;
+    public function update(Exam $exam): Exam;
+    public function delete(int $id): void;
+    public function deleteBatch(Collection $ids): void;
+    public function deleteFreeChoice(): void;
 }

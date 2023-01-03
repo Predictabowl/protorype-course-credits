@@ -12,6 +12,7 @@ use App\Models\Role;
 use App\Repositories\Interfaces\UserRepository;
 use App\Services\Interfaces\UserManager;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Description of UserManagerImpl
@@ -19,40 +20,44 @@ use Illuminate\Contracts\Pagination\Paginator;
  * @author piero
  */
 class UserManagerImpl implements UserManager{
-    
-    
-    public function modRole($userId, array $attributes) {
-        $userRepo = $this->getUserRepository();
 
-        if (array_key_exists(Role::ADMIN, $attributes)){            
-            $userRepo->addRole($userId, Role::ADMIN);
-        } else {
-            $userRepo->removeRole($userId, Role::ADMIN);
-        }
-        if (array_key_exists(Role::SUPERVISOR, $attributes)){
-            $userRepo->addRole($userId, Role::SUPERVISOR);
-        } else {
-            $userRepo->removeRole($userId, Role::SUPERVISOR);
-        }
+    private UserRepository $userRepo;
+
+    public function __construct(UserRepository $userRepo) {
+        $this->userRepo = $userRepo;
+    }
+
+    public function modRole($userId, array $attributes) {
+        DB::transaction(function() use($userId, $attributes){
+            if (array_key_exists(Role::ADMIN, $attributes)){
+                $this->userRepo->addRole($userId, Role::ADMIN);
+            } else {
+                $this->userRepo->removeRole($userId, Role::ADMIN);
+            }
+            if (array_key_exists(Role::SUPERVISOR, $attributes)){
+                $this->userRepo->addRole($userId, Role::SUPERVISOR);
+            } else {
+                $this->userRepo->removeRole($userId, Role::SUPERVISOR);
+            }
+        });
     }
 
     public function getAll($filters): Paginator{
-        return $this->getUserRepository()->getAll($filters,25);
+        return $this->userRepo->getAll($filters,25);
     }
-    
+
     public function setName($userId, string $name) {
-        $repo = $this->getUserRepository();
-        $user = $repo->get($userId);
-        $user->name = $name;
-        $repo->update($user);
+        DB::transaction(function() use($userId, $name){
+            $user = $this->userRepo->get($userId);
+            $user->name = $name;
+            $this->userRepo->update($user);
+        });
     }
-    
+
     public function deleteUser($userId): bool {
-        return $this->getUserRepository()->delete($userId);
-    }
-    
-    private function getUserRepository(): UserRepository{
-        return app()->make(UserRepository::class);
+        return DB::transaction(function() use($userId){
+            return $this->userRepo->delete($userId);
+        });
     }
 
 }

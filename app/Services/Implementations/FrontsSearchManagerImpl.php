@@ -24,21 +24,22 @@ use Illuminate\Support\Collection;
  */
 class FrontsSearchManagerImpl implements FrontsSearchManager{
     
-    private $courses;
+    private CourseRepository $courseRepo;
+    private FrontRepository $frontRepo;
     
-    public function __construct() {
-        $this->courses = app()->make(CourseRepository::class)->getAll();
+    public function __construct(CourseRepository $courseRepo, FrontRepository $frontRepo) {
+        $this->courseRepo = $courseRepo;
+        $this->frontRepo = $frontRepo;
     }
 
     
     public function getCourses(): Collection {
-        return $this->courses;
+        return $this->courseRepo->getAll();
     }
 
     public function getCurrentCourse(Request $request): ?Course {
-         if ($request->has("course")){
-            return $this->getCourses()->first(fn($course) => 
-                    $course->id == $request->get("course"));
+        if ($request->has("course")){
+            return $this->courseRepo->get($request->get("course"));
         };
         
         return null;
@@ -47,8 +48,7 @@ class FrontsSearchManagerImpl implements FrontsSearchManager{
     public function getFilteredFronts(Request $request, int $pageSize = 50): Paginator {
         $filters = $request->only(["search","course"]);
 
-        return app()->make(FrontRepository::class)
-                ->getAll($filters,$pageSize);
+        return $this->frontRepo->getAll($filters,$pageSize);
     }
 
 }

@@ -19,7 +19,7 @@ use App\Domain\ExamOptionDTO;
  * @author piero
  */
 class ExamOptionMapperImpl  implements ExamOptionMapper{
-    
+
     public function toDTO(ExamBlockOption $model, ExamBlockDTO $block): ExamOptionDTO {
         $ssd = $model->exam->ssd;
         if($ssd != null){

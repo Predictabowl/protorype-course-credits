@@ -11,6 +11,8 @@ namespace App\Repositories\Implementations;
 use App\Exceptions\Custom\CourseNotFoundException;
 use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
+use App\Repositories\Interfaces\ExamBlockRepository;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
@@ -21,20 +23,33 @@ use InvalidArgumentException;
  * @author piero
  */
 class CourseRepositoryImpl implements CourseRepository {
+    
+    private ExamBlockRepository $ebRepo;
+    
+    public function __construct(ExamBlockRepository $ebRepo) {
+        $this->ebRepo = $ebRepo;
+    }
 
-    public function delete($id): bool {
+    public function delete(int $id): bool {
+        $course = Course::with("examBlocks")->find($id);
+        if(is_null($course)){
+            return false;
+        }
+        $course->examBlocks->each(function($examBlock){
+            $this->ebRepo->delete($examBlock->id);
+        });
         return Course::destroy($id);
     }
 
-    public function get($id): ?Course {
-        return Course::find($id);        
+    public function get(int $id): ?Course {
+        return Course::find($id);
     }
 
     public function save(Course $course): bool {
         if (isset($course->id)){
             throw new InvalidArgumentException("The id of a new Course must be empty");
         }
-        
+
         try{
             return $course->save();
         } catch (QueryException $exc){
@@ -43,8 +58,8 @@ class CourseRepositoryImpl implements CourseRepository {
         }
     }
 
-    public function getAll() {
-        return Course::all();
+    public function getAll(array $filters = []): Collection {
+        return Course::filter($filters)->get();
     }
 
     public function update(Course $course): bool {
@@ -58,6 +73,10 @@ class CourseRepositoryImpl implements CourseRepository {
             Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
             return false;
         }
+    }
+
+    public function getFromName(string $name): ?Course {
+        return Course::where("name","=",$name)->get()->first();
     }
 
 }

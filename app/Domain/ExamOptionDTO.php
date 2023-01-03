@@ -9,15 +9,17 @@
 namespace App\Domain;
 
 use App\Domain\Interfaces\ExamDTO;
-use Illuminate\Support\Collection;
 use App\Exceptions\Custom\InvalidStateException;
+use Illuminate\Support\Collection;
+use Serializable;
+use function collect;
 
 /**
  * Description of ExamOptionDTO
  *
  * @author piero
  */
-class ExamOptionDTO implements ExamDTO, \Serializable{
+class ExamOptionDTO implements ExamDTO, Serializable{
 
     private $id;
     private $examName;
@@ -37,19 +39,19 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
         $this->linkedTakenExams = collect([]);
         $this->calculateRecognizedCredits();
     }
-    
+
     public function getExamName(): string {
         return $this->examName;
     }
 
     public function getBlock(): ExamBlockDTO {
         if(!isset($this->block)){
-            throw new InvalidStateException(__METHOD__ . " " 
+            throw new InvalidStateException(__METHOD__ . " "
                     ."Exam Block null value, likely was not set after unserialization.");
         }
         return $this->block;
     }
-    
+
     public function setBlock(ExamBlockDTO $block): void {
         $this->block = $block;
     }
@@ -61,7 +63,7 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
     public function getSsd(): ?string {
         return $this->ssd;
     }
-    
+
     public function getId(){
         return $this->id;
     }
@@ -73,11 +75,11 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
     public function addCompatibleOption(string $ssd){
         $this->compatibleOptions->push($ssd);
     }
-    
+
     public function setCompatibleOptions(Collection $ssds){
         $this->compatibleOptions = $ssds;
     }
-    
+
         /**
      * @return mixed
      */
@@ -85,15 +87,15 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
     {
         return $this->linkedTakenExams;
     }
-    
+
     public function getTakenExam($id): TakenExamDTO{
         return $this->linkedTakenExams[$id];
     }
-    
+
      /**
      * The object will be added only if there's no decifit in the
      * Integration value.
-     * 
+     *
      * @param DeclaredExam $declaredExams
      *
      * @return Integration Value decifit.
@@ -116,14 +118,14 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
         $this->calculateRecognizedCredits();
         return $exam;
     }
-    
+
     public function isTakenExamAddable(TakenExamDTO $exam): bool
     {
         if (($this->getIntegrationValue() < 1) || ($exam->getActualCfu() < 1)){
             return false;
         }
 
-        if ($this->linkedTakenExams->isEmpty() && 
+        if ($this->linkedTakenExams->isEmpty() &&
                 $this->getBlock()->getNumSlotsAvailable() < 1){
             return false;
         }
@@ -131,43 +133,50 @@ class ExamOptionDTO implements ExamDTO, \Serializable{
         return true;
     }
 
-    
+
     public function getIntegrationValue(): int
     {
         return $this->getCfu() -
             $this->getRecognizedCredits();
     }
-    
+
     public function getRecognizedCredits(): int{
         return $this->recognizedCredits;
     }
-    
+
     private function calculateRecognizedCredits(){
         $this->recognizedCredits = collect($this->linkedTakenExams)
                 ->map(fn ($item) => $item->getActualCfu())
                 ->sum();
     }
-    
+
     public function serialize(): string {
-        return serialize([
+        return serialize($this->__serialize());
+    }
+
+    public function unserialize(string $serialized): void {
+        $this->__unserialize(unserialize($serialized));
+    }
+
+    public function __serialize(): array {
+        return [
             "id" => $this->id,
             "examName" => $this->examName,
             "ssd" => $this->ssd,
             "compatibleOptions" => $this->compatibleOptions,
             "linkedTakenExams" => $this->linkedTakenExams,
             "recognizedCredits" => $this->recognizedCredits,
-        ]);
+        ];
     }
 
-    public function unserialize(string $serialized): void {
-        $array = unserialize($serialized);
-        $this->id = $array["id"];
-        $this->examName = $array["examName"];
+    public function __unserialize(array $data) {
+        $this->id = $data["id"];
+        $this->examName = $data["examName"];
         $this->block = null;
-        $this->ssd = $array["ssd"];
-        $this->compatibleOptions = $array["compatibleOptions"];
-        $this->linkedTakenExams = $array["linkedTakenExams"];
-        $this->recognizedCredits = $array["recognizedCredits"];
+        $this->ssd = $data["ssd"];
+        $this->compatibleOptions = $data["compatibleOptions"];
+        $this->linkedTakenExams = $data["linkedTakenExams"];
+        $this->recognizedCredits = $data["recognizedCredits"];
     }
 
     public function getCourseYear(): ?int {

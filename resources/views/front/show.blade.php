@@ -16,7 +16,7 @@
                         </header>
                         <div class="space-y-3">
                             <div class="mt-1">
-                                <x-input type="text" class="w-full" name="name" :placeholder="__('Teaching name')" 
+                                <x-input type="text" class="w-full" name="name" :placeholder="__('Teaching name')"
                                     :value="old('name')" required />
 
                                 @error("name")
@@ -30,7 +30,7 @@
                                 @enderror
                              </div>
                             <div>
-                                <x-input class="w-32" type="text" name="ssd" placeholder="SSD" 
+                                <x-input class="w-32" type="text" name="ssd" placeholder="SSD"
                                     value="{{old('ssd')}}" required/>
 
                                 @error("ssd")
@@ -38,7 +38,7 @@
                                 @enderror
                             </div>
                             <div>
-                                <x-input class="w-20" type="number" name="grade" placeholder="{{ __('Grade') }}" 
+                                <x-input class="w-20" type="number" name="grade" placeholder="{{ __('Grade') }}"
                                     value="{{old('grade')}}" required/>
                                 @error("grade")
                                     <span class="text-xs text-red-500">{{ $message }}</span>
@@ -53,7 +53,7 @@
                         </div>
                     </form>
                 </div>
-            </x-panel>            
+            </x-panel>
             <x-panel class="flex-initial sm:items-center sm:ml-6 place-self-start">
                 <div class="pr-2 text-lg">
                     {{ __("Degree Course") }}:
@@ -93,26 +93,27 @@
                 </x-dropdown>
                 <div class="flex justify-end mt-4 pt-4 border-t border-gray-200">
                     <x-button-link href="{{ route('studyPlan',[$front]) }}">{{ __("Calculate Credits")}}</x-button-link>
-                    
+
                 </div>
             </x-panel>
         </div>
 
 
         {{-- Taken exams table --}}
-        <x-panel class="overflow-y-scroll lg:max-h-screen" x-data="{ showConfirmationBox: false, formId: ''}">
-            <div class="flex gap-2">
+        <x-panel class="overflow-y-scroll lg:max-h-screen" x-data="{ showConfirmationBox: false, formId: '-'}">
+            <div class="flex gap-2 items-center">
                 <h1 class="text-lg">
                     {{ __("Exams Taken") }}
                 </h1>
                 <form method="POST" id="formDeleteExams" action="{{ route("deleteFrontTakenExam",[$front]) }}">
                     @csrf
                     @method("DELETE")
-                    <x-button-icon type="button" width="w-10" height="h-6" 
-                            x-on:click="showConfirmationBox = true; formId = 'formDeleteExams'">
-                        <img src="/images/delete-icon.svg" alt="Elimina">
+                    <x-button-icon type="button"
+                            x-on:click="showConfirmationBox = true; formId = 'formDeleteExams'"
+                            title="{{__('Delete all Exams')}}">
+                        <x-heroicon-o-trash class="h-6 w-6"/>
                     </x-button-icon>
-                </form> 
+                </form>
             </div>
             <div class="place-content-center">
                 <table class="min-w-full rounded-lg">
@@ -135,10 +136,12 @@
                                     <form method="POST" action="{{ route("deleteTakenExam",[$front]) }}">
                                         @csrf
                                         @method("DELETE")
-                                        <x-button-icon width="w-9" height="h-6" name="exam" value="{{serialize($exam)}}">
-                                            <img src="/images/delete-icon.svg" alt="Elimina">
+                                        <x-button-icon name="exam"
+                                        value="{{serialize($exam)}}"
+                                        title="{{__('Delete')}}">
+                                            <x-heroicon-m-trash class="h-5 w-5"/>
                                         </x-button-icon>
-                                    </form>                                
+                                    </form>
                                 </td>
                         </tr>
                         @endforeach

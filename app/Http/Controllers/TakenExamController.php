@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Front;
 use App\Services\Interfaces\FrontManager;
-use App\Factories\Interfaces\FrontManagerFactory;
 use Illuminate\Validation\Rule;
-use Illuminate\Http\Request;
+use function app;
+use function back;
+use function request;
 
 class TakenExamController extends Controller
 {

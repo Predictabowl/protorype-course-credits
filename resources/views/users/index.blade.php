@@ -26,16 +26,16 @@
                         <tr class="hover:bg-blue-100 active:bg-blue-400">
                             <td> {{ $user->name }} </td>
                             <td> {{ $user->email}} </td>
-                            <td> 
+                            <td>
                                 @foreach($user->roles as $role)
-                                    {{ $role->name }}, 
-                                @endforeach 
+                                    {{ $role->name }},
+                                @endforeach
                             </td>
                             <td class="text-center"> {{ $user->created_at->isoFormat("DD MMMM YYYY") }}</td>
                             <td class="w-10">
                                 <a href="{{route("userShow",[$user])}}">
-                                    <x-button-icon width="w-9" height="h-6" name="id">
-                                        <img src="/images/edit-icon.svg" alt="Elimina">
+                                    <x-button-icon name="id" title="{{__('Edit')}}">
+                                        <x-heroicon-m-pencil-square class="w-5 h-5"/>
                                     </x-button-icon>
                                 </a>
                             </td>
@@ -43,13 +43,12 @@
                                 <form id="form-{{$user->id}}" method="POST" action="{{ route("userDelete",[$user]) }}">
                                     @csrf
                                     @method("DELETE")
-                                    <x-button-icon type="button" 
-                                        x-on:click=" 
+                                    <x-button-icon type="button"
+                                        x-on:click="
                                             showConfirmationBox = true;
                                             $refs.boxName.innerHTML = '{{$user->name}}';
-                                            formId = 'form-{{ $user->id }}'" 
-                                        width="w-9" height="h-6" name="id" >
-                                        <img src="/images/delete-icon.svg" alt="Elimina">
+                                            formId = 'form-{{ $user->id }}'" name="id" title="{{__('Delete')}}">
+                                        <x-heroicon-m-trash class="h-5 w-5"/>
                                     </x-button-icon>
                                 </form>
                             </td>

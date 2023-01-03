@@ -8,8 +8,8 @@
 
 namespace App\Support\Seeders;
 
-use App\Models\ExamBlock;
 use App\Models\Exam;
+use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
 use App\Models\ExamBlockOptionSsd;
 
@@ -19,6 +19,7 @@ use App\Models\ExamBlockOptionSsd;
  * @author piero
  */
 class GenerateExamBlock {
+    
 
     public static function generateBlock(
             $courseId,
@@ -58,9 +59,7 @@ class GenerateExamBlock {
     }
     
     public static function generateFreeChoiceExams($courseId, $numExams, $cfu){
-        $exam = Exam::firstOrCreate([
-                "name" => "Esame a scelta dello studente",
-        ]);
+        $exam = ExamSupport::getFreeChoiceExam();
         
         for ($index = 0; $index < $numExams; $index++) {
             $block = ExamBlock::create([

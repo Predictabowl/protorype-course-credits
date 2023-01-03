@@ -21,15 +21,17 @@ use Carbon\Carbon;
  * @author piero
  */
 class StudyPlanManagerImpl implements StudyPlanManager{
-    
-    private $front;
+
+    private YearCalculator $yearCalc;
+    private Front $front;
     private $plan;
-    private $yearCalculator;
+    private UserFrontManager $userFrontManager;
     
-    public function __construct(Front $front) {
+    public function __construct(Front $front, UserFrontManager $userFrontManager,
+            YearCalculator $yearCalc) {
         $this->front = $front;
-        $this->plan = null;
-        $this->yearCalculator = app()->make(YearCalculator::class);
+        $this->yearCalc = $yearCalc;
+        $this->userFrontManager = $userFrontManager;
     }
     
     public function getStudyPlan(): ?StudyPlan {
@@ -40,7 +42,7 @@ class StudyPlanManagerImpl implements StudyPlanManager{
     }
     
     private function buildStudyPlan(): ?StudyPlan{
-        $builder = app()->make(UserFrontManager::class)
+        $builder = $this->userFrontManager
                 ->setUserId($this->front->user_id)
                 ->getStudyPlanBuilder();
         if (!isset($builder)){
@@ -51,7 +53,7 @@ class StudyPlanManagerImpl implements StudyPlanManager{
 
     public function getAcademicYear(): int {
         $date = Carbon::now();
-        return $this->yearCalculator->getAcademicYear(
+        return $this->yearCalc->getAcademicYear(
                 $date->format("d"),
                 $date->format("m"),
                 $date->format("Y")
@@ -63,7 +65,7 @@ class StudyPlanManagerImpl implements StudyPlanManager{
         if( $studyPlan == null){
             return null;
         }
-        return $this->yearCalculator->getCourseYear($this->front->course,$studyPlan);
+        return $this->yearCalc->getCourseYear($this->front->course,$studyPlan);
     }
 
 }

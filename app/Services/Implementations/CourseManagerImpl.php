@@ -2,14 +2,14 @@
 
 namespace App\Services\Implementations;
 
-use App\Models\Course;
 use App\Domain\ExamBlockDTO;
-use App\Services\Interfaces\CourseManager;
-use App\Repositories\Interfaces\ExamBlockRepository;
-use App\Repositories\Interfaces\CourseRepository;
 use App\Mappers\Interfaces\ExamBlockMapper;
+use App\Models\Course;
+use App\Repositories\Interfaces\CourseRepository;
+use App\Repositories\Interfaces\ExamBlockRepository;
+use App\Services\Interfaces\CourseManager;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Gate;
+use function collect;
 
 /**
  * Description of CourseManagerImpl
@@ -18,22 +18,31 @@ use Illuminate\Support\Facades\Gate;
  */
 class CourseManagerImpl implements CourseManager {
     
-    private $blockMapper;
+    private ExamBlockMapper $blockMapper;
     private $courseId;
+    private ExamBlockRepository $blockRepo;
+    private CourseRepository $courseRepo;
     
-    public function __construct($courseId) {
+    public function __construct(
+            $courseId,
+            ExamBlockMapper $blockMapper,
+            ExamBlockRepository $blockRepo,
+            CourseRepository $courseRepo)
+    {
         $this->courseId = $courseId;
-        $this->blockMapper = app()->make(ExamBlockMapper::class);
+        $this->blockMapper = $blockMapper;
+        $this->blockRepo = $blockRepo;
+        $this->courseRepo = $courseRepo;
     }
 
     public function getExamBlocks(): Collection {
-        return $this->getBlockRepository()
+        return $this->blockRepo
                 ->getFilteredByCourse($this->courseId)
                 ->map(fn($block) => $this->blockMapper->toDTO($block));
     }
 
     public function getExamOptions(): Collection {
-        $options = $this->getExamBlocks()->map(fn(ExamBlockDTO $block) => 
+        $options = $this->getExamBlocks()->map(fn(ExamBlockDTO $block) =>
                 $block->getExamOptions());
         if (isset($options)){
             $options = $options->flatten()->unique();
@@ -44,12 +53,7 @@ class CourseManagerImpl implements CourseManager {
     }
     
     public function getCourse(): Course {
-        return app()->make(CourseRepository::class)->get($this->courseId);
+        return $this->courseRepo->get($this->courseId);
     }
-    
-    private function getBlockRepository(): ExamBlockRepository {
-        return app()->make(ExamBlockRepository::class);
-    }
-
 
 }

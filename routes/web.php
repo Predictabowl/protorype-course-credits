@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\TakenExamController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudyPlanController;
+use App\Http\Controllers\TakenExamController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,6 +58,9 @@ Route::put("/userUpdate/{user}",[UserController::class,"put"]);
 
 //-------------- Course
 Route::get("/course",[CourseController::class,"index"])->name("courseIndex");
+Route::post("/course",[CourseController::class,"post"])->name("courseCreate");
+Route::delete("/course/{course}",[CourseController::class,"delete"])->name("courseDelete");
+Route::put("/course/{course}",[CourseController::class,"put"])->name("courseUpdate");
 
 //-------------- User Roles
 Route::put("/userRole/{user}",[UserController::class,"putRoles"])->name("userRoleUpdate");

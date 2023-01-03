@@ -8,17 +8,18 @@
 
 namespace Tests\Feature\Services;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Front;
+use App\Domain\StudyPlan;
 use App\Models\Course;
+use App\Models\Front;
 use App\Models\User;
-use App\Services\Interfaces\UserFrontManager;
 use App\Services\Implementations\StudyPlanManagerImpl;
 use App\Services\Interfaces\StudyPlanBuilder;
-use App\Domain\StudyPlan;
+use App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\YearCalculator;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use function collect;
 
 /**
  * Description of StudyPlanManagerImplTest
@@ -29,118 +30,105 @@ class StudyPlanManagerImplTest extends TestCase{
     
     use RefreshDatabase;
     
+    private Front $front;
+    private UserFrontManager $ufManager;
+    private YearCalculator $yCalc;
+    private StudyPlanManagerImpl $sut;
+    
+    protected function setUp(): void {
+        parent::setUp();
+        
+        $user = User::factory()->create();
+        $this->front = Front::create(["user_id" => $user->id]);
+        $this->ufManager = $this->createMock(UserFrontManager::class);
+        $this->yCalc = $this->createMock(YearCalculator::class);
+        
+        $this->sut = new StudyPlanManagerImpl($this->front, $this->ufManager,
+                $this->yCalc);
+    }
+    
     public function test_getStudyPlan_with_course_not_set(){
-        $front = new Front(["user_id" => 3]);
-        $userFrontManager = $this->createMock(UserFrontManager::class);
-        app()->instance(UserFrontManager::class, $userFrontManager);
-        
-        $userFrontManager->expects($this->once())
+        $this->ufManager->expects($this->once())
                 ->method("setUserId")
-                ->with(3)
-                ->willReturn($userFrontManager);
+                ->with($this->front->user_id)
+                ->willReturn($this->ufManager);
         
-        $userFrontManager->expects($this->once())
+        $this->ufManager->expects($this->once())
                 ->method("getStudyPlanBuilder")
                 ->willReturn(null);
         
-        $manager = new StudyPlanManagerImpl($front);
-        
-        $plan = $manager->getStudyPlan();
+        $plan = $this->sut->getStudyPlan();
         
         $this->assertNull($plan);
     }
     
     public function test_getStudyPlan_success(){
         $plan = new StudyPlan(collect([]));
-        $front = $this->setupStudyPlan($plan);
+        $this->setupStudyPlan($plan);
         
-        $manager = new StudyPlanManagerImpl($front);
-        
-        $result = $manager->getStudyPlan();
+        $result = $this->sut->getStudyPlan();
         
         $this->assertSame($plan, $result);
     }
     
     public function test_getAcademicYear(){
-        $front = new Front();
-        $calculator = $this->createMock(YearCalculator::class);
-        app()->instance(YearCalculator::class, $calculator);
         $date = Carbon::now();
         $year = $date->format("Y");
         $month = $date->format("m");
         $day = $date->format("d");
-        $calculator->expects($this->once())
+        $this->yCalc->expects($this->once())
                 ->method("getAcademicYear")
                 ->with($day,$month,$year)
                 ->willreturn(1498);
 
-        $manager = new StudyPlanManagerImpl($front);
-        
-        $result = $manager->getAcademicYear();
+        $result = $this->sut->getAcademicYear();
         
         $this->assertEquals(1498, $result);
     }
     
     public function test_getCourseYear_failure(){
-        $user = User::factory()->create();
-        $front = Front::create(["user_id" => $user->id]);
-        $userFrontManager = $this->createMock(UserFrontManager::class);
-        app()->instance(UserFrontManager::class, $userFrontManager);
-        
-        $userFrontManager->expects($this->once())
+        $this->ufManager->expects($this->once())
                 ->method("setUserId")
-                ->with($user->id)
-                ->willReturn($userFrontManager);
+                ->with($this->front->user_id)
+                ->willReturn($this->ufManager);
         
-        $userFrontManager->expects($this->once())
+        $this->ufManager->expects($this->once())
                 ->method("getStudyPlanBuilder")
                 ->willReturn(null);        
 
-        $yearCalculator = $this->createMock(YearCalculator::class);
-        app()->instance(YearCalculator::class, $yearCalculator);
-        $yearCalculator->expects($this->never())
+        $this->yCalc->expects($this->never())
                 ->method("getCourseYear");
         
-        $manager = new StudyPlanManagerImpl($front);
-        
-        $this->assertNull($manager->getCourseYear());
+        $this->assertNull($this->sut->getCourseYear());
         
     }
     
     public function test_getCourseYear_success(){
         $plan = $this->createMock(StudyPlan::class);
-        $front = $this->setupStudyPlan($plan);
-        $yearCalculator = $this->createMock(YearCalculator::class);
-        app()->instance(YearCalculator::class, $yearCalculator);
-        $yearCalculator->expects($this->once())
+        $this->front = $this->setupStudyPlan($plan);
+        $this->yCalc->expects($this->once())
                 ->method("getCourseYear")
-                ->with($front->course, $plan)
+                ->with($this->front->course, $plan)
                 ->willReturn(2);
         
-        $manager = new StudyPlanManagerImpl($front);
-        
-        $result = $manager->getCourseYear();
+        $result = $this->sut->getCourseYear();
         
         $this->assertEquals(2, $result);
     }
     
     private function setupStudyPlan(?StudyPlan $plan){
         $course = Course::factory()->create();
-        $user = User::factory()->create();
-        $front = Front::create(["user_id" => $user->id]);
-        $front->course()->associate($course);
-        $front->save();
-        $userFrontManager = $this->createMock(UserFrontManager::class);
-        app()->instance(UserFrontManager::class, $userFrontManager);
+        $this->front->course()->associate($course);
+        $this->front->save();
         
-        $userFrontManager->expects($this->once())
+        $this->ufManager->expects($this->once())
                 ->method("setUserId")
-                ->with($user->id)
-                ->willReturn($userFrontManager);
+                ->with($this->front->user_id)
+                ->willReturn($this->ufManager);
         
         $builder = $this->createMock(StudyPlanBuilder::class);
         
-        $userFrontManager->expects($this->once())
+        $this->ufManager->expects($this->once())
                 ->method("getStudyPlanBuilder")
                 ->willReturn($builder);
         
@@ -148,7 +136,7 @@ class StudyPlanManagerImplTest extends TestCase{
                 ->method("getStudyPlan")
                 ->willReturn($plan);
         
-        return $front;
+        return $this->front;
     }
     
 }
