@@ -8,7 +8,7 @@
 
 namespace App\Mappers\Implementations;
 
-use App\Domain\ExamBlockDTO;
+use App\Domain\ExamBlockStudyPlanDTO;
 use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
 use App\Mappers\Interfaces\ExamOptionMapper;
@@ -27,8 +27,8 @@ class ExamBlockMapperImpl implements ExamBlockMapper{
         $this->optionMapper = app()->make(ExamOptionMapper::class);
     }
     
-    public function toDTO(ExamBlock $model): ExamBlockDTO {
-        $newBlock = new ExamBlockDTO(
+    public function toDTO(ExamBlock $model): ExamBlockStudyPlanDTO {
+        $newBlock = new ExamBlockStudyPlanDTO(
                 $model->id,
                 $model->max_exams,
                 $model->cfu,

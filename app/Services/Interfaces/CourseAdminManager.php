@@ -9,9 +9,9 @@ namespace App\Services\Interfaces;
 
 use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
+use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
-use Illuminate\Support\Collection;
 
 /**
  *
@@ -19,7 +19,7 @@ use Illuminate\Support\Collection;
  */
 interface CourseAdminManager {
 
-    public function getCourseBlocks($courseId): Collection;
+    public function getCourseFullData($courseId): ?Course;
     public function saveExamBlock(NewExamBlockInfo $examBlock, $courseId): ExamBlock;
     public function updateExamBlock(ExamBlock $examBlock): bool;
     public function saveExam(NewExamInfo $exam, $examBlockId): Exam;

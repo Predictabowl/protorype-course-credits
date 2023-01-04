@@ -10,9 +10,9 @@ namespace Tests\Unit\Domain;
 
 use App\Models\Course;
 use PHPUnit\Framework\TestCase;
-use App\Domain\ExamOptionDTO;
+use App\Domain\ExamOptionStudyPlanDTO;
 use App\Domain\TakenExamDTO;
-use App\Domain\ExamBlockDTO;
+use App\Domain\ExamBlockStudyPlanDTO;
 use App\Domain\StudyPlan;
 
 /**
@@ -24,8 +24,8 @@ class StudyPlanTest extends TestCase{
 
     
     public function test_addExamLik_when_exam_not_present_in_the_course() {
-        $block = new ExamBlockDTO(1,1,12,3);
-        $option = new ExamOptionDTO(1,"option1", new ExamBlockDTO(2,1,12,2), "ssd");
+        $block = new ExamBlockStudyPlanDTO(1,1,12,3);
+        $option = new ExamOptionStudyPlanDTO(1,"option1", new ExamBlockStudyPlanDTO(2,1,12,2), "ssd");
         $taken = new TakenExamDTO(1,"taken1", "ssd", 9, 24);
         $takenPk = $taken->getId();
         
@@ -37,9 +37,9 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_addExamLink_leftover_cfu_values() {
-        $block = new ExamBlockDTO(1,2,12,2);
-        $option1 = new ExamOptionDTO(1,"option1", $block, "ssd");
-        $option2 = new ExamOptionDTO(2,"option2", $block, "ssd");
+        $block = new ExamBlockStudyPlanDTO(1,2,12,2);
+        $option1 = new ExamOptionStudyPlanDTO(1,"option1", $block, "ssd");
+        $option2 = new ExamOptionStudyPlanDTO(2,"option2", $block, "ssd");
         $taken1 = new TakenExamDTO(1,"taken1", "ssd", 10, 19);
         $taken2 = new TakenExamDTO(2,"taken2", "ssd", 6, 27);
         
@@ -66,11 +66,11 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_getRecognizedCredits() {
-        $block1 = new ExamBlockDTO(1,2,9,1);
-        $block2 = new ExamBlockDTO(2,1,18,2);
-        $option1 = new ExamOptionDTO(1,"option1", $block1, "ssd1");
-        $option2 = new ExamOptionDTO(2,"option2", $block1, "ssd2");
-        $option3 = new ExamOptionDTO(3,"option3", $block2, "ssd1");
+        $block1 = new ExamBlockStudyPlanDTO(1,2,9,1);
+        $block2 = new ExamBlockStudyPlanDTO(2,1,18,2);
+        $option1 = new ExamOptionStudyPlanDTO(1,"option1", $block1, "ssd1");
+        $option2 = new ExamOptionStudyPlanDTO(2,"option2", $block1, "ssd2");
+        $option3 = new ExamOptionStudyPlanDTO(3,"option3", $block2, "ssd1");
         $taken1 = new TakenExamDTO(1,"taken1", "ssd1", 10, 23);
         $taken2 = new TakenExamDTO(2,"taken2", "ssd2", 6, 24);
         $taken3 = new TakenExamDTO(2,"taken2", "ssd1", 9, 22);
@@ -101,8 +101,8 @@ class StudyPlanTest extends TestCase{
     
     
     public function test_getLeftOverAllottedCfu() {
-        $block1 = $this->createMock(ExamBlockDTO::class);
-        $block2 = $this->createMock(ExamBlockDTO::class);
+        $block1 = $this->createMock(ExamBlockStudyPlanDTO::class);
+        $block2 = $this->createMock(ExamBlockStudyPlanDTO::class);
         
         $block1->expects($this->once())
                 ->method("getRecognizedCredits")
@@ -133,8 +133,8 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_addExamLink_with_max_cfu() {
-        $block1 = $this->createMock(ExamBlockDTO::class);
-        $option = $this->createMock(ExamOptionDTO::class);
+        $block1 = $this->createMock(ExamBlockStudyPlanDTO::class);
+        $option = $this->createMock(ExamOptionStudyPlanDTO::class);
         $exam = $this->createMock(TakenExamDTO::class);
         $macCfu = 15;
         $recognizedCfu = 5;
@@ -165,8 +165,8 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_serialize(){
-        $block1 = new ExamBlockDTO(1, 1, 10, 2);
-        $block2 = new ExamBlockDTO(3, 2, 9, 3);
+        $block1 = new ExamBlockStudyPlanDTO(1, 1, 10, 2);
+        $block2 = new ExamBlockStudyPlanDTO(3, 2, 9, 3);
         $plan = new StudyPlan(collect([$block1, $block2]));
         
         $string = serialize($plan);

@@ -2,7 +2,7 @@
 
 namespace App\Services\Implementations;
 
-use App\Domain\ExamBlockDTO;
+use App\Domain\ExamBlockStudyPlanDTO;
 use App\Mappers\Interfaces\ExamBlockMapper;
 use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
@@ -42,7 +42,7 @@ class CourseManagerImpl implements CourseManager {
     }
 
     public function getExamOptions(): Collection {
-        $options = $this->getExamBlocks()->map(fn(ExamBlockDTO $block) =>
+        $options = $this->getExamBlocks()->map(fn(ExamBlockStudyPlanDTO $block) =>
                 $block->getExamOptions());
         if (isset($options)){
             $options = $options->flatten()->unique();

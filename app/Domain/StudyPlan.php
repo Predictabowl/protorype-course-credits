@@ -2,8 +2,8 @@
 
 namespace App\Domain;
 
-use App\Domain\ExamBlockDTO;
-use App\Domain\ExamOptionDTO;
+use App\Domain\ExamBlockStudyPlanDTO;
+use App\Domain\ExamOptionStudyPlanDTO;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Serializable;
@@ -21,7 +21,7 @@ class StudyPlan implements Serializable{
      */
     public function __construct(Collection $examBlocks, ?int $maxCfu = null) {
         $this->examBlocks = $examBlocks->mapWithKeys(
-                fn(ExamBlockDTO $block) => 
+                fn(ExamBlockStudyPlanDTO $block) => 
                     [$block->getId() => $block]);
         $this->leftovers = collect([]);
         $this->maxCfu = $maxCfu;
@@ -35,7 +35,7 @@ class StudyPlan implements Serializable{
         $this->maxCfu = $maxCfu;
     }
 
-    public function addExamLink(ExamOptionDTO $option, TakenExamDTO $taken): TakenExamDTO {
+    public function addExamLink(ExamOptionStudyPlanDTO $option, TakenExamDTO $taken): TakenExamDTO {
         $id = $option->getId();
         $appExam = $this->getExam($id);
         if (!isset($appExam)){
@@ -46,18 +46,18 @@ class StudyPlan implements Serializable{
         return $linkInserted;
     }
     
-    public function getExam($id): ?ExamOptionDTO{
-        return $this->getExams()->first(fn(ExamOptionDTO $exam) =>
+    public function getExam($id): ?ExamOptionStudyPlanDTO{
+        return $this->getExams()->first(fn(ExamOptionStudyPlanDTO $exam) =>
                 $exam->getId() === $id);
     }
     
-    public function setExam(ExamOptionDTO $exam){
+    public function setExam(ExamOptionStudyPlanDTO $exam){
         $id = $exam->getBlock()->getId();
         $this->examBlocks[$id]->setOption($exam);
     }
 
     public function getExams() {
-        return $this->examBlocks->map(fn(ExamBlockDTO $block) =>
+        return $this->examBlocks->map(fn(ExamBlockStudyPlanDTO $block) =>
                 $block->getExamOptions())->flatten();
     }
     
@@ -66,7 +66,7 @@ class StudyPlan implements Serializable{
     }
     
     public function getRecognizedCredits(): int {
-        return $this->getExamBlocks()->map(fn(ExamBlockDTO $block) =>
+        return $this->getExamBlocks()->map(fn(ExamBlockStudyPlanDTO $block) =>
                 $block->getRecognizedCredits())->sum();
     }
     

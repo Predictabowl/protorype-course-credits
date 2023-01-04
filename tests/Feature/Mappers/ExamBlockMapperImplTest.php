@@ -13,8 +13,8 @@ use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Ssd;
 use App\Models\ExamBlockOption;
-use App\Domain\ExamBlockDTO;
-use App\Domain\ExamOptionDTO;
+use App\Domain\ExamBlockStudyPlanDTO;
+use App\Domain\ExamOptionStudyPlanDTO;
 use App\Mappers\Implementations\ExamBlockMapperImpl;
 use App\Mappers\Interfaces\ExamOptionMapper;
 use Tests\TestCase;
@@ -51,19 +51,19 @@ class ExamBlockMapperImplTest extends TestCase{
         ExamBlockOption::factory(3)->create([
            "exam_block_id" => 1,
         ]);
-        $block = new ExamBlockDTO(5, 3, 7, 2);
+        $block = new ExamBlockStudyPlanDTO(5, 3, 7, 2);
         
-        $optionDto1 = new ExamOptionDTO(4, "nome 2", $block,"ssd6");
-        $optionDto2 = new ExamOptionDTO(7, "nome test", $block, "ssd4");
-        $optionDto3 = new ExamOptionDTO(13, "nome ad", $block, "ssd1");
+        $optionDto1 = new ExamOptionStudyPlanDTO(4, "nome 2", $block,"ssd6");
+        $optionDto2 = new ExamOptionStudyPlanDTO(7, "nome test", $block, "ssd4");
+        $optionDto3 = new ExamOptionStudyPlanDTO(13, "nome ad", $block, "ssd1");
         
         $options = ExamBlockOption::all();
         $this->optionMapper->expects($this->exactly(3))
                 ->method("toDTO")
                 ->withConsecutive(
-                        [$options[0],$this->isInstanceOf(ExamBlockDTO::class)],
-                        [$options[1],$this->isInstanceOf(ExamBlockDTO::class)],
-                        [$options[2],$this->isInstanceOf(ExamBlockDTO::class)],
+                        [$options[0],$this->isInstanceOf(ExamBlockStudyPlanDTO::class)],
+                        [$options[1],$this->isInstanceOf(ExamBlockStudyPlanDTO::class)],
+                        [$options[2],$this->isInstanceOf(ExamBlockStudyPlanDTO::class)],
                     )
                 ->willReturnOnConsecutiveCalls(
                         $optionDto1, $optionDto2, $optionDto3);
@@ -71,7 +71,7 @@ class ExamBlockMapperImplTest extends TestCase{
         $mapper = new ExamBlockMapperImpl();
         $result = $mapper->toDTO($model);
         
-        $this->assertEquals(new ExamBlockDTO(1, 2, 10, 1), $result);
+        $this->assertEquals(new ExamBlockStudyPlanDTO(1, 2, 10, 1), $result);
     }
     
     
