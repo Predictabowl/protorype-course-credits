@@ -8,15 +8,15 @@
 
 namespace App\Mappers\Interfaces;
 
-use App\Models\ExamBlockOption;
-use App\Domain\ExamOptionStudyPlanDTO;
 use App\Domain\ExamBlockStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
+use App\Models\Exam;
 
 /**
  *
  * @author piero
  */
-interface ExamOptionMapper {
+interface ExamStudyPlanMapper {
 
-    public function toDTO(ExamBlockOption $model, ExamBlockStudyPlanDTO $block): ExamOptionStudyPlanDTO;
+    public function toDTO(Exam $model, ExamBlockStudyPlanDTO $block): ExamStudyPlanDTO;
 }

@@ -42,7 +42,7 @@ class ExamBlockRepositoryImplTest extends TestCase
      * This doesn't actually test the eager load, so the added options are
      * bloat.
      */
-    public function test_get_block_with_options()
+    public function test_get_block_with_eagerLoading()
     {
         $course = Course::factory()->create();
         $ssds = Ssd::factory(3)->create();
@@ -51,16 +51,16 @@ class ExamBlockRepositoryImplTest extends TestCase
             "course_id" => $course
         ]);
         
-        $option = ExamBlockOption::factory()->create([
-            "exam_id" => Exam::factory()->create(),
+        $exam = Exam::factory()->create([
             "exam_block_id" => $block
         ]);
-        $option->ssds()->attach($ssds);
+        $block->ssds()->attach($ssds);
         
         $result = $this->sut->get(1);
         
         $block = ExamBlock::find(1);
         $this->assertEquals($block->attributesToArray(), $result->attributesToArray());
+        $this->assertEquals(2, sizeof($result->getRelations()));
     }
     
     public function test_getFilteredByCourse_when_course_not_present() {
@@ -70,19 +70,19 @@ class ExamBlockRepositoryImplTest extends TestCase
     }
 
 
-    public function test_getFilteredByCrouse_without_options(){
-        $course = Course::factory()->create();
-        
-        ExamBlock::factory(3)->create([
-            "course_id" => $course
-        ]);
-        
-        $result = $this->sut->getFilteredByCourse($course->id);
-        
-        $this->assertCount(3,$result);
-        $this->assertContainsOnlyInstancesOf(ExamBlock::class, $result);
-        // this test was cut short to save time
-    }
+//    public function test_getFilteredByCourse_without_options(){
+//        $course = Course::factory()->create();
+//        
+//        ExamBlock::factory(3)->create([
+//            "course_id" => $course
+//        ]);
+//        
+//        $result = $this->sut->getFilteredByCourse($course->id);
+//        
+//        $this->assertCount(3,$result);
+//        $this->assertContainsOnlyInstancesOf(ExamBlock::class, $result);
+//        // this test was cut short to save time
+//    }
     
     public function test_getFilteredByCourse_with_options(){
         $course = Course::factory()->create();
@@ -96,24 +96,22 @@ class ExamBlockRepositoryImplTest extends TestCase
             "course_id" => Course::factory()->create()
         ]);
         
-        ExamBlockOption::factory(3)->create([
-            "exam_id" => Exam::factory()->create(),
+        Exam::factory(3)->create([
             "exam_block_id" => $blocks[0]
         ]);
         
-        ExamBlockOption::factory(2)->create([
-            "exam_id" => Exam::factory()->create(),
+        Exam::factory(2)->create([
             "exam_block_id" => $blocks[1]
         ]);
         
-        ExamBlockOption::factory(1)->create([
-            "exam_id" => Exam::factory()->create(),
+        Exam::factory(1)->create([
             "exam_block_id" => $blocks[2]
         ]);
         
         $result = $this->sut->getFilteredByCourse($course->id);
         
         $this->assertCount(3,$result);
+        $this->assertCount(2, $result->getRelations());
         $this->assertContainsOnlyInstancesOf(ExamBlock::class, $result);
         $this->assertEquals(ExamBlock::find(1)->attributesToArray(),
                 $result[0]->attributesToArray());

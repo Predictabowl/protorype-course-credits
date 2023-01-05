@@ -10,7 +10,7 @@ namespace Tests\Unit\Domain;
 
 use PHPUnit\Framework\TestCase;
 use App\Domain\ExamBlockStudyPlanDTO;
-use App\Domain\ExamOptionStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
 use App\Domain\TakenExamDTO;
 
 /**
@@ -29,9 +29,9 @@ class ExamBlockDTOTest extends TestCase{
     
     protected function setUp(): void {
         $this->block=  new ExamBlockStudyPlanDTO(1,self::FIXTURE_NUM_EXAMS, self::FIXTURE_CFU, self::FIXTURE_COURSE_YEAR);
-        $this->exams[0] = new ExamOptionStudyPlanDTO(1,"first", $this->block, "ssd1");
-        $this->exams[1] = new ExamOptionStudyPlanDTO(2,"second", $this->block, "ssd2");
-        $this->exams[2] = new ExamOptionStudyPlanDTO(3,"third", $this->block, "ssd3");
+        $this->exams[0] = new ExamStudyPlanDTO(1,"first", $this->block, "ssd1");
+        $this->exams[1] = new ExamStudyPlanDTO(2,"second", $this->block, "ssd2");
+        $this->exams[2] = new ExamStudyPlanDTO(3,"third", $this->block, "ssd3");
     }
     
     
@@ -102,8 +102,8 @@ class ExamBlockDTOTest extends TestCase{
     
     public function test_serialize(){
         $block1 = new ExamBlockStudyPlanDTO(3, 2, 10, 1);
-        $option1 = new ExamOptionStudyPlanDTO(5, "option 1", $block1, "ssd1");
-        $option2 = new ExamOptionStudyPlanDTO(7, "option 2", $block1, "ssd5");
+        $option1 = new ExamStudyPlanDTO(5, "option 1", $block1, "ssd1");
+        $option2 = new ExamStudyPlanDTO(7, "option 2", $block1, "ssd5");
         
         $string = serialize($block1);
         $result = unserialize($string);

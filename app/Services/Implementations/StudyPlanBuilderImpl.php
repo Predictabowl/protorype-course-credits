@@ -3,7 +3,7 @@
 namespace App\Services\Implementations;
 
 use App\Domain\TakenExamDTO;
-use App\Domain\ExamOptionStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
 use App\Domain\StudyPlan;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Interfaces\FrontManager;
@@ -141,7 +141,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
      */
     public function getOptionsByCompatibility(TakenExamDTO $takenExam): Collection{
         return $this->sortOptions(
-                $this->examOptions->filter(fn(ExamOptionStudyPlanDTO $option) =>
+                $this->examOptions->filter(fn(ExamStudyPlanDTO $option) =>
                     $option->getCompatibleOptions()->contains(
                             fn(string $ssd) => $ssd === $takenExam->getSsd()))
                 ,$takenExam);

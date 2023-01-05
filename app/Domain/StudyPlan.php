@@ -3,7 +3,7 @@
 namespace App\Domain;
 
 use App\Domain\ExamBlockStudyPlanDTO;
-use App\Domain\ExamOptionStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Serializable;
@@ -35,7 +35,7 @@ class StudyPlan implements Serializable{
         $this->maxCfu = $maxCfu;
     }
 
-    public function addExamLink(ExamOptionStudyPlanDTO $option, TakenExamDTO $taken): TakenExamDTO {
+    public function addExamLink(ExamStudyPlanDTO $option, TakenExamDTO $taken): TakenExamDTO {
         $id = $option->getId();
         $appExam = $this->getExam($id);
         if (!isset($appExam)){
@@ -46,12 +46,12 @@ class StudyPlan implements Serializable{
         return $linkInserted;
     }
     
-    public function getExam($id): ?ExamOptionStudyPlanDTO{
-        return $this->getExams()->first(fn(ExamOptionStudyPlanDTO $exam) =>
+    public function getExam($id): ?ExamStudyPlanDTO{
+        return $this->getExams()->first(fn(ExamStudyPlanDTO $exam) =>
                 $exam->getId() === $id);
     }
     
-    public function setExam(ExamOptionStudyPlanDTO $exam){
+    public function setExam(ExamStudyPlanDTO $exam){
         $id = $exam->getBlock()->getId();
         $this->examBlocks[$id]->setOption($exam);
     }

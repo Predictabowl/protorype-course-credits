@@ -19,22 +19,20 @@ use function collect;
  *
  * @author piero
  */
-class ExamOptionStudyPlanDTO implements ExamDTO, Serializable{
+class ExamStudyPlanDTO implements ExamDTO, Serializable{
 
-    private $id;
-    private $examName;
-    private $block;
-    private $ssd;
-    private $compatibleOptions;
-    private $linkedTakenExams;
+    private int $id;
+    private string $examName;
+    private ExamBlockStudyPlanDTO $block;
+    private ?string $ssd;
+    private Collection $linkedTakenExams;
     private $recognizedCredits;
 
-    public function __construct($id, string $examName, ExamBlockStudyPlanDTO $block, ?string $ssd) {
+    public function __construct(int $id, string $examName, ExamBlockStudyPlanDTO $block, ?string $ssd) {
         $this->id = $id;
         $this->examName = $examName;
         $this->block = $block;
         $this->ssd = $ssd;
-        $this->compatibleOptions = collect([]);
         $block->setOption($this);
         $this->linkedTakenExams = collect([]);
         $this->calculateRecognizedCredits();
@@ -69,15 +67,7 @@ class ExamOptionStudyPlanDTO implements ExamDTO, Serializable{
     }
 
     public function getCompatibleOptions(): Collection {
-        return $this->compatibleOptions;
-    }
-
-    public function addCompatibleOption(string $ssd){
-        $this->compatibleOptions->push($ssd);
-    }
-
-    public function setCompatibleOptions(Collection $ssds){
-        $this->compatibleOptions = $ssds;
+        return $this->block->getCompatibleOptions();
     }
 
         /**
@@ -129,10 +119,8 @@ class ExamOptionStudyPlanDTO implements ExamDTO, Serializable{
                 $this->getBlock()->getNumSlotsAvailable() < 1){
             return false;
         }
-
         return true;
     }
-
 
     public function getIntegrationValue(): int
     {

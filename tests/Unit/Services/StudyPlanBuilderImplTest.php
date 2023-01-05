@@ -3,7 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\Domain\ExamBlockStudyPlanDTO;
-use App\Domain\ExamOptionStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
 use App\Domain\TakenExamDTO;
 use App\Models\Course;
 use App\Services\Implementations\StudyPlanBuilderImpl;
@@ -52,7 +52,7 @@ class StudyPlanBuilderImplTest extends TestCase
     
      public function test_getOptionsBySsd_when_no_ssd_associated() {
         $takenExam = new TakenExamDTO(17,"test exam 01","IUS/01",5,28);
-        $option1 = new ExamOptionStudyPlanDTO(1,"test 1", $this->blocks[0], 12, null);
+        $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], 12, null);
         $this->options = collect([$option1]);
         $this->examDistance->expects($this->never())
                 ->method("calculateDistance");
@@ -67,10 +67,10 @@ class StudyPlanBuilderImplTest extends TestCase
 
     public function test_getOptionsBySsd() {
         $takenExam = new TakenExamDTO(17,"test exam 01","IUS/01",5,23);
-        $option1 = new ExamOptionStudyPlanDTO(1,"test 1", $this->blocks[0], "IUS/01");
-        $option2 = new ExamOptionStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
-        $option3 = new ExamOptionStudyPlanDTO(3,"test 3", $this->blocks[1], "IUS/01");
-        $option4 = new ExamOptionStudyPlanDTO(4,"test 4", $this->blocks[2], "IUS/01");
+        $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], "IUS/01");
+        $option2 = new ExamStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
+        $option3 = new ExamStudyPlanDTO(3,"test 3", $this->blocks[1], "IUS/01");
+        $option4 = new ExamStudyPlanDTO(4,"test 4", $this->blocks[2], "IUS/01");
         $this->options = collect([$option1,$option2,$option3,$option4]);
         $this->examDistance->expects($this->exactly(3))                
                 ->method("calculateDistance")
@@ -88,10 +88,10 @@ class StudyPlanBuilderImplTest extends TestCase
     
     public function test_getOptionsByCompatibility() {
         $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5,25);
-        $option1 = new ExamOptionStudyPlanDTO(1,"test 1", $this->blocks[0], null);
-        $option2 = new ExamOptionStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
-        $option3 = new ExamOptionStudyPlanDTO(3,"test 3", $this->blocks[1], "IUS/07");
-        $option4 = new ExamOptionStudyPlanDTO(4,"test 4", $this->blocks[2], "IUS/01");
+        $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], null);
+        $option2 = new ExamStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
+        $option3 = new ExamStudyPlanDTO(3,"test 3", $this->blocks[1], "IUS/07");
+        $option4 = new ExamStudyPlanDTO(4,"test 4", $this->blocks[2], "IUS/01");
         $option1->addCompatibleOption("IUS/02");
         $option4->addCompatibleOption("IUS/02");
         $option4->addCompatibleOption("IUS/07");
@@ -112,10 +112,10 @@ class StudyPlanBuilderImplTest extends TestCase
     
     public function test_getFreeChoiceOptions() {
         $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5,22);
-        $option1 = new ExamOptionStudyPlanDTO(1,"test 1", $this->blocks[0], null);
-        $option2 = new ExamOptionStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
-        $option3 = new ExamOptionStudyPlanDTO(3,"test 3", $this->blocks[1], null);
-        $option4 = new ExamOptionStudyPlanDTO(4,"test 4", $this->blocks[2], "IUS/01");
+        $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], null);
+        $option2 = new ExamStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
+        $option3 = new ExamStudyPlanDTO(3,"test 3", $this->blocks[1], null);
+        $option4 = new ExamStudyPlanDTO(4,"test 4", $this->blocks[2], "IUS/01");
         $option1->addCompatibleOption("IUS/02");
         $option4->addCompatibleOption("IUS/02");
         $option4->addCompatibleOption("IUS/07");
@@ -145,9 +145,9 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->blocks = [$block1, $block2, $block3];
         
          $this->options = collect([
-            new ExamOptionStudyPlanDTO(1,"Esame a scelta", $block1, null),
-            new ExamOptionStudyPlanDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
-            new ExamOptionStudyPlanDTO(3,"Altro esame", $block3, "IUS/07"),
+            new ExamStudyPlanDTO(1,"Esame a scelta", $block1, null),
+            new ExamStudyPlanDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
+            new ExamStudyPlanDTO(3,"Altro esame", $block3, "IUS/07"),
         ]);        
         $this->options[1]->addCompatibleOption("IUS/03");
         
@@ -182,9 +182,9 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->blocks = [$block1, $block2, $block3];
         
          $this->options = collect([
-            new ExamOptionStudyPlanDTO(1,"Esame a scelta", $block1, null),
-            new ExamOptionStudyPlanDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
-            new ExamOptionStudyPlanDTO(3,"Altro esame", $block3, "IUS/07"),
+            new ExamStudyPlanDTO(1,"Esame a scelta", $block1, null),
+            new ExamStudyPlanDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
+            new ExamStudyPlanDTO(3,"Altro esame", $block3, "IUS/07"),
         ]);        
         $this->options[1]->addCompatibleOption("IUS/03");
         
@@ -221,9 +221,9 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->blocks = [$block1, $block2, $block3];
         
          $this->options = collect([
-            new ExamOptionStudyPlanDTO(1,"Esame a scelta", $block1, null),
-            new ExamOptionStudyPlanDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
-            new ExamOptionStudyPlanDTO(3,"Altro esame", $block3, "IUS/07"),
+            new ExamStudyPlanDTO(1,"Esame a scelta", $block1, null),
+            new ExamStudyPlanDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
+            new ExamStudyPlanDTO(3,"Altro esame", $block3, "IUS/07"),
         ]);        
         $this->options[1]->addCompatibleOption("IUS/03");
         
@@ -330,14 +330,14 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->blocks = [$block1, $block2, $block3, $block4,$block5];
         
         $this->options = collect([
-            new ExamOptionStudyPlanDTO(1,"Diritto Privato a distanza", $block1, "IUS/01"),
-            new ExamOptionStudyPlanDTO(2,"Istituzione di Diritto ", $block1, "IUS/09"),
-            new ExamOptionStudyPlanDTO(3,"Diritto commerciale a distanza", $block2, "IUS/04"),
-            new ExamOptionStudyPlanDTO(4,"Diritto di qualcosa", $block2, "IUS/03"),
-            new ExamOptionStudyPlanDTO(5,"Istituzione generica", $block3, "IUS/07"),
-            new ExamOptionStudyPlanDTO(12,"Storia di qualcosa", $block4, "STO/19"),
-            new ExamOptionStudyPlanDTO(13,"Altro esame IUS/09", $block5, "IUS/12"),
-            new ExamOptionStudyPlanDTO(14,"Altro esame IUS/07", $block3, "IUS/07"),
+            new ExamStudyPlanDTO(1,"Diritto Privato a distanza", $block1, "IUS/01"),
+            new ExamStudyPlanDTO(2,"Istituzione di Diritto ", $block1, "IUS/09"),
+            new ExamStudyPlanDTO(3,"Diritto commerciale a distanza", $block2, "IUS/04"),
+            new ExamStudyPlanDTO(4,"Diritto di qualcosa", $block2, "IUS/03"),
+            new ExamStudyPlanDTO(5,"Istituzione generica", $block3, "IUS/07"),
+            new ExamStudyPlanDTO(12,"Storia di qualcosa", $block4, "STO/19"),
+            new ExamStudyPlanDTO(13,"Altro esame IUS/09", $block5, "IUS/12"),
+            new ExamStudyPlanDTO(14,"Altro esame IUS/07", $block3, "IUS/07"),
         ]);
         
         $this->options[5]->addCompatibleOption("IUS/03");

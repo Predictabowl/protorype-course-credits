@@ -11,7 +11,7 @@ namespace App\Support\Seeders;
 use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
-use App\Models\ExamBlockOptionSsd;
+use App\Models\ExamBlockSsd;
 
 /**
  * Description of GenerateExamBlock
@@ -36,30 +36,32 @@ class GenerateExamBlock {
             "courseYear" => $year
         ]);
         
-        foreach ($data as $value) {
-            $exam = Exam::firstOrCreate([
-                "name" => $value[0],
-                "ssd_id" => GenerateSSD::getSSDId($value[1])
-            ]);
-            
-            $option = ExamBlockOption::create([
-                "exam_id" => $exam->id,
+        foreach ($compatibilities as $compatibility) {
+            ExamBlockSsd::create([
+                "ssd_id" => GenerateSSD::getSSDId($compatibility),
                 "exam_block_id" => $block->id
             ]);
-            
-            foreach ($compatibilities as $compatibility) {
-                ExamBlockOptionSsd::create([
-                    "ssd_id" => GenerateSSD::getSSDId($compatibility),
-                    "exam_block_option_id" => $option->id
-                ]);
-            }
+        }
+        
+//        foreach ($data as $value) {
+//            $exam = Exam::firstOrCreate([
+//                "name" => $value[0],
+//                "ssd_id" => GenerateSSD::getSSDId($value[1]),
+//                "exam_block_id" => $block->id
+//            ]);
+        foreach ($data as $value) {
+            $exam = Exam::create([
+                "name" => $value[0],
+                "ssd_id" => GenerateSSD::getSSDId($value[1]),
+                "exam_block_id" => $block->id
+            ]);
             
         }
 
     }
     
     public static function generateFreeChoiceExams($courseId, $numExams, $cfu){
-        $exam = ExamSupport::getFreeChoiceExam();
+//        $exam = ExamSupport::getFreeChoiceExam();
         
         for ($index = 0; $index < $numExams; $index++) {
             $block = ExamBlock::create([
@@ -67,11 +69,17 @@ class GenerateExamBlock {
                 "course_id" => $courseId,
                 "cfu" => $cfu
             ]);
-
-            $option = ExamBlockOption::create([
-                    "exam_id" => $exam->id,
-                    "exam_block_id" => $block->id
+            
+            Exam::Create([
+                "name" => ExamSupport::FREE_CHOICE_NAME,
+                "free_choice" => true,
+                "exam_block_id" => $block->id
             ]);
+
+//            $option = ExamBlockOption::create([
+//                    "exam_id" => $exam->id,
+//                    "exam_block_id" => $block->id
+//            ]);
         }
     }
 }

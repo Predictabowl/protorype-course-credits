@@ -10,9 +10,9 @@ use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\ExamRepository;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
@@ -30,13 +30,12 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
     }
 
     public function get(int $id): ?ExamBlock {
-        return ExamBlock::with("examBlockOptions.exam.ssd",
-                "examBlockOptions.ssds")->find($id);
+        return ExamBlock::with("exams.ssd", "ssds")->find($id);
     }
 
     public function getFilteredByCourse(int $courseId): Collection {
-        $course = Course::with("examBlocks.examBlockOptions.exam.ssd",
-                "examBlocks.examBlockOptions.ssds")->find($courseId);
+        $course = Course::with("examBlocks.exams.ssd",
+                "examBlocks.ssds")->find($courseId);
         if (!isset($course)){
             throw new ModelNotFoundException("Could not find Course with id: ".$courseId);
         }

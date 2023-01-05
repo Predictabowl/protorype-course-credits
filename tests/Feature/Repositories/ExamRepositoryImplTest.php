@@ -9,7 +9,9 @@ namespace Tests\Feature\Repositories;
 
 use App\Exceptions\Custom\ExamNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
+use App\Models\Course;
 use App\Models\Exam;
+use App\Models\ExamBlock;
 use App\Models\Ssd;
 use App\Repositories\Implementations\ExamRepositoryImpl;
 use App\Support\Seeders\ExamSupport;
@@ -31,6 +33,9 @@ class ExamRepositoryImplTest extends TestCase{
     protected function setUp(): void {
         parent::setUp();
         $this->sut = new ExamRepositoryImpl();
+        Course::factory()->create();
+        Ssd::factory()->create();
+        ExamBlock::factory()->create();
     }
     
     public function test_get_whenNotPresent(){
@@ -40,11 +45,12 @@ class ExamRepositoryImplTest extends TestCase{
     }
     
     public function test_get_success(){
-        Ssd::factory()->create();
-        $fixture = Exam::factory()->create([
+
+        Exam::factory()->create([
             "id" => 2,
             "code" => null
         ]);
+        $fixture = Exam::first();
         
         $get = $this->sut->get(2);
         
@@ -70,7 +76,7 @@ class ExamRepositoryImplTest extends TestCase{
     
     public function test_save_successfull(){
         $ssd = Ssd::factory()->create();
-        $toSave = Exam::make([
+        $toSave = Exam::factory()->make([
             "code" => null,
             "ssd_id" => $ssd->id,
             "name" => "test name"
@@ -86,7 +92,6 @@ class ExamRepositoryImplTest extends TestCase{
     }
     
     public function test_update_whenInvalidSsd_shouldThrow(){
-        Ssd::factory()->create();
         $exam = Exam::factory()->create();
         $exam->ssd_id += 1;
         
@@ -121,8 +126,7 @@ class ExamRepositoryImplTest extends TestCase{
         $this->assertEquals("new name",$modified->name);
     }
     
-    public function test_deleteNormalExam(){
-        Ssd::factory()->create();
+    public function test_deleteExam(){
         $exam = Exam::factory()->create();
         
         $this->sut->delete($exam->id);
@@ -131,39 +135,17 @@ class ExamRepositoryImplTest extends TestCase{
         $this->assertNull($loaded);
     }
     
-    public function test_delete_shouldIgnoreFreeChoiceExam(){
-        $exam = ExamSupport::getFreeChoiceExam();
-        
-        $this->sut->delete($exam->id);
-        
-        $this->assertDatabaseCount("exams", 1);
-    }
-    
-    public function test_deleteFreeChoice(){
-        Ssd::factory()->create();
-        $exam = Exam::factory()->create();
-        ExamSupport::getFreeChoiceExam();
-        
-        $this->sut->deleteFreeChoice();
-        
-        $this->assertDatabaseCount("exams", 1);
-        $loaded = Exam::find($exam->id);
-        $this->assertNotNull($loaded);
-    }
-    
-    public function test_deleteBatch_shouldIgnoreFreeChoiceExam(){
+    public function test_deleteBatch(){
         Ssd::factory(3)->create();
         $exams = Exam::factory(2)->create();
-        $freeChoice = ExamSupport::getFreeChoiceExam();
         $ids = $exams->map(function ($item){
                 return $item->id;
             });
         
         $this->sut->deleteBatch($ids);
         
-        $this->assertDatabaseCount("exams", 1);
-        $this->assertDatabaseCount("ssds", 3);
-        $this->assertTrue(ExamSupport::isFreeChoiceExam(Exam::first()->id));
+        $this->assertDatabaseCount("exams", 0);
+        $this->assertDatabaseCount("ssds", 4);
     }
     
 }

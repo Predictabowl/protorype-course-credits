@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateExamBlockOptionsTable extends Migration
+class CreateExamsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,13 @@ class CreateExamBlockOptionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('exam_block_options', function (Blueprint $table) {
+        Schema::create('exams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("exam_id")->constrained()->cascadeOnDelete();
+            $table->foreignId("ssd_id")->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId("exam_block_id")->constrained()->cascadeOnDelete();
+            $table->string("code")->unique()->nullable(); //unused right now, but left for future applications
+            $table->boolean("free_choice")->default(false);
+            $table->string("name");
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ class CreateExamBlockOptionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('exam_block_options');
+        Schema::dropIfExists('exams');
     }
 }

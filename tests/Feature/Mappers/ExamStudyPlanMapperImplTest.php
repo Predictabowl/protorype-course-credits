@@ -14,7 +14,7 @@ use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
 use App\Domain\ExamBlockStudyPlanDTO;
-use App\Mappers\Implementations\ExamOptionMapperImpl;
+use App\Mappers\Implementations\ExamStudyPlanMapperImpl;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,7 +23,7 @@ use Tests\TestCase;
  *
  * @author piero
  */
-class ExamOptionMapperImplTest extends TestCase{
+class ExamStudyPlanMapperImplTest extends TestCase{
     
     use RefreshDatabase;
     
@@ -32,27 +32,26 @@ class ExamOptionMapperImplTest extends TestCase{
     protected function setUp(): void{
         parent::setUp();
         
-        $this->mapper = new ExamOptionMapperImpl();
+        $this->mapper = new ExamStudyPlanMapperImpl();
     }
     
     public function test_toTDO() {
         Ssd::factory(3)->create();
         Course::factory()->create();
-        Exam::factory(3)->create();
         ExamBlock::factory()->create();
-        ExamBlockOption::factory()->create();
-        $option = ExamBlockOption::first();
+        Exam::factory(3)->create();
+        $exam = Exam::first();
         $block = new ExamBlockStudyPlanDTO(1, 2, 9, null);
         
-        $result = $this->mapper->toDTO($option, $block);
+        $result = $this->mapper->toDTO($exam, $block);
         
         $this->assertEquals($block, $result->getBlock());
         $this->assertEquals($block->getExamOption(1), $result);
         $this->assertEquals(
-               [$option->id,
+               [$exam->id,
                 9,
-                $option->exam->name,
-                $option->exam->ssd->code
+                $exam->name,
+                $exam->ssd->code
                 ],
                [$result->getId(),
                 $result->getCfu(),
@@ -63,23 +62,22 @@ class ExamOptionMapperImplTest extends TestCase{
     public function test_toTDO_on_exam_with_null_ssD() {
         Ssd::factory(3)->create();
         Course::factory()->create();
-        Exam::create([
+        ExamBlock::factory()->create();
+        Exam::factory()->create([
             "name" => "esame test",
         ]);
-        ExamBlock::factory()->create();
-        ExamBlockOption::factory()->create();
-        $option = ExamBlockOption::first();
+        $exam = Exam::first();
         $block = new ExamBlockStudyPlanDTO(1, 2, 7, 1);
         
-        $result = $this->mapper->toDTO($option, $block);
+        $result = $this->mapper->toDTO($exam, $block);
         
         $this->assertEquals($block, $result->getBlock());
         $this->assertEquals($block->getExamOption(1), $result);
         $this->assertEquals(
-               [$option->id,
+               [$exam->id,
                 7,
-                $option->exam->name,
-                $option->exam->ssd,
+                $exam->name,
+                $exam->ssd->code,
                 ],
                [$result->getId(),
                 $result->getCfu(),

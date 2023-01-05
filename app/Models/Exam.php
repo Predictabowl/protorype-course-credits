@@ -16,8 +16,8 @@ class Exam extends Model
         return $this->belongsTo(Ssd::class);
     }
 
-    public function examBlockOptions()
+    public function examBlock()
     {
-        return $this->hasMany(ExamBlockOption::class);
+        return $this->belongsTo(ExamBlock::class);
     }
 }

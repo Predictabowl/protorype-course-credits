@@ -4,7 +4,7 @@ namespace Tests\Unit\Services;
 
 use PHPUnit\Framework\TestCase;
 use App\Services\Implementations\ExamDistanceByName;
-use App\Domain\ExamOptionStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
 use App\Domain\ExamBlockStudyPlanDTO;
 use App\Domain\TakenExamDTO;
 
@@ -24,7 +24,7 @@ class ExamDistanceByNameTest extends TestCase{
     }
     
     public function test_name_distance_insertion() {
-        $option = new ExamOptionStudyPlanDTO(1,"nome insegnamento", $this->block, "ssd");
+        $option = new ExamStudyPlanDTO(1,"nome insegnamento", $this->block, "ssd");
         $taken = new TakenExamDTO(1,"nome dell'insegnamento","ssd",6, 19);
         
         $dist = $this->eDistance->calculateDistance($option, $taken);
@@ -33,7 +33,7 @@ class ExamDistanceByNameTest extends TestCase{
     }
     
     public function test_name_distance_deletion() {
-        $option = new ExamOptionStudyPlanDTO(1,"Nome Insegnamento", $this->block, "ssd");
+        $option = new ExamStudyPlanDTO(1,"Nome Insegnamento", $this->block, "ssd");
         $taken = new TakenExamDTO(1,"nome insegna","ssd",6, 23);
         
         $dist = $this->eDistance->calculateDistance($option, $taken);
@@ -42,7 +42,7 @@ class ExamDistanceByNameTest extends TestCase{
     }
     
     public function test_name_distance_replacement() {
-        $option = new ExamOptionStudyPlanDTO(1,"Nome insegnamento", $this->block, "ssd");
+        $option = new ExamStudyPlanDTO(1,"Nome insegnamento", $this->block, "ssd");
         $taken = new TakenExamDTO(1,"nome insegnamenti","ssd",6, 26);
         
         $dist = $this->eDistance->calculateDistance($option, $taken);

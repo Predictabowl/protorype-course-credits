@@ -11,13 +11,18 @@ class ExamBlock extends Model
     
     protected $guarded = [];
 
-    public function examBlockOptions()
+    public function exams()
     {
-        return $this->hasMany(ExamBlockOption::class);
+        return $this->hasMany(Exam::class);
     }
 
     public function course()
     {
         return $this->belongsTo(Course::class);
+    }
+    
+    public function ssds()
+    {
+        return $this->belongsToMany(Ssd::class);
     }
 }

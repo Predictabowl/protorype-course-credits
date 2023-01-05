@@ -62,23 +62,10 @@ class ExamRepositoryImpl implements ExamRepository{
     }
 
     public function delete(int $id): void {
-        if(!ExamSupport::isFreeChoiceExam($id)){
-            Exam::destroy($id);
-        }
-    }
-
-    public function deleteFreeChoice(): void {
-        $exam = ExamSupport::findFreeChoiceExam();
-        if(!is_null($exam)){
-            Exam::destroy($exam->id);
-        }
+        Exam::destroy($id);
     }
 
     public function deleteBatch(Collection $ids): void {
-        $freeChoice = ExamSupport::findFreeChoiceExam();
-        if(!is_null($freeChoice)){
-            $ids = $ids->except(["id",$freeChoice->id]);
-        }
         Exam::destroy($ids);
     }
 
