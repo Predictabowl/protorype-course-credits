@@ -13,7 +13,7 @@ use App\Models\Ssd;
 use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Models\ExamBlockOption;
-use App\Domain\ExamBlockDTO;
+use App\Domain\ExamBlockStudyPlanDTO;
 use App\Mappers\Implementations\ExamOptionMapperImpl;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -42,7 +42,7 @@ class ExamOptionMapperImplTest extends TestCase{
         ExamBlock::factory()->create();
         ExamBlockOption::factory()->create();
         $option = ExamBlockOption::first();
-        $block = new ExamBlockDTO(1, 2, 9, null);
+        $block = new ExamBlockStudyPlanDTO(1, 2, 9, null);
         
         $result = $this->mapper->toDTO($option, $block);
         
@@ -69,7 +69,7 @@ class ExamOptionMapperImplTest extends TestCase{
         ExamBlock::factory()->create();
         ExamBlockOption::factory()->create();
         $option = ExamBlockOption::first();
-        $block = new ExamBlockDTO(1, 2, 7, 1);
+        $block = new ExamBlockStudyPlanDTO(1, 2, 7, 1);
         
         $result = $this->mapper->toDTO($option, $block);
         

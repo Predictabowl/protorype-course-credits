@@ -11,6 +11,7 @@ use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
+use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Repositories\Interfaces\CourseRepository;
@@ -18,7 +19,6 @@ use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\ExamRepository;
 use App\Repositories\Interfaces\SSDRepository;
 use App\Services\Interfaces\CourseAdminManager;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use TheSeer\Tokenizer\Exception;
 
@@ -48,8 +48,8 @@ class CourseAdminManagerImpl implements CourseAdminManager {
         throw new Exception("Method not yet implemented");
     }
 
-    public function getCourseBlocks($courseId): Collection {
-        throw new Exception("Method not yet implemented");
+    public function getCourseFullData($courseId): ?Course {
+        return $this->courseRepo->get($courseId,true);
     }
 
     public function saveExam(NewExamInfo $exam, $examBlockId): Exam {

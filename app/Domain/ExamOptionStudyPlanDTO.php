@@ -19,7 +19,7 @@ use function collect;
  *
  * @author piero
  */
-class ExamOptionDTO implements ExamDTO, Serializable{
+class ExamOptionStudyPlanDTO implements ExamDTO, Serializable{
 
     private $id;
     private $examName;
@@ -29,7 +29,7 @@ class ExamOptionDTO implements ExamDTO, Serializable{
     private $linkedTakenExams;
     private $recognizedCredits;
 
-    public function __construct($id, string $examName, ExamBlockDTO $block, ?string $ssd) {
+    public function __construct($id, string $examName, ExamBlockStudyPlanDTO $block, ?string $ssd) {
         $this->id = $id;
         $this->examName = $examName;
         $this->block = $block;
@@ -44,7 +44,7 @@ class ExamOptionDTO implements ExamDTO, Serializable{
         return $this->examName;
     }
 
-    public function getBlock(): ExamBlockDTO {
+    public function getBlock(): ExamBlockStudyPlanDTO {
         if(!isset($this->block)){
             throw new InvalidStateException(__METHOD__ . " "
                     ."Exam Block null value, likely was not set after unserialization.");
@@ -52,7 +52,7 @@ class ExamOptionDTO implements ExamDTO, Serializable{
         return $this->block;
     }
 
-    public function setBlock(ExamBlockDTO $block): void {
+    public function setBlock(ExamBlockStudyPlanDTO $block): void {
         $this->block = $block;
     }
 

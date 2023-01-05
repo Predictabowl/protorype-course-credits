@@ -17,10 +17,10 @@ use Illuminate\Database\Eloquent\Collection;
  */
 interface CourseRepository {
 
-    public function get(int $id): ?Course;
+    public function get(int $id, bool $fullDepth = false): ?Course;
     
     public function getFromName(string $name): ?Course;
-
+    
     public function getAll(array $filters = []): Collection;
 
     public function save(Course $course): bool;

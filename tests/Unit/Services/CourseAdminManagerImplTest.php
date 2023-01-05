@@ -10,6 +10,7 @@ namespace Tests\Unit\Services;
 use App\Domain\NewExamInfo;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
+use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Models\Ssd;
@@ -113,6 +114,17 @@ class CourseAdminManagerImplTest extends TestCase{
         $result = $this->sut->saveExam($examInfo,2);
 
         $this->assertEquals($result, $savedExam);
-    }    
+    }
 
+    public function test_getCourseFullData(){
+        $course = new Course();
+        $this->courseRepo->expects($this->once())
+                ->method("get")
+                ->with(5, true)
+                ->willReturn($course);
+        
+        $result = $this->sut->getCourseFullData(5);
+        
+        $this->assertSame($course, $result);
+    }
 }

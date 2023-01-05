@@ -17,7 +17,16 @@ class TakenExamController extends Controller
         $this->middleware(["auth","verified"]);
     }
 
-    
+    /* Effectively the SSD validation that check it's existence is 
+     * semantic and not syntactic. It basically skip every layer to check
+     * directly on the Data Layer from the the Presentantion layer,
+     * which is one of the worst pratices imho.
+     * But the alternative here is to manually build all the scaffolding
+     * in a proper layered structure, which will take considerable time
+     * for such a simple task, so il take the pre baked solution even if 
+     * I think is bad.
+     * 
+     */
     public function create(Front $front) {
         $this->authorize("create",$front);
         

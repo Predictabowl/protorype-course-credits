@@ -9,9 +9,9 @@
 namespace App\Mappers\Implementations;
 
 use App\Mappers\Interfaces\ExamOptionMapper;
-use App\Domain\ExamBlockDTO;
+use App\Domain\ExamBlockStudyPlanDTO;
 use App\Models\ExamBlockOption;
-use App\Domain\ExamOptionDTO;
+use App\Domain\ExamOptionStudyPlanDTO;
 
 /**
  * Description of ExamOptionMapper
@@ -20,12 +20,12 @@ use App\Domain\ExamOptionDTO;
  */
 class ExamOptionMapperImpl  implements ExamOptionMapper{
 
-    public function toDTO(ExamBlockOption $model, ExamBlockDTO $block): ExamOptionDTO {
+    public function toDTO(ExamBlockOption $model, ExamBlockStudyPlanDTO $block): ExamOptionStudyPlanDTO {
         $ssd = $model->exam->ssd;
         if($ssd != null){
             $ssd = $ssd->code;
         }
-        $newOption = new ExamOptionDTO($model->id, $model->exam->name, $block, $ssd);
+        $newOption = new ExamOptionStudyPlanDTO($model->id, $model->exam->name, $block, $ssd);
         $model->ssds->each(fn($ssd) => $newOption->addCompatibleOption($ssd->code));
         return $newOption;
     }

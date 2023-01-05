@@ -10,8 +10,8 @@ namespace Tests\Unit\Services;
 
 use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
-use App\Domain\ExamBlockDTO;
-use App\Domain\ExamOptionDTO;
+use App\Domain\ExamBlockStudyPlanDTO;
+use App\Domain\ExamOptionStudyPlanDTO;
 use App\Models\ExamBlock;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Services\Implementations\CourseManagerImpl;
@@ -49,7 +49,7 @@ class CourseManagerImplTest extends TestCase{
         $models = collect([
             new ExamBlock(["id" => 1]), 
             new ExamBlock(["id" => 2])]);
-        $blocks = collect([new ExamBlockDTO(1, 2, 9, null), new ExamBlockDTO(1, 1, 6, 3)]);
+        $blocks = collect([new ExamBlockStudyPlanDTO(1, 2, 9, null), new ExamBlockStudyPlanDTO(1, 1, 6, 3)]);
         $this->blockRepo->expects($this->once())
                 ->method("getFilteredByCourse")
                 ->with(self::FIXTURE_COURSE_ID)
@@ -76,11 +76,11 @@ class CourseManagerImplTest extends TestCase{
 
 
     public function test_getExamOptions() {
-        $block1 = new ExamBlockDTO(1, 2, 12, 2);
-        $block2 = new ExamBlockDTO(1, 1, 12, null);
-        $option1 = new ExamOptionDTO(1, "name 1", $block1, "ssd1");
-        $option2 = new ExamOptionDTO(2, "name 2", $block1, "ssd2");
-        $option3 = new ExamOptionDTO(3, "name 3", $block2, "ssd3");
+        $block1 = new ExamBlockStudyPlanDTO(1, 2, 12, 2);
+        $block2 = new ExamBlockStudyPlanDTO(1, 1, 12, null);
+        $option1 = new ExamOptionStudyPlanDTO(1, "name 1", $block1, "ssd1");
+        $option2 = new ExamOptionStudyPlanDTO(2, "name 2", $block1, "ssd2");
+        $option3 = new ExamOptionStudyPlanDTO(3, "name 3", $block2, "ssd3");
         $models = collect([
             new ExamBlock(["name" => "test"]),
             new ExamBlock(["name" => "name"])]);

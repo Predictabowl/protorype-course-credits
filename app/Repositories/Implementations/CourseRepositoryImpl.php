@@ -41,7 +41,10 @@ class CourseRepositoryImpl implements CourseRepository {
         return Course::destroy($id);
     }
 
-    public function get(int $id): ?Course {
+    public function get(int $id, bool $fullDepth = false): ?Course {
+        if ($fullDepth){
+            return Course::with("examBlocks.examBlockOptions.exam")->find($id);
+        }
         return Course::find($id);
     }
 
