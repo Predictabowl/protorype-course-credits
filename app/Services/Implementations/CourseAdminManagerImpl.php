@@ -54,10 +54,15 @@ class CourseAdminManagerImpl implements CourseAdminManager {
 
     public function saveExam(NewExamInfo $exam, $examBlockId): Exam {
         return DB::transaction(function() use($exam, $examBlockId){
-            $ssd = $this->ssdRepo->getSsdFromCode($exam->getSsd());
-            if (is_null($ssd)){
-                throw new SsdNotFoundException(
-                        "Ssd not found with code: ".$exam->getSsd());
+            if(!is_null($exam->getSsd())){
+                $ssd = $this->ssdRepo->getSsdFromCode($exam->getSsd());
+                if (is_null($ssd)){
+                    throw new SsdNotFoundException(
+                            "Ssd not found with code: ".$exam->getSsd());
+                }
+                $ssdId = $ssd->id;
+            } else {
+                $ssdId = null;
             }
             $examBlock = $this->ebRepo->get($examBlockId);
             if(is_null($examBlock)){
@@ -66,9 +71,9 @@ class CourseAdminManagerImpl implements CourseAdminManager {
             }
             $modelExam = new Exam([
                 "name" => $exam->getName(),
-                "ssd_id" => $ssd->id]);
+                "ssd_id" => $ssdId,
+                "free_choice" => $exam->isFreeChoice()]);
             $savedExam = $this->examRepo->save($modelExam);
-            $this->ebRepo->attachExam($examBlock->id, $savedExam->id);
             return $savedExam;
         });
     }

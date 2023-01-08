@@ -15,7 +15,5 @@ interface ExamBlockRepository {
     public function getFilteredByCourse(int $courseId): Collection;
     public function save(ExamBlock $examBlock): bool;
     public function update(ExamBlock $examBlock);
-    public function attachExam(int $examBlockId,  int $examId): bool;
-    public function detachExam(int $examBlockId, int $examId): bool;
     public function delete(int $id): bool;
 }

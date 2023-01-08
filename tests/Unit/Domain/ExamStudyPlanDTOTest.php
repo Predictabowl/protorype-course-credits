@@ -5,12 +5,14 @@ namespace Tests\Unit\Domain;
 /** This technically an integration test, but it's more work mocking
  * than using the DTO
 */
+
 use App\Domain\ExamBlockStudyPlanDTO;
 use App\Domain\ExamStudyPlanDTO;
 use App\Domain\TakenExamDTO;
+use App\Exceptions\Custom\InvalidStateException;
 use PHPUnit\Framework\TestCase;
 
-class ExamOptionDTOTest extends TestCase
+class ExamStudyPlanDTOTest extends TestCase
 {
 
     public function test_Integration_value()
@@ -88,7 +90,7 @@ class ExamOptionDTOTest extends TestCase
     
     public function test_serialization_ok(){
         $block = new ExamBlockStudyPlanDTO(3, 1, 9, 2);
-        $option = new ExamStudyPlanDTO(5, "test", $block, "ssd1");
+        $option = new ExamStudyPlanDTO(5, "test", $block, "ssd1", true);
         $taken1 = new TakenExamDTO(7, "taken 1", "ssd3", 3, 18);
         $taken2 = new TakenExamDTO(11, "taken 2", "ssd5", 4, 20);
         $option->addTakenExam($taken1);
@@ -100,17 +102,6 @@ class ExamOptionDTOTest extends TestCase
         $this->assertInstanceOf(ExamStudyPlanDTO::class, $result);
         $result->setBlock($block);
         $this->assertEquals($option,$result);
-    }
-    
-    public function test_serialization_invalid_state(){
-        $block = new ExamBlockStudyPlanDTO(3, 1, 9, null);
-        $option = new ExamStudyPlanDTO(5, "test", $block, "ssd1");
-        
-        $string = serialize($option);
-        $result = unserialize($string);
-        
-        $this->expectException(\App\Exceptions\Custom\InvalidStateException::class);
-        $result->getBlock();
     }
 
     private function createOption($cfu = 12): ExamStudyPlanDTO

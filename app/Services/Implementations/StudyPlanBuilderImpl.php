@@ -127,8 +127,9 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
      */
     public function getOptionsBySsd(TakenExamDTO $takenExam): Collection{
         return $this->sortOptions(
-                $this->examOptions->filter(fn($option) =>
-                        $option->getSsd() === $takenExam->getSsd())
+                $this->examOptions->filter(fn(ExamStudyPlanDTO $option) =>
+                        $option->getSsd() === $takenExam->getSsd() &&
+                        !$option->isFreeChoice())
                 ,$takenExam);
     }
 
@@ -155,8 +156,8 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
      */
     public function getFreeChoiceOptions(TakenExamDTO $takenExam): Collection{
         return $this->sortOptions(
-                $this->examOptions->filter(fn($option) =>
-                        $option->getSsd() === null)
+                $this->examOptions->filter(fn(ExamStudyPlanDTO $option) =>
+                        $option->isFreeChoice())
                 ,$takenExam);
     }
 
@@ -206,7 +207,7 @@ class StudyPlanBuilderImpl implements StudyPlanBuilder {
         return $options->map(fn($option) => [
                 "object" => $option,
                 "distance" => $this->eDistance->calculateDistance($option, $takenExam)])
-            ->sortBy("distance")
+            ->sortBy("distance")->values()
             ->map(fn($item) => $item["object"]);
     }
 

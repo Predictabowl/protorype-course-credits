@@ -136,10 +136,7 @@ class ExamBlockStudyPlanDTO implements Serializable{
         $this->numExams = $data["numExams"];
         $this->cfu = $data["cfu"];
         $this->courseYear = $data["courseYear"];
-        $this->approvedExams = $data["approvedExams"]->map(function (ExamStudyPlanDTO $option){
-                $option->setBlock($this);
-                return $option;
-            });
+        $this->approvedExams = $data["approvedExams"];
         $this->compatibleOptions = $data["compatibleOptions"];
     }
 

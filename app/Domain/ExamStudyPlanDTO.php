@@ -27,15 +27,19 @@ class ExamStudyPlanDTO implements ExamDTO, Serializable{
     private ?string $ssd;
     private Collection $linkedTakenExams;
     private $recognizedCredits;
+    private bool $freeChoice;
 
-    public function __construct(int $id, string $examName, ExamBlockStudyPlanDTO $block, ?string $ssd) {
+    public function __construct(int $id, string $examName, ExamBlockStudyPlanDTO $block,
+            ?string $ssd, bool $freeChoice = false) {
         $this->id = $id;
         $this->examName = $examName;
         $this->block = $block;
-        $this->ssd = $ssd;
         $block->setOption($this);
         $this->linkedTakenExams = collect([]);
         $this->calculateRecognizedCredits();
+        $this->freeChoice = $freeChoice;
+        $this->ssd = $ssd;
+            
     }
 
     public function getExamName(): string {
@@ -76,6 +80,10 @@ class ExamStudyPlanDTO implements ExamDTO, Serializable{
     public function getTakenExams(): Collection
     {
         return $this->linkedTakenExams;
+    }
+
+    public function isFreeChoice(): bool {
+        return $this->freeChoice;
     }
 
     public function getTakenExam($id): TakenExamDTO{
@@ -151,20 +159,21 @@ class ExamStudyPlanDTO implements ExamDTO, Serializable{
             "id" => $this->id,
             "examName" => $this->examName,
             "ssd" => $this->ssd,
-            "compatibleOptions" => $this->compatibleOptions,
             "linkedTakenExams" => $this->linkedTakenExams,
             "recognizedCredits" => $this->recognizedCredits,
+            "block" => $this->block,
+            "freeChoice" => $this->freeChoice
         ];
     }
 
     public function __unserialize(array $data) {
         $this->id = $data["id"];
         $this->examName = $data["examName"];
-        $this->block = null;
+        $this->block = $data["block"];
         $this->ssd = $data["ssd"];
-        $this->compatibleOptions = $data["compatibleOptions"];
         $this->linkedTakenExams = $data["linkedTakenExams"];
         $this->recognizedCredits = $data["recognizedCredits"];
+        $this->freeChoice = $data["freeChoice"];
     }
 
     public function getCourseYear(): ?int {

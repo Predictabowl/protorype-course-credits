@@ -52,7 +52,7 @@ class StudyPlanBuilderImplTest extends TestCase
     
      public function test_getOptionsBySsd_when_no_ssd_associated() {
         $takenExam = new TakenExamDTO(17,"test exam 01","IUS/01",5,28);
-        $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], 12, null);
+        $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], null);
         $this->options = collect([$option1]);
         $this->examDistance->expects($this->never())
                 ->method("calculateDistance");
@@ -92,33 +92,31 @@ class StudyPlanBuilderImplTest extends TestCase
         $option2 = new ExamStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
         $option3 = new ExamStudyPlanDTO(3,"test 3", $this->blocks[1], "IUS/07");
         $option4 = new ExamStudyPlanDTO(4,"test 4", $this->blocks[2], "IUS/01");
-        $option1->addCompatibleOption("IUS/02");
-        $option4->addCompatibleOption("IUS/02");
-        $option4->addCompatibleOption("IUS/07");
+        $this->blocks[0]->addCompatibleOption("IUS/02");
+        $this->blocks[2]->addCompatibleOption("IUS/02");
+        $this->blocks[2]->addCompatibleOption("IUS/07");
         $this->options = collect([$option1,$option2,$option3,$option4]);
-        $this->examDistance->expects($this->exactly(2))                
+        $this->examDistance->expects($this->exactly(3))
                 ->method("calculateDistance")
-                ->will($this->onConsecutiveCalls(7,5));
+                ->will($this->onConsecutiveCalls(7,4,5));
         $this->setupMocks();
-        
         $this->planBuilder->refreshStudyPlan();
-        
         $orederedOptions = $this->planBuilder->getOptionsByCompatibility($takenExam);
-        
-        $this->assertCount(2, $orederedOptions);
-        $this->assertEquals($option4, $orederedOptions->first());
+        $this->assertCount(3, $orederedOptions);
+        $this->assertEquals($option2, $orederedOptions->first());
+        $this->assertEquals($option4, $orederedOptions->get(1));
         $this->assertEquals($option1, $orederedOptions->last());
     }
     
     public function test_getFreeChoiceOptions() {
         $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5,22);
-        $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], null);
+        $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], null, true);
         $option2 = new ExamStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
-        $option3 = new ExamStudyPlanDTO(3,"test 3", $this->blocks[1], null);
+        $option3 = new ExamStudyPlanDTO(3,"test 3", $this->blocks[1], "MAT/01", true);
         $option4 = new ExamStudyPlanDTO(4,"test 4", $this->blocks[2], "IUS/01");
-        $option1->addCompatibleOption("IUS/02");
-        $option4->addCompatibleOption("IUS/02");
-        $option4->addCompatibleOption("IUS/07");
+        $this->blocks[0]->addCompatibleOption("IUS/02");
+        $this->blocks[2]->addCompatibleOption("IUS/02");
+        $this->blocks[2]->addCompatibleOption("IUS/07");
         $this->options = collect([$option1,$option2,$option3,$option4]);
         $this->examDistance->expects($this->exactly(2))                
                 ->method("calculateDistance")
@@ -145,11 +143,11 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->blocks = [$block1, $block2, $block3];
         
          $this->options = collect([
-            new ExamStudyPlanDTO(1,"Esame a scelta", $block1, null),
+            new ExamStudyPlanDTO(1,"Esame a scelta", $block1, null, true),
             new ExamStudyPlanDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
             new ExamStudyPlanDTO(3,"Altro esame", $block3, "IUS/07"),
         ]);        
-        $this->options[1]->addCompatibleOption("IUS/03");
+        $block2->addCompatibleOption("IUS/03");
         
         $this->setupMocks();
         // is called once for each pass in the free choices loops
@@ -182,11 +180,11 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->blocks = [$block1, $block2, $block3];
         
          $this->options = collect([
-            new ExamStudyPlanDTO(1,"Esame a scelta", $block1, null),
+            new ExamStudyPlanDTO(1,"Esame a scelta", $block1, null, true),
             new ExamStudyPlanDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
             new ExamStudyPlanDTO(3,"Altro esame", $block3, "IUS/07"),
         ]);        
-        $this->options[1]->addCompatibleOption("IUS/03");
+        $block2->addCompatibleOption("IUS/03");
         
         $this->setupMocks();
         // On the first pass the fraction CFU is not considered, and so is called only once
@@ -221,11 +219,11 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->blocks = [$block1, $block2, $block3];
         
          $this->options = collect([
-            new ExamStudyPlanDTO(1,"Esame a scelta", $block1, null),
+            new ExamStudyPlanDTO(1,"Esame a scelta", $block1, null, true),
             new ExamStudyPlanDTO(2,"Istituzione di Diritto ", $block2, "IUS/09"),
             new ExamStudyPlanDTO(3,"Altro esame", $block3, "IUS/07"),
         ]);        
-        $this->options[1]->addCompatibleOption("IUS/03");
+        $block2->addCompatibleOption("IUS/03");
         
         $this->setupMocks();
         $this->examDistance->expects($this->once())                
@@ -340,8 +338,8 @@ class StudyPlanBuilderImplTest extends TestCase
             new ExamStudyPlanDTO(14,"Altro esame IUS/07", $block3, "IUS/07"),
         ]);
         
-        $this->options[5]->addCompatibleOption("IUS/03");
-        $this->options[6]->addCompatibleOption("IUS/0");
+        $block4->addCompatibleOption("IUS/03");
+        $block5->addCompatibleOption("IUS/0");
     }
 
 }

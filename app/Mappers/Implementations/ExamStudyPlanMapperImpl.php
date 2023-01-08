@@ -25,7 +25,8 @@ class ExamStudyPlanMapperImpl  implements ExamStudyPlanMapper{
         if($ssd != null){
             $ssd = $ssd->code;
         }
-        $newOption = new ExamStudyPlanDTO($model->id, $model->name, $block, $ssd);
+        $newOption = new ExamStudyPlanDTO($model->id, $model->name, $block, $ssd,
+                $model->free_choice);
 //        $model->ssds->each(fn($ssd) => $newOption->addCompatibleOption($ssd->code));
         return $newOption;
     }

@@ -27,15 +27,15 @@ class ExamStudyPlanMapperImplTest extends TestCase{
     
     use RefreshDatabase;
     
-    private $mapper;
+    private ExamStudyPlanMapperImpl $sut;
     
     protected function setUp(): void{
         parent::setUp();
         
-        $this->mapper = new ExamStudyPlanMapperImpl();
+        $this->sut = new ExamStudyPlanMapperImpl();
     }
     
-    public function test_toTDO() {
+    public function test_toTdo() {
         Ssd::factory(3)->create();
         Course::factory()->create();
         ExamBlock::factory()->create();
@@ -43,7 +43,7 @@ class ExamStudyPlanMapperImplTest extends TestCase{
         $exam = Exam::first();
         $block = new ExamBlockStudyPlanDTO(1, 2, 9, null);
         
-        $result = $this->mapper->toDTO($exam, $block);
+        $result = $this->sut->toDTO($exam, $block);
         
         $this->assertEquals($block, $result->getBlock());
         $this->assertEquals($block->getExamOption(1), $result);
@@ -51,25 +51,28 @@ class ExamStudyPlanMapperImplTest extends TestCase{
                [$exam->id,
                 9,
                 $exam->name,
-                $exam->ssd->code
+                $exam->ssd->code,
+                false
                 ],
                [$result->getId(),
                 $result->getCfu(),
                 $result->getExamName(),
-                $result->getSsd()]);
+                $result->getSsd(),
+                $result->isFreeChoice()]);
     }
     
-    public function test_toTDO_on_exam_with_null_ssD() {
+    public function test_toTdo_on_exam_with_null_ssd() {
         Ssd::factory(3)->create();
         Course::factory()->create();
         ExamBlock::factory()->create();
         Exam::factory()->create([
             "name" => "esame test",
+            "free_choice" => true
         ]);
         $exam = Exam::first();
         $block = new ExamBlockStudyPlanDTO(1, 2, 7, 1);
         
-        $result = $this->mapper->toDTO($exam, $block);
+        $result = $this->sut->toDTO($exam, $block);
         
         $this->assertEquals($block, $result->getBlock());
         $this->assertEquals($block->getExamOption(1), $result);
@@ -78,10 +81,12 @@ class ExamStudyPlanMapperImplTest extends TestCase{
                 7,
                 $exam->name,
                 $exam->ssd->code,
+                true
                 ],
                [$result->getId(),
                 $result->getCfu(),
                 $result->getExamName(),
-                $result->getSsd()]);
+                $result->getSsd(),
+                $result->isFreeChoice()]);
     }
 }

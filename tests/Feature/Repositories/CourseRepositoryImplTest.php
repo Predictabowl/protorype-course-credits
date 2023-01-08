@@ -222,10 +222,7 @@ class CourseRepositoryImplTest extends TestCase {
         $examBlock = ExamBlock::factory()->create();
         $examBlock->course()->associate($course);
         Ssd::factory()->create();
-        ExamBlockOption::factory()->create([
-            "exam_block_id" => $examBlock->id,
-            "exam_id" => Exam::factory()->create()
-        ]);
+        Exam::factory()->create();
 
         $found = $this->sut->get($course->id, true);
 
@@ -233,13 +230,10 @@ class CourseRepositoryImplTest extends TestCase {
                 [$course->id, $course->name, $course->cfu],
                 [$found->id, $found->name, $found->cfu]);
 
-        $this->assertNotNull($found->examBlocks());
         $relationships = $found->relationsToArray();
         $this->assertEquals(1,sizeof($relationships));
         $this->assertArrayHasKey("exam_blocks",$relationships);
-        $this->assertArrayHasKey("exam_block_options",$relationships["exam_blocks"][0]);
-        $this->assertArrayHasKey("exam",$relationships["exam_blocks"][0]
-                ["exam_block_options"][0]);
+        $this->assertArrayHasKey("exams",$relationships["exam_blocks"][0]);
     }
 
 }

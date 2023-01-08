@@ -18,7 +18,7 @@ use App\Domain\TakenExamDTO;
  *
  * @author piero
  */
-class ExamBlockDTOTest extends TestCase{
+class ExamBlockStudyPlanDTOTest extends TestCase{
     
     const FIXTURE_CFU = 12;
     const FIXTURE_NUM_EXAMS = 2;

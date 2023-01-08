@@ -74,20 +74,17 @@ class CourseAdminManagerImplTest extends TestCase{
         $this->sut->saveExam($examInfo,2);
     }
     public function test_saveExam_success(){
-        $examInfo = new NewExamInfo("test name", "inf/02");
+        $examInfo = new NewExamInfo("test name", "inf/02", true);
         $exam = new Exam([
             "id" => null,
             "name" => "test name",
             "ssd" => "INF/02"
         ]);
-        $ssd = new Ssd(["id" => 11]);
         $examBlock = new ExamBlock();
         $examBlock->id = 7;
         
-        $this->ssdRepo->expects($this->once())
-                ->method("getSsdFromCode")
-                ->with("INF/02")
-                ->willReturn($ssd);
+        $this->ssdRepo->expects($this->never())
+                ->method("getSsdFromCode");
         
         $this->ebRepo->expects($this->once())
                 ->method("get")
@@ -96,21 +93,18 @@ class CourseAdminManagerImplTest extends TestCase{
 
         $modelExam = new Exam([
             "name" => "test name",
-            "ssd_id" => 11]);
+            "ssd_id" => null,
+            "free_choice" => true]);
         $savedExam = new Exam([
-            "name" => "test name",
-            "ssd_id" => 11]);
+            "name" => "test name 2",
+            "ssd_id" => 10,
+            "free_choice" => false]);
         $savedExam->id = 5;
         $this->examRepo->expects($this->once())
                 ->method("save")
                 ->with($modelExam)
                 ->willReturn($savedExam);
 
-        $this->ebRepo->expects($this->once())
-                ->method("attachExam")
-                ->with(7,5)
-                ->willReturn(true);
-        
         $result = $this->sut->saveExam($examInfo,2);
 
         $this->assertEquals($result, $savedExam);
