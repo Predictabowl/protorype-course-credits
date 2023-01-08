@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App;
 use App\Factories\Interfaces\StudyPlanManagerFactory;
 use App\Models\Front;
 use Illuminate\Support\Facades\Gate;
+use function __;
+use function app;
+use function back;
+use function session;
+use function view;
 
 
 class StudyPlanController extends Controller
 {
-    
     
     public function __construct() {
         $this->middleware(["auth","verified"]);
@@ -49,7 +54,7 @@ class StudyPlanController extends Controller
     }
     
     private function setupDomPdf(Front $front){
-        $pdf = \App::make("dompdf.wrapper");
+        $pdf = App::make("dompdf.wrapper");
         $pdf->setPaper("a4","portrait")
             ->loadView("studyplan.showplanPdf",[
                 "studyPlan" => session()->get("studyPlan"),

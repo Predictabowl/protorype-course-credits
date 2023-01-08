@@ -6,13 +6,16 @@ use App\Services\Interfaces\UserFrontManager;
 
 class StudentController extends Controller
 {
-    public function __construct() {
+    private UserFrontManager $userFrontManager;
+    
+    public function __construct(UserFrontManager $userFrontManager) {
         $this->middleware(["auth","verified"]);
+        $this->userFrontManager = $userFrontManager;
     }
     
     public function showFront()
     {   
-        $frontManager = app()->make(UserFrontManager::class)->getFrontManager();
+        $frontManager = $this->userFrontManager->getFrontManager();
         return redirect()->route("frontView", [$frontManager->getFront()]);
 
     }

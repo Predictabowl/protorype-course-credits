@@ -14,22 +14,16 @@ namespace App\Domain;
  */
 class NewExamBlockInfo {
     
-    private $id;
     private int $maxExams;
     private int $cfu;
     private int $courseYear;
     
-    public function __construct($id, int $maxExams, int $cfu, int $courseYear) {
-        $this->id = $id;
+    public function __construct(int $maxExams, int $cfu, int $courseYear) {
         $this->maxExams = $maxExams;
         $this->cfu = $cfu;
         $this->courseYear = $courseYear;
     }
                 
-    public function getId() {
-        return $this->id;
-    }
-
     public function getMaxExams(): int {
         return $this->maxExams;
     }
