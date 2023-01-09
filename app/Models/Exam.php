@@ -9,7 +9,7 @@ class Exam extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["name","cfu","ssd_id","free_choice"];
+    protected $guarded = [];
 
     public function ssd()
     {
