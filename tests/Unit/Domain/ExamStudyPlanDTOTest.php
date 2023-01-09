@@ -5,12 +5,14 @@ namespace Tests\Unit\Domain;
 /** This technically an integration test, but it's more work mocking
  * than using the DTO
 */
+
 use App\Domain\ExamBlockStudyPlanDTO;
-use App\Domain\ExamOptionStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
 use App\Domain\TakenExamDTO;
+use App\Exceptions\Custom\InvalidStateException;
 use PHPUnit\Framework\TestCase;
 
-class ExamOptionDTOTest extends TestCase
+class ExamStudyPlanDTOTest extends TestCase
 {
 
     public function test_Integration_value()
@@ -58,9 +60,9 @@ class ExamOptionDTOTest extends TestCase
     
     public function test_addTakenExam_is_not_added_if_block_is_full(){
         $block = new ExamBlockStudyPlanDTO(1,2,12, 1);
-        $option1 = new ExamOptionStudyPlanDTO(1, "name 1", $block, "ssd1");
-        $option2 = new ExamOptionStudyPlanDTO(2, "name 2", $block, "ssd2");
-        $option3 = new ExamOptionStudyPlanDTO(3, "name 3", $block, "ssd3");
+        $option1 = new ExamStudyPlanDTO(1, "name 1", $block, "ssd1");
+        $option2 = new ExamStudyPlanDTO(2, "name 2", $block, "ssd2");
+        $option3 = new ExamStudyPlanDTO(3, "name 3", $block, "ssd3");
         
         $takenExam1 = $option1->addTakenExam($this->createTakenExam(9,"name 1"));
         $takenExam2 = $option2->addTakenExam($this->createTakenExam(9,"name 2"));
@@ -88,7 +90,7 @@ class ExamOptionDTOTest extends TestCase
     
     public function test_serialization_ok(){
         $block = new ExamBlockStudyPlanDTO(3, 1, 9, 2);
-        $option = new ExamOptionStudyPlanDTO(5, "test", $block, "ssd1");
+        $option = new ExamStudyPlanDTO(5, "test", $block, "ssd1", true);
         $taken1 = new TakenExamDTO(7, "taken 1", "ssd3", 3, 18);
         $taken2 = new TakenExamDTO(11, "taken 2", "ssd5", 4, 20);
         $option->addTakenExam($taken1);
@@ -97,25 +99,14 @@ class ExamOptionDTOTest extends TestCase
         $string = serialize($option);
         $result = unserialize($string);
         
-        $this->assertInstanceOf(ExamOptionStudyPlanDTO::class, $result);
+        $this->assertInstanceOf(ExamStudyPlanDTO::class, $result);
         $result->setBlock($block);
         $this->assertEquals($option,$result);
     }
-    
-    public function test_serialization_invalid_state(){
-        $block = new ExamBlockStudyPlanDTO(3, 1, 9, null);
-        $option = new ExamOptionStudyPlanDTO(5, "test", $block, "ssd1");
-        
-        $string = serialize($option);
-        $result = unserialize($string);
-        
-        $this->expectException(\App\Exceptions\Custom\InvalidStateException::class);
-        $result->getBlock();
-    }
 
-    private function createOption($cfu = 12): ExamOptionStudyPlanDTO
+    private function createOption($cfu = 12): ExamStudyPlanDTO
     {
-        return new ExamOptionStudyPlanDTO(1,"test", new ExamBlockStudyPlanDTO(1,2,$cfu,2),"ssd");
+        return new ExamStudyPlanDTO(1,"test", new ExamBlockStudyPlanDTO(1,2,$cfu,2),"ssd");
     }
     
     private function createTakenExam($cfu = 9, $name = "taken", $actual = null): TakenExamDTO

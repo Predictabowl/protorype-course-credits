@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Exam;
+use App\Models\ExamBlock;
 use App\Models\Ssd;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,6 +26,7 @@ class ExamFactory extends Factory
         return [
             "ssd_id" => $this->faker->numberBetween(1,Ssd::count()),
             "name" => $this->faker->sentence(),
+            "exam_block_id" => $this->faker->numberBetween(1, ExamBlock::count())
             //"cfu" => $this->faker->numberBetween(3,12)
         ];
     }

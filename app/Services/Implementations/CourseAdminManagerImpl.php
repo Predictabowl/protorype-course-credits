@@ -9,18 +9,22 @@ namespace App\Services\Implementations;
 
 use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
+use App\Exceptions\Custom\CourseNotFoundException;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
+use App\Exceptions\Custom\ExamNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
+use App\Mappers\Interfaces\ExamBlockInfoMapper;
+use App\Mappers\Interfaces\ExamInfoMapper;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
+use App\Models\Ssd;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\ExamRepository;
 use App\Repositories\Interfaces\SSDRepository;
 use App\Services\Interfaces\CourseAdminManager;
 use Illuminate\Support\Facades\DB;
-use TheSeer\Tokenizer\Exception;
 
 /**
  * Description of CourseAdminManagerImpl
@@ -33,56 +37,108 @@ class CourseAdminManagerImpl implements CourseAdminManager {
     private ExamBlockRepository $ebRepo;
     private ExamRepository $examRepo;
     private SSDRepository $ssdRepo;
+    private ExamBlockInfoMapper $ebMapper;
+    private ExamInfoMapper $examMapper;
 
     public function __construct(CourseRepository $courseRepo,
             ExamBlockRepository $ebRepo,
             ExamRepository $examRepo,
-            SSDRepository $ssdRepo) {
+            SSDRepository $ssdRepo,
+            ExamBlockInfoMapper $ebMapper,
+            ExamInfoMapper $examMapper) {
         $this->courseRepo = $courseRepo;
         $this->ebRepo = $ebRepo;
         $this->examRepo = $examRepo;
         $this->ssdRepo = $ssdRepo;
+        $this->ebMapper = $ebMapper;
+        $this->examMapper = $examMapper;
     }
 
-    public function addExamOfChoice($examBlockId): bool {
-        throw new Exception("Method not yet implemented");
-    }
-
-    public function getCourseFullData($courseId): ?Course {
+    public function getCourseFullData(int $courseId): ?Course {
         return $this->courseRepo->get($courseId,true);
     }
 
-    public function saveExam(NewExamInfo $exam, $examBlockId): Exam {
-        return DB::transaction(function() use($exam, $examBlockId){
-            $ssd = $this->ssdRepo->getSsdFromCode($exam->getSsd());
-            if (is_null($ssd)){
-                throw new SsdNotFoundException(
-                        "Ssd not found with code: ".$exam->getSsd());
+    public function saveExam(NewExamInfo $exam, int $examBlockId): void {
+        DB::transaction(function() use($exam, $examBlockId){
+            if($exam->isFreeChoice()){
+                $ssdId = null;
+            } else {
+                $ssdId = $this->getSsdOrThrow($exam->getSsd())->id;
             }
             $examBlock = $this->ebRepo->get($examBlockId);
             if(is_null($examBlock)){
                 throw new ExamBlockNotFoundException(
                         "Exam Block not found with id: ".$examBlockId);
             }
-            $modelExam = new Exam([
-                "name" => $exam->getName(),
-                "ssd_id" => $ssd->id]);
-            $savedExam = $this->examRepo->save($modelExam);
-            $this->ebRepo->attachExam($examBlock->id, $savedExam->id);
-            return $savedExam;
+            $modelExam = $this->examMapper->map($exam, $examBlockId, $ssdId);
+            $this->examRepo->save($modelExam);
         });
     }
 
-    public function saveExamBlock(NewExamBlockInfo $examBlock, $courseId): ExamBlock {
-        throw new Exception("Method not yet implemented");
+    public function saveExamBlock(NewExamBlockInfo $examBlock, int $courseId): void {
+        DB::transaction(function() use($examBlock, $courseId){
+            $course = $this->courseRepo->get($courseId);
+            if (is_null($course)){
+                throw new CourseNotFoundException("Course not found with id: ".$courseId);
+            }
+            $examBlock = $this->ebMapper->map($examBlock, $courseId);
+            $this->ebRepo->save($examBlock);
+        });
+    }
+    
+    public function deleteExam(int $examId): void{
+        DB::transaction(function() use($examId){
+            $this->examRepo->delete($examId);
+        });
     }
 
-    public function updateExam(Exam $exam): bool {
-        throw new Exception("Method not yet implemented");
+    public function deleteExamBlock(int $examBlockId): void{
+        DB::transaction(function() use($examBlockId){
+            $this->ebRepo->delete($examBlockId);
+        });
     }
 
-    public function updateExamBlock(ExamBlock $examBlock): bool {
-        throw new Exception("Method not yet implemented");
+    public function updateExam(NewExamInfo $examInfo, int $examId): void {
+        DB::transaction(function() use($examInfo, $examId){
+            $exam = $this->getExamOrThrow($examId);
+            $ssd = $this->getSsdOrThrow($examInfo->getSsd());
+            $newExam = $this->examMapper->map($examInfo, $exam->exam_block_id,
+                    $ssd->id);
+            $newExam->id = $examId;
+            $this->examRepo->update($newExam);
+        });
     }
 
+    public function updateExamBlock(NewExamBlockInfo $examBlockInfo, int $examBlockId): void {
+        DB::transaction(function() use($examBlockInfo, $examBlockId){
+            $examBlock = $this->getExamBlockOrThrow($examBlockId);
+            $newExamBlock = $this->ebMapper->map($examBlockInfo, $examBlock->course_id);
+            $newExamBlock->id = $examBlockId;
+            $this->ebRepo->update($newExamBlock);
+        });
+    }
+
+    private function getSsdOrThrow(string $code): Ssd{
+        $ssd = $this->ssdRepo->getSsdFromCode($code);
+        if (is_null($ssd)){
+            throw new SsdNotFoundException("Ssd not found with code: ".$code);
+        }
+        return $ssd;
+    }
+    
+    private function getExamOrThrow(int $examId): Exam{
+        $exam = $this->examRepo->get($examId);
+        if(is_null($exam)){
+            throw new ExamNotFoundException("Could not find Exam with id: ".$examId);
+        }
+        return $exam;
+    }
+    
+    private function getExamBlockOrThrow(int $ebId): ExamBlock{
+        $examBlock = $this->ebRepo->get($ebId);
+        if(is_null($examBlock)){
+            throw new ExamBlockNotFoundException("Could not find Exam Block with id: ".$ebId);
+        }
+        return $examBlock;
+    }
 }

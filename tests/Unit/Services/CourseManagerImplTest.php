@@ -11,7 +11,7 @@ namespace Tests\Unit\Services;
 use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Domain\ExamBlockStudyPlanDTO;
-use App\Domain\ExamOptionStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
 use App\Models\ExamBlock;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Services\Implementations\CourseManagerImpl;
@@ -78,9 +78,9 @@ class CourseManagerImplTest extends TestCase{
     public function test_getExamOptions() {
         $block1 = new ExamBlockStudyPlanDTO(1, 2, 12, 2);
         $block2 = new ExamBlockStudyPlanDTO(1, 1, 12, null);
-        $option1 = new ExamOptionStudyPlanDTO(1, "name 1", $block1, "ssd1");
-        $option2 = new ExamOptionStudyPlanDTO(2, "name 2", $block1, "ssd2");
-        $option3 = new ExamOptionStudyPlanDTO(3, "name 3", $block2, "ssd3");
+        $option1 = new ExamStudyPlanDTO(1, "name 1", $block1, "ssd1");
+        $option2 = new ExamStudyPlanDTO(2, "name 2", $block1, "ssd2");
+        $option3 = new ExamStudyPlanDTO(3, "name 3", $block2, "ssd3");
         $models = collect([
             new ExamBlock(["name" => "test"]),
             new ExamBlock(["name" => "name"])]);

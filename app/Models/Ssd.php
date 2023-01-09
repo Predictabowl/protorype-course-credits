@@ -24,8 +24,8 @@ class Ssd extends Model
         return $this->hasMany(TakenExam::class);
     }
     
-    public function ExamBlockOptions(){
-        return $this->belongsToMany(ExamBlockOption::class);
+    public function ExamBlocks(){
+        return $this->belongsToMany(ExamBlock::class);
     }
     
     //---------- Mutators

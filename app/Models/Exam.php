@@ -9,15 +9,15 @@ class Exam extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["name","cfu","ssd_id"];
+    protected $guarded = [];
 
     public function ssd()
     {
         return $this->belongsTo(Ssd::class);
     }
 
-    public function examBlockOptions()
+    public function examBlock()
     {
-        return $this->hasMany(ExamBlockOption::class);
+        return $this->belongsTo(ExamBlock::class);
     }
 }

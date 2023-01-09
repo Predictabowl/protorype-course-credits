@@ -7,9 +7,14 @@
 
 namespace Tests\Unit\Services;
 
+use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
+use App\Exceptions\Custom\CourseNotFoundException;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
+use App\Exceptions\Custom\ExamNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
+use App\Mappers\Interfaces\ExamBlockInfoMapper;
+use App\Mappers\Interfaces\ExamInfoMapper;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
@@ -33,6 +38,9 @@ class CourseAdminManagerImplTest extends TestCase{
     private ExamBlockRepository $ebRepo;
     private ExamRepository $examRepo;
     private SSDRepository $ssdRepo;
+    private ExamBlockInfoMapper $ebMapper;
+    private ExamInfoMapper $examMapper;
+    
 
     protected function setUp(): void {
         parent::setUp();
@@ -40,9 +48,11 @@ class CourseAdminManagerImplTest extends TestCase{
         $this->ebRepo = $this->createMock(ExamBlockRepository::class);
         $this->examRepo = $this->createMock(ExamRepository::class);
         $this->ssdRepo = $this->createMock(SSDRepository::class);
+        $this->ebMapper = $this->createMock(ExamBlockInfoMapper::class);
+        $this->examMapper = $this->createMock(ExamInfoMapper::class);
 
         $this->sut = new CourseAdminManagerImpl($this->courseRepo, $this->ebRepo, 
-                $this->examRepo, $this->ssdRepo);
+                $this->examRepo, $this->ssdRepo, $this->ebMapper, $this->examMapper);
     }
 
     public function test_saveExam_withMissingSsd(){
@@ -74,15 +84,8 @@ class CourseAdminManagerImplTest extends TestCase{
         $this->sut->saveExam($examInfo,2);
     }
     public function test_saveExam_success(){
-        $examInfo = new NewExamInfo("test name", "inf/02");
-        $exam = new Exam([
-            "id" => null,
-            "name" => "test name",
-            "ssd" => "INF/02"
-        ]);
-        $ssd = new Ssd(["id" => 11]);
-        $examBlock = new ExamBlock();
-        $examBlock->id = 7;
+        $examInfo = new NewExamInfo("test name", "inf/02", false);
+        $ssd = new Ssd(["id" => 3]);
         
         $this->ssdRepo->expects($this->once())
                 ->method("getSsdFromCode")
@@ -92,28 +95,46 @@ class CourseAdminManagerImplTest extends TestCase{
         $this->ebRepo->expects($this->once())
                 ->method("get")
                 ->with(2)
-                ->willReturn($examBlock);
+                ->willReturn(new ExamBlock());
+        $exam = new Exam([
+            "ssd_id" => 5,
+            "exam_block_id" => 11
+        ]);
+        $this->examMapper->expects($this->once())
+                ->method("map")
+                ->with($examInfo, 2, 3)
+                ->willReturn($exam);
 
-        $modelExam = new Exam([
-            "name" => "test name",
-            "ssd_id" => 11]);
-        $savedExam = new Exam([
-            "name" => "test name",
-            "ssd_id" => 11]);
-        $savedExam->id = 5;
         $this->examRepo->expects($this->once())
                 ->method("save")
-                ->with($modelExam)
-                ->willReturn($savedExam);
+                ->with($exam)
+                ->willReturn(new Exam());
 
+        $this->sut->saveExam($examInfo,2);
+    }
+    
+    public function test_saveFreeChoiceExam_success(){
+        $examInfo = new NewExamInfo("test name", "inf/02", true);
+        $this->ssdRepo->expects($this->never())
+                ->method("getSsdFromCode");
+        $exam = new Exam([
+            "ssd_id" => null,
+            "exam_block_id" => 11
+        ]);
+        $this->examMapper->expects($this->once())
+                ->method("map")
+                ->with($examInfo, 2, null)
+                ->willReturn($exam);
         $this->ebRepo->expects($this->once())
-                ->method("attachExam")
-                ->with(7,5)
-                ->willReturn(true);
-        
-        $result = $this->sut->saveExam($examInfo,2);
+                ->method("get")
+                ->with(2)
+                ->willReturn(new ExamBlock());
+        $this->examRepo->expects($this->once())
+                ->method("save")
+                ->with($exam)
+                ->willReturn(new Exam());
 
-        $this->assertEquals($result, $savedExam);
+        $this->sut->saveExam($examInfo,2);
     }
 
     public function test_getCourseFullData(){
@@ -126,5 +147,143 @@ class CourseAdminManagerImplTest extends TestCase{
         $result = $this->sut->getCourseFullData(5);
         
         $this->assertSame($course, $result);
+    }
+    
+    public function test_saveExamBlock_withMissingCourse_shouldThrow(){
+        $examBlock = new NewExamBlockInfo(2, 6, 2);
+        
+        $this->courseRepo->expects($this->once())
+                ->method("get")
+                ->with(7)
+                ->willReturn(null);
+        
+        $this->ebRepo->expects($this->never())
+                ->method("save");
+        
+        $this->expectException(CourseNotFoundException::class);
+        $this->sut->saveExamBlock($examBlock, 7);
+    }
+    
+    public function test_saveExamBlock_success(){
+        $courseId = 7;
+        $ebInfo = new NewExamBlockInfo(2, 6, 3);
+        
+        $this->courseRepo->expects($this->once())
+                ->method("get")
+                ->with($courseId)
+                ->willReturn(new course());
+        $examBlock = new ExamBlock(["name" => "test name"]);
+        $this->ebMapper->expects($this->once())
+                ->method("map")
+                ->with($ebInfo, $courseId)
+                ->willReturn($examBlock);
+        $this->ebRepo->expects($this->once())
+                ->method("save")
+                ->with($examBlock)
+                ->willReturn(true);
+
+        $this->sut->saveExamBlock($ebInfo, $courseId);
+    }
+    
+    public function test_deleteExam(){
+        $this->examRepo->expects($this->once())
+                ->method("delete")
+                ->with(3);
+        
+        $this->sut->deleteExam(3);
+    }
+    
+    public function test_deleteExamBlock(){
+        $this->ebRepo->expects($this->once())
+                ->method("delete")
+                ->with(5);
+        
+        $this->sut->deleteExamBlock(5);
+    }
+    
+    public function test_updateExam_whenExamIsMissing_shouldthrow(){
+        $examInfo = new NewExamInfo("new name", "IUS/01");
+        $this->examRepo->expects($this->once())
+                ->method("get")
+                ->with(3)
+                ->willReturn(null);
+        $this->ssdRepo->expects($this->never())
+                ->method("getSsdFromCode");
+        $this->examRepo->expects($this->never())
+                ->method("update");
+        
+        $this->expectException(ExamNotFoundException::class);
+        $this->sut->updateExam($examInfo, 3);
+    }
+    
+    public function test_updateExam_withSsdMissing_shouldThrow(){
+        $examInfo = new NewExamInfo("new name", "IUS/01");
+        $examId = 3;
+        $this->examRepo->expects($this->once())
+                ->method("get")
+                ->with($examId)
+                ->willReturn(new Exam(["exam_block_id" => 7]));
+        $this->ssdRepo->expects($this->once())
+                ->method("getSsdFromCode")
+                ->with("IUS/01")
+                ->willReturn(null);        
+        $this->examRepo->expects($this->never())
+                ->method("update");
+        
+        $this->expectException(SsdNotFoundException::class);
+        $this->sut->updateExam($examInfo, $examId);
+    }
+    
+    public function test_updateExam_success(){
+        $examInfo = new NewExamInfo("new name", "IUS/01");
+        $examId = 3;
+        $this->examRepo->expects($this->once())
+                ->method("get")
+                ->with($examId)
+                ->willReturn(new Exam(["exam_block_id" => 7]));
+        $this->ssdRepo->expects($this->once())
+                ->method("getSsdFromCode")
+                ->with("IUS/01")
+                ->willReturn(new Ssd(["id" => 11]));        
+        $this->examMapper->expects($this->once())
+                ->method("map")
+                ->with($examInfo, 7, 11)
+                ->willReturn(new Exam());
+        $this->examRepo->expects($this->once())
+                ->method("update")
+                ->with(new Exam(["id" => $examId]));
+        
+        $this->sut->updateExam($examInfo, $examId);
+    }      
+
+    public function test_updateExamBlock_withBlockMissing_shouldThrow() {
+        $ebInfo = new NewExamBlockInfo(3, 9, 2);
+        $this->ebRepo->expects($this->once())
+                ->method("get")
+                ->with(3)
+                ->willReturn(null);
+        $this->ebRepo->expects($this->never())
+                ->method("update");
+        
+        $this->expectException(ExamBlockNotFoundException::class);
+        $this->sut->updateExamBlock($ebInfo, 3);
+    }
+    
+    public function test_updateExamBlock_success() {
+        $ebInfo = new NewExamBlockInfo(3, 9, 2);
+        $ebId = 3;
+        $this->ebRepo->expects($this->once())
+                ->method("get")
+                ->with($ebId)
+                ->willReturn(new ExamBlock(["course_id" => 13]));
+        $this->ebMapper->expects($this->once())
+                ->method("map")
+                ->with($ebInfo, 13)
+                ->willReturn(new ExamBlock());
+        $this->ebRepo->expects($this->once())
+                ->method("update")
+                ->with(new ExamBlock(["id" => $ebId]));
+        
+        $this->sut->updateExamBlock($ebInfo, $ebId);
     }
 }

@@ -23,10 +23,17 @@ class NewExamInfoTest extends TestCase{
         $exam = new NewExamInfo("test name", "inf/01");
         
         $this->assertEquals("INF/01", $exam->getSsd());
+        $this->assertFalse($exam->isFreeChoice());
     }
     
     public function test_ssd_wrongFormat_shouldThrow(){
         $this->expectException(InvalidArgumentException::class);
         $exam = new NewExamInfo("test name", "INF-/01");
+    }
+    
+    public function test_ifIsFreeChoice_ssdShouldBeNull(){
+        $exam = new NewExamInfo("test name", "inf/01", true);
+        
+        $this->assertNull($exam->getSsd());
     }
 }

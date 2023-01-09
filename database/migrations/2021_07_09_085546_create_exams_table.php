@@ -16,7 +16,9 @@ class CreateExamsTable extends Migration
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
             $table->foreignId("ssd_id")->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId("exam_block_id")->constrained()->cascadeOnDelete();
             $table->string("code")->unique()->nullable(); //unused right now, but left for future applications
+            $table->boolean("free_choice")->default(false);
             $table->string("name");
             $table->timestamps();
         });

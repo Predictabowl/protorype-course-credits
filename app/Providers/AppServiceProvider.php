@@ -10,11 +10,11 @@ use App\Factories\Interfaces\CourseManagerFactory;
 use App\Factories\Interfaces\FrontManagerFactory;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Factories\Interfaces\StudyPlanManagerFactory;
-use App\Mappers\Implementations\ExamBlockMapperImpl;
-use App\Mappers\Implementations\ExamOptionMapperImpl;
+use App\Mappers\Implementations\ExamBlockStudyPlanMapperImpl;
+use App\Mappers\Implementations\ExamStudyPlanMapperImpl;
 use App\Mappers\Implementations\TakenExamMapperImpl;
 use App\Mappers\Interfaces\ExamBlockMapper;
-use App\Mappers\Interfaces\ExamOptionMapper;
+use App\Mappers\Interfaces\ExamStudyPlanMapper;
 use App\Mappers\Interfaces\TakenExamMapper;
 use App\Repositories\Implementations\CourseRepositoryImpl;
 use App\Repositories\Implementations\ExamBlockRepositoryImpl;
@@ -64,8 +64,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(StudyPlanManagerFactory::class, StudyPlanManagerFactoryImpl::class);
         
         //---- Mappers
-        $this->app->bind(ExamBlockMapper::class, ExamBlockMapperImpl::class);
-        $this->app->bind(ExamOptionMapper::class, ExamOptionMapperImpl::class);
+        $this->app->bind(ExamBlockMapper::class, ExamBlockStudyPlanMapperImpl::class);
+        $this->app->bind(ExamStudyPlanMapper::class, ExamStudyPlanMapperImpl::class);
         $this->app->bind(TakenExamMapper::class, TakenExamMapperImpl::class);
         
         //---- Repositories

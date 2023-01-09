@@ -20,5 +20,4 @@ interface ExamRepository {
     public function update(Exam $exam): Exam;
     public function delete(int $id): void;
     public function deleteBatch(Collection $ids): void;
-    public function deleteFreeChoice(): void;
 }

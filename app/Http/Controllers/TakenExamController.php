@@ -6,15 +6,17 @@ use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Front;
 use App\Services\Interfaces\FrontManager;
 use Illuminate\Validation\Rule;
-use function app;
 use function back;
 use function request;
 
 class TakenExamController extends Controller
 {
     
-    public function __construct() {
+    private FrontManagerFactory $frontManagerFactory;
+    
+    public function __construct(FrontManagerFactory $frontManagerFactory) {
         $this->middleware(["auth","verified"]);
+        $this->frontManagerFactory = $frontManagerFactory;
     }
 
     /* Effectively the SSD validation that check it's existence is 
@@ -62,8 +64,7 @@ class TakenExamController extends Controller
     
     
     private function getFrontManager(Front $front): FrontManager {
-        $factory = app()->make(FrontManagerFactory::class);
-        return $factory->getFrontManager($front->id);
+        return $this->frontManagerFactory->getFrontManager($front->id);
     }
     
 }

@@ -8,7 +8,8 @@
 
 namespace App\Domain;
 
-use App\Domain\ExamOptionStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
+use Illuminate\Support\Collection;
 use Serializable;
 use function collect;
 
@@ -19,30 +20,32 @@ use function collect;
  */
 class ExamBlockStudyPlanDTO implements Serializable{
 
-    private $id;
-    private $approvedExams;
-    private $numExams;
-    private $cfu;
-    private $courseYear;
+    private int $id;
+    private Collection $approvedExams;
+    private int $numExams;
+    private int $cfu;
+    private ?int $courseYear;
+    private Collection $compatibleOptions;
 
-    public function __construct($id, int $numExams, int $cfu, ?int $courseYear) {
+    public function __construct(int $id, int $numExams, int $cfu, ?int $courseYear) {
         $this->id = $id;
         $this->approvedExams = collect([]);
         $this->numExams = $numExams;
         $this->cfu = $cfu;
         $this->courseYear = $courseYear;
+        $this->compatibleOptions = collect([]);
     }
 
     public function getId() {
         return $this->id;
     }
 
-    public function setOption(ExamOptionStudyPlanDTO $option) {
+    public function setOption(ExamStudyPlanDTO $option) {
         $this->approvedExams[$option->getId()] = $option;
         return $this;
     }
 
-    public function removeOption(ExamOptionStudyPlanDTO $option) {
+    public function removeOption(ExamStudyPlanDTO $option) {
         unset($this->approvedExams[$option->getId()]);
         return $this;
     }
@@ -55,7 +58,7 @@ class ExamBlockStudyPlanDTO implements Serializable{
         return $this->approvedExams;
     }
 
-    public function getExamOption($id): ExamOptionStudyPlanDTO {
+    public function getExamOption($id): ExamStudyPlanDTO {
         return $this->approvedExams[$id];
     }
 
@@ -66,7 +69,7 @@ class ExamBlockStudyPlanDTO implements Serializable{
 
     public function getRecognizedCredits(): int{
 
-        return $this->approvedExams->map(fn(ExamOptionStudyPlanDTO $exam) =>
+        return $this->approvedExams->map(fn(ExamStudyPlanDTO $exam) =>
                     $exam->getTakenExams()->map(fn(TakenExamDTO $taken)=>
                         $taken->getActualCfu()
                     )
@@ -85,46 +88,45 @@ class ExamBlockStudyPlanDTO implements Serializable{
         return $this->courseYear;
     }
 
-        /**
+    public function getCompatibleOptions(): Collection {
+        return $this->compatibleOptions;
+    }
+    
+    public function addCompatibleOption(string $ssd){
+        $this->compatibleOptions->push($ssd);
+    }
+
+    public function setCompatibleOptions(Collection $compatibleOptions): void {
+        $this->compatibleOptions = $compatibleOptions;
+    }
+
+                /**
      * Return the number of exams that can actually be used,
      * which is the maximum number of options minus the ones already taken,
      * even if the taken options are not completely integrated
      */
     public function getNumSlotsAvailable(): int{
         return $this->getNumExams() -
-                $this->approvedExams->map(fn(ExamOptionStudyPlanDTO $exam) =>
+                $this->approvedExams->map(fn(ExamStudyPlanDTO $exam) =>
                         $exam->getTakenExams()->isEmpty() ? 0 : 1)
                 ->sum();
     }
 
     public function serialize(): string {
-        return serialize([
-            "id" => $this->id,
-            "numExams" => $this->numExams,
-            "cfu" => $this->cfu,
-            "approvedExams" => $this->approvedExams,
-            "courseYear" => $this->courseYear
-        ]);
+        return serialize($this->__serialize());
     }
 
     public function unserialize(string $serialized): void {
-        $array = unserialize($serialized);
-        $this->id = $array["id"];
-        $this->numExams = $array["numExams"];
-        $this->cfu = $array["cfu"];
-        $this->courseYear = $array["courseYear"];
-        $this->approvedExams = $array["approvedExams"]->map(function (ExamOptionStudyPlanDTO $option){
-                $option->setBlock($this);
-                return $option;
-            });
+        $this->__unserialize(unserialize($serialized));
     }
-
+    
     public function __serialize(): array {
         return [
             "id" => $this->id,
             "numExams" => $this->numExams,
             "cfu" => $this->cfu,
             "approvedExams" => $this->approvedExams,
+            "compatibleOptions" => $this->compatibleOptions,
             "courseYear" => $this->courseYear
         ];
     }
@@ -134,10 +136,8 @@ class ExamBlockStudyPlanDTO implements Serializable{
         $this->numExams = $data["numExams"];
         $this->cfu = $data["cfu"];
         $this->courseYear = $data["courseYear"];
-        $this->approvedExams = $data["approvedExams"]->map(function (ExamOptionStudyPlanDTO $option){
-                $option->setBlock($this);
-                return $option;
-            });
+        $this->approvedExams = $data["approvedExams"];
+        $this->compatibleOptions = $data["compatibleOptions"];
     }
 
 }

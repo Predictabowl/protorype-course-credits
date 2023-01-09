@@ -16,6 +16,15 @@ class StudentControllerTest extends TestCase
     use RefreshDatabase;
     
     
+    private UserFrontManager $userFrontManager;
+    protected function setUp(): void {
+        parent::setUp();
+        
+        $this-> userFrontManager = $this->createMock(UserFrontManager::class);
+        app()->instance(UserFrontManager::class, $this-> userFrontManager);
+    }
+
+    
     public function test_authentication_required(){
         $response =  $this->get(route("frontPersonal"));
         
@@ -26,10 +35,8 @@ class StudentControllerTest extends TestCase
         $user =  User::factory()->create();
         $front = Front::create(["user_id" => $user->id]);
         $frontManager = $this->createMock(FrontManager::class);
-        $userFrontManager = $this->createMock(UserFrontManager::class);
-        app()->instance(UserFrontManager::class, $userFrontManager);
         
-        $userFrontManager->expects($this->once())
+        $this->userFrontManager->expects($this->once())
                 ->method("getFrontManager")
                 ->willReturn($frontManager);
         

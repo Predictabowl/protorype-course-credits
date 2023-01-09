@@ -20,9 +20,9 @@ class TakenExamControllerTest extends TestCase
     
     const FIXTURE_START_URI = "front";
     
-    private $user;
-    private $front;
-    private $manager;
+    private User $user;
+    private Front $front;
+    private FrontManager $manager;
     private $createAttributes;
     
     
@@ -39,6 +39,14 @@ class TakenExamControllerTest extends TestCase
             "ssd" => $ssd->code,
             "grade" => 22
         ];
+        
+        $managerFactory = $this->createMock(FrontManagerFactory::class);
+        $this->manager = $this->createMock(FrontManager::class);
+        $managerFactory->expects($this->any())
+                ->method("getFrontManager")
+                ->with($this->front->id)
+                ->willReturn($this->manager);
+        app()->instance(FrontManagerFactory::class, $managerFactory);
     }
     
     public function test_access_redirect_without_authentication(){
@@ -256,13 +264,13 @@ class TakenExamControllerTest extends TestCase
     private function setupMocksAndAuth(){
         $this->be($this->user);
 
-        $managerFactory = $this->createMock(FrontManagerFactory::class);
-        $this->manager = $this->createMock(FrontManager::class);
-        app()->instance(FrontManagerFactory::class, $managerFactory);
-        $managerFactory->expects($this->any())
-                ->method("getFrontManager")
-                ->with($this->front->id)
-                ->willReturn($this->manager);  
+//        $managerFactory = $this->createMock(FrontManagerFactory::class);
+//        $this->manager = $this->createMock(FrontManager::class);
+//        app()->instance(FrontManagerFactory::class, $managerFactory);
+//        $managerFactory->expects($this->any())
+//                ->method("getFrontManager")
+//                ->with($this->front->id)
+//                ->willReturn($this->manager);
     }
     
 }

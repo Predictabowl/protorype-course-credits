@@ -9,22 +9,22 @@
 namespace App\Mappers\Implementations;
 
 use App\Domain\ExamBlockStudyPlanDTO;
-use App\Models\ExamBlock;
-use App\Models\ExamBlockOption;
-use App\Mappers\Interfaces\ExamOptionMapper;
 use App\Mappers\Interfaces\ExamBlockMapper;
+use App\Mappers\Interfaces\ExamStudyPlanMapper;
+use App\Models\Exam;
+use App\Models\ExamBlock;
 
 /**
  * Description of ExamBlockMapperImpl
  *
  * @author piero
  */
-class ExamBlockMapperImpl implements ExamBlockMapper{
+class ExamBlockStudyPlanMapperImpl implements ExamBlockMapper{
     
-    private $optionMapper;
+    private ExamStudyPlanMapper $examMapper;
     
-    public function __construct() {
-        $this->optionMapper = app()->make(ExamOptionMapper::class);
+    public function __construct(ExamStudyPlanMapper $examMapper) {
+        $this->examMapper = $examMapper;
     }
     
     public function toDTO(ExamBlock $model): ExamBlockStudyPlanDTO {
@@ -33,8 +33,9 @@ class ExamBlockMapperImpl implements ExamBlockMapper{
                 $model->max_exams,
                 $model->cfu,
                 $model->courseYear);
-        $model->examBlockOptions->map(fn(ExamBlockOption $option) =>  
-                $this->optionMapper->toDTO($option, $newBlock));
+        $model->exams->map(fn(Exam $option) =>  
+                $this->examMapper->toDTO($option, $newBlock));
+        $model->ssds->each(fn($ssd) => $newBlock->addCompatibleOption($ssd->code));
         return $newBlock;
     }
     

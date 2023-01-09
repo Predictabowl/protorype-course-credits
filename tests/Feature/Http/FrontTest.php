@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Http;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use \Illuminate\Foundation\Testing\DatabaseMigrations;
-use App\Models\User;
 use App\Models\Front;
+use App\Models\Role;
+use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use function route;
 
 class FrontTest extends TestCase
 {
@@ -16,7 +16,7 @@ class FrontTest extends TestCase
     public function test_front_access_with_basic_authentication()
     {
         $user = User::factory()->create();
-        $role = \App\Models\Role::create(["name" => "admin"]);
+        $role = Role::create(["name" => Role::ADMIN]);
         $user->roles()->attach($role);
         $front = Front::create(["user_id" => $user->id]);
         $user = User::first();

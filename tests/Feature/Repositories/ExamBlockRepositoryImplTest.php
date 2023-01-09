@@ -23,13 +23,11 @@ class ExamBlockRepositoryImplTest extends TestCase
     use RefreshDatabase;
     
     private ExamBlockRepositoryImpl $sut;
-    private ExamRepository $examRepo;
     
     protected function setUp(): void {
         parent::setUp();
-        $this->examRepo = $this->createMock(ExamRepository::class);
         
-        $this->sut = new ExamBlockRepositoryImpl($this->examRepo);
+        $this->sut = new ExamBlockRepositoryImpl();
     }
     
     public function test_get_when_not_present(){
@@ -42,7 +40,7 @@ class ExamBlockRepositoryImplTest extends TestCase
      * This doesn't actually test the eager load, so the added options are
      * bloat.
      */
-    public function test_get_block_with_options()
+    public function test_get_block_with_eagerLoading()
     {
         $course = Course::factory()->create();
         $ssds = Ssd::factory(3)->create();
@@ -51,16 +49,16 @@ class ExamBlockRepositoryImplTest extends TestCase
             "course_id" => $course
         ]);
         
-        $option = ExamBlockOption::factory()->create([
-            "exam_id" => Exam::factory()->create(),
+        $exam = Exam::factory()->create([
             "exam_block_id" => $block
         ]);
-        $option->ssds()->attach($ssds);
+        $block->ssds()->attach($ssds);
         
         $result = $this->sut->get(1);
         
         $block = ExamBlock::find(1);
         $this->assertEquals($block->attributesToArray(), $result->attributesToArray());
+        $this->assertEquals(2, sizeof($result->getRelations()));
     }
     
     public function test_getFilteredByCourse_when_course_not_present() {
@@ -70,7 +68,7 @@ class ExamBlockRepositoryImplTest extends TestCase
     }
 
 
-    public function test_getFilteredByCrouse_without_options(){
+    public function test_getFilteredByCourse_without_options(){
         $course = Course::factory()->create();
         
         ExamBlock::factory(3)->create([
@@ -96,18 +94,15 @@ class ExamBlockRepositoryImplTest extends TestCase
             "course_id" => Course::factory()->create()
         ]);
         
-        ExamBlockOption::factory(3)->create([
-            "exam_id" => Exam::factory()->create(),
+        Exam::factory(3)->create([
             "exam_block_id" => $blocks[0]
         ]);
         
-        ExamBlockOption::factory(2)->create([
-            "exam_id" => Exam::factory()->create(),
+        Exam::factory(2)->create([
             "exam_block_id" => $blocks[1]
         ]);
         
-        ExamBlockOption::factory(1)->create([
-            "exam_id" => Exam::factory()->create(),
+        Exam::factory(1)->create([
             "exam_block_id" => $blocks[2]
         ]);
         
@@ -121,6 +116,10 @@ class ExamBlockRepositoryImplTest extends TestCase
                 $result[1]->attributesToArray());
         $this->assertEquals(ExamBlock::find(3)->attributesToArray(),
                 $result[2]->attributesToArray());
+        
+        $result->each(function (ExamBlock $block){
+            $this->assertCount(2, $block->getRelations());
+        });
         // incomplete test
     }
 
@@ -142,8 +141,6 @@ class ExamBlockRepositoryImplTest extends TestCase
     
     public function test_saveWithId_notNull_ShouldThrow(){
         $course = Course::factory()->make();
-        $course->save();
-        
         $attributes = [
             "id" => 2,
             "max_exams" => 1,
@@ -151,6 +148,7 @@ class ExamBlockRepositoryImplTest extends TestCase
             "cfu" => 6
         ];
         $examBlock = ExamBlock::make($attributes);
+        $course->save();
         
         $this->expectException(InvalidArgumentException::class);
         $this->sut->save($examBlock);
@@ -159,15 +157,12 @@ class ExamBlockRepositoryImplTest extends TestCase
     }
    
     public function test_save_newExamBlock_Success(){
-        $course = Course::factory()->make();
-        $course->save();
-        
+        $course = Course::factory()->create();
         $attributes = [
             "max_exams" => 1,
             "course_id" => $course->id,
             "cfu" => 6
         ];
-        
         $examBlock = ExamBlock::make($attributes);
         
         $bResult = $this->sut->save($examBlock);
@@ -209,97 +204,24 @@ class ExamBlockRepositoryImplTest extends TestCase
         $this->assertEquals(3, $loaded->max_exams);
         $this->assertEquals(9, $loaded->cfu);
     }
-    
-    public function test_attachExam_whenBlockMissing(){
-        $this->expectException(ExamBlockNotFoundException::class);
-        $this->sut->attachExam(2, 3);
-    }
-    
-    public function test_attachExam_whenExamMissing(){
-        Course::factory()->create();
-        $examBlock = ExamBlock::factory()->create();
-        
-        $this->expectException(ExamNotFoundException::class);
-        $this->sut->attachExam($examBlock -> id, 3);
-    }
-    
-    public function test_attachExam_success(){
-        Course::factory()->create();
-        Ssd::factory()->create();
-        ExamBlock::factory(2)->create();
-        Exam::factory(4)->create();
-        $examBlock = ExamBlock::factory()->create();
-        $exam = Exam::factory()->create();
-        
-        $return = $this->sut->attachExam($examBlock -> id, $exam->id);
-        
-        $this->assertTrue($return);
-        
-        $ebLoaded = Exam::find($exam->id)->examBlockOptions->first()->examBlock;
-        $this->assertEquals($examBlock->id, $ebLoaded->id);
-        
-        $examLoaded = ExamBlock::find($examBlock->id)->examBlockOptions->first()->exam;
-        $this->assertEquals($exam->id, $exam->id);
-        
-        $this->assertDatabaseCount("exam_block_options", 1);
-    }
-    
-    public function test_attachExam_whenAlreadyAttached_shouldNotDuplicate(){
-        Course::factory()->create();
-        Ssd::factory()->create();
-        ExamBlock::factory(2)->create();
-        Exam::factory(4)->create();
-        $examBlock = ExamBlock::factory()->create();
-        $exam = Exam::factory()->create();
-        ExamBlockOption::create([
-            "exam_id" => $exam->id,
-            "exam_block_id" => $examBlock->id
-        ]);
-        
-        $return = $this->sut->attachExam($examBlock -> id, $exam->id);
-        
-        $this->assertFalse($return);
-        $this->assertDatabaseCount("exam_block_options", 1);
-    }
-    
+
     public function test_delete_whenMissing(){       
         $return = $this->sut->delete(2);
         
         $this->assertFalse($return);
     }
     
-    public function test_delete_examsOnCascade(){
+    public function test_delete_examBlock_shouldDeleteExams(){
         Ssd::factory(5)->create();
         Course::factory()->create();
         ExamBlock::factory()->create();
         $examBlock = ExamBlock::first();
         Exam::factory(3)->create();
-        $exams = Exam::all();
-        foreach($exams as $exam){
-            ExamBlockOption::create([
-                "exam_id" => $exam->id,
-                "exam_block_id" => $examBlock->id
-            ]);
-        }
-        $freeChoice = ExamSupport::getFreeChoiceExam();
-        ExamBlockOption::create([
-            "exam_id" => $freeChoice->id,
-            "exam_block_id" => $examBlock->id
-        ]);
-        
-        $this->examRepo->expects($this->once())
-                ->method("deleteBatch")
-                ->with(collect([
-                    $exams->get(0)->id,
-                    $exams->get(1)->id,
-                    $exams->get(2)->id,
-                    $freeChoice->id
-                ]));
         
         $result = $this->sut->delete($examBlock->id);
         
         $this->assertTrue($result);
-        $this->assertDatabaseCount("exam_block_options", 0);
+        $this->assertDatabaseCount("exams", 0);
         $this->assertDatabaseCount("exam_blocks", 0);
     }
 }

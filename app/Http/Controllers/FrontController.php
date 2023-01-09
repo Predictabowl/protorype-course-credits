@@ -2,22 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\Interfaces\FrontsSearchManager;
-use App\Services\Interfaces\FrontManager;
 use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Front;
+use App\Services\Interfaces\FrontManager;
+use App\Services\Interfaces\FrontsSearchManager;
+use function app;
+use function back;
+use function request;
+use function view;
 
 class FrontController extends Controller
 {
     
-    public function __construct() {
+    private FrontManagerFactory $frontManagerFactory;
+    
+    public function __construct(FrontManagerFactory $frontManagerFactory) {
         
         $this->middleware(["auth","verified"]);
         // The following auto biding policy makes viewAny fails... this is a Laravel bug
         // It's better to use the $this->authorize() method
         //$this->middleware("can:view,front");
         //$this->middleware("can:viewAny,App/Front");
+        $this->frontManagerFactory = $frontManagerFactory;
     }
     
     public function index(){
@@ -54,7 +60,7 @@ class FrontController extends Controller
     }
     
     private function makeFrontManager($id): FrontManager{
-        return app()->make(FrontManagerFactory::class)->getFrontManager($id);
+        return $this->frontManagerFactory->getFrontManager($id);
     }
     
 }

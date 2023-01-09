@@ -22,10 +22,10 @@ class FrontControllerTest extends TestCase
     
     const FIXTURE_START_URI = "front";
     
-    private $searchManager;
-    private $frontManager;
-    private $user;
-    private $front;
+    private FrontsSearchManager $searchManager;
+    private FrontManager $frontManager;
+    private User $user;
+    private Front $front;
     
     protected function setUp(): void {
         parent::setUp();
