@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ExamBlockController;
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudyPlanController;
@@ -56,11 +58,18 @@ Route::delete("/user/{user}",[UserController::class,"delete"])->name("userDelete
 Route::get("/userUpdate/{user}",[UserController::class,"updateView"])->name("userUpdate");
 Route::put("/userUpdate/{user}",[UserController::class,"put"]);
 
-//-------------- Course
+//-------------- Course (Admin only)
 Route::get("/course",[CourseController::class,"index"])->name("courseIndex");
 Route::post("/course",[CourseController::class,"post"])->name("courseCreate");
 Route::delete("/course/{course}",[CourseController::class,"delete"])->name("courseDelete");
 Route::put("/course/{course}",[CourseController::class,"put"])->name("courseUpdate");
+Route::get("/course/{course}",[ExamBlockController::class,"index"])->name("courseDetails");
+Route::post("/course/{course}/examblock",[ExamBlockController::class,"post"])->name("examBlockCreate");
+Route::delete("/course/examblock/{examblock}",[ExamBlockController::class,"delete"])->name("examBlockDelete");
+Route::put("/course/examblock/{examblock}",[ExamBlockController::class,"put"])->name("examBlockUpdate");
+Route::post("/course/examblock/{examblock}/exam",[ExamController::class,"post"])->name("examCreate");
+Route::delete("/course/examblock/exam/{exam}",[ExamController::class,"delete"])->name("examDelete");
+Route::put("/course/examblock/exam/{exam}",[ExamController::class,"put"])->name("examUpdate");
 
 //-------------- User Roles
 Route::put("/userRole/{user}",[UserController::class,"putRoles"])->name("userRoleUpdate");

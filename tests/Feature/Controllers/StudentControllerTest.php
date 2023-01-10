@@ -2,14 +2,15 @@
 
 namespace Tests\Feature\Controllers;
 
-
+use App\Factories\Interfaces\UserFrontManagerFactory;
 use App\Models\Front;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\UserFrontManager;
-
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use function app;
+use function route;
 
 class StudentControllerTest extends TestCase
 {
@@ -17,11 +18,15 @@ class StudentControllerTest extends TestCase
     
     
     private UserFrontManager $userFrontManager;
+    private UserFrontManagerFactory $ufManagerFactory;
+    
     protected function setUp(): void {
         parent::setUp();
         
         $this-> userFrontManager = $this->createMock(UserFrontManager::class);
-        app()->instance(UserFrontManager::class, $this-> userFrontManager);
+        $this->ufManagerFactory = $this->createMock(UserFrontManagerFactory::class);
+        
+        app()->instance(UserFrontManagerFactory::class, $this-> ufManagerFactory);
     }
 
     
@@ -35,6 +40,11 @@ class StudentControllerTest extends TestCase
         $user =  User::factory()->create();
         $front = Front::create(["user_id" => $user->id]);
         $frontManager = $this->createMock(FrontManager::class);
+        
+        $this->ufManagerFactory->expects($this->once())
+                ->method("get")
+                ->with($user->id)
+                ->willReturn($this->userFrontManager);
         
         $this->userFrontManager->expects($this->once())
                 ->method("getFrontManager")

@@ -10,6 +10,8 @@ use App\Models\Ssd;
  */
 class GenerateSSD {
     
+    public const SSD_REGEX = "/\b([A-Z]+(-[A-Z]+)?\/[0-5][0-9])\b/";
+    
     public static function create(string $prefix, int $max) {
         $prefix = strtoupper($prefix);
         for ($i=1; $i<=$max; $i++){
@@ -73,7 +75,6 @@ class GenerateSSD {
     }
     
     public static function isPossibleSSD(string $ssd): bool{
-        $rgx = "/\b([A-Z]+(-[A-Z]+)?\/[0-5][0-9])\b/";
-        return preg_match($rgx, $ssd);
+        return preg_match(self::SSD_REGEX, $ssd);
     }
 }

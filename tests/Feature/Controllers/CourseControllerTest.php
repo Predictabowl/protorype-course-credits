@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Http\Controllers\CourseController;
 use App\Models\Course;
 use App\Models\Role;
 use App\Models\User;
@@ -99,48 +98,22 @@ class CourseControllerTest extends TestCase
         $response->assertRedirect(route("courseIndex"));
     }
     
-    public function test_create_course_name_required(){
-        $this->performValidationTest("name",null);
-    }
-    
-    public function test_create_course_cfu_required(){
-        $this->performValidationTest("cfu",null);
-    }
-    
-    public function test_create_course_cfu_mustBeNumber(){
-        $this->performValidationTest("cfu","ci4");
-    }
-    
-    public function test_create_course_finaExamCfu_required(){
-        $this->performValidationTest("finalExamCfu",null);
-    }
+    public function test_create_course_validations(){
+        $this->beAdmin();
+        $this->coursesManager->expects($this->never())
+                ->method("addCourse");
         
-    public function test_create_course_finaExamCfu_mustBeNumber(){
-        $this->performValidationTest("finalExamCfu","4r");
-    }
-    
-    public function test_create_course_maxRecognizedCfu_mustBeNumber(){
-        $this->performValidationTest("maxRecognizedCfu","4r");
-    }
-    
-    public function test_create_course_otherActivities_mustBeNumber(){
-        $this->performValidationTest("otherActivitiesCfu","4r");
-    }
-    
-    public function test_create_course_numberOfYears_mustBeNumber(){
-        $this->performValidationTest("numberOfYears","4r");
-    }
-    
-    public function test_create_course_numberOfYears_isRequired(){
-        $this->performValidationTest("numberOfYears",null);
-    }
-    
-    public function test_create_course_cfuTreshold_isRequired(){
-        $this->performValidationTest("cfuTresholdForYear",null);
-    }
-    
-    public function test_create_course_cfuTreshold_mustBeNumber(){
-        $this->performValidationTest("cfuTresholdForYear","ch6");
+        $this->performPostValidationTest("name",null);
+        $this->performPostValidationTest("cfu",null);
+        $this->performPostValidationTest("cfu","ci4");
+        $this->performPostValidationTest("finalExamCfu",null);
+        $this->performPostValidationTest("finalExamCfu","4r");
+        $this->performPostValidationTest("maxRecognizedCfu","4r");
+        $this->performPostValidationTest("otherActivitiesCfu","4r");
+        $this->performPostValidationTest("numberOfYears","4r");
+        $this->performPostValidationTest("numberOfYears",null);
+        $this->performPostValidationTest("cfuTresholdForYear",null);
+        $this->performPostValidationTest("cfuTresholdForYear","ch6");
     }
     
     public function test_deleteCourse(){
@@ -202,15 +175,20 @@ class CourseControllerTest extends TestCase
         return $admin;
     }
     
-    private function performValidationTest(string $attrName, $attrValue){
-        $this->beAdmin();
-        $this->courseAttributes[$attrName] = $attrValue;
-        
-        $this->coursesManager->expects($this->never())
-                ->method("addCourse");
+    private function performPostValidationTest(string $attrName, $attrValue){
+        $localAttributes = [
+            "name" => "test name",
+            "cfu" => 6,
+            "maxRecognizedCfu" => 100,
+            "otherActivitiesCfu" => 15,
+            "finalExamCfu" => 10,
+            "numberOfYears" => 3,
+            "cfuTresholdForYear" => 40
+        ];
+        $localAttributes[$attrName] = $attrValue;
         
         $response = $this->from((route("courseIndex")))
-                ->post(route("courseCreate"),$this->courseAttributes);
+                ->post(route("courseCreate"),$localAttributes);
         
         $response->assertRedirect(route("courseIndex"));
     }

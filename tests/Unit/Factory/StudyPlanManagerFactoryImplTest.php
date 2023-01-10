@@ -3,28 +3,26 @@
 namespace Tests\Unit\Factory;
 
 use App\Factories\Implementations\StudyPlanManagerFactoryImpl;
+use App\Factories\Interfaces\UserFrontManagerFactory;
 use App\Models\Front;
 use App\Services\Interfaces\StudyPlanManager;
-use App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\YearCalculator;
 use PHPUnit\Framework\TestCase;
-use function app;
 
 class StudyPlanManagerFactoryImplTest extends TestCase
 {
     private StudyPlanManagerFactoryImpl $sut;
-    private UserFrontManager $ufManager;
+    private UserFrontManagerFactory $ufManagerFactory;
     private YearCalculator $yCalc;
     
     protected function setUp(): void {
         parent::setUp();
         
-        $this->ufManager = $this->createMock(UserFrontManager::class);
-        app()->instance(UserFrontManager::class, $this->ufManager);
+        $this->ufManagerFactory = $this->createMock(UserFrontManagerFactory::class);
         $this->yCalc = $this->createMock(YearCalculator::class);
-        app()->instance(YearCalculator::class, $this->yCalc);
         
-        $this->sut = new StudyPlanManagerFactoryImpl();
+        $this->sut = new StudyPlanManagerFactoryImpl($this->ufManagerFactory,
+                $this->yCalc);
     }
 
     

@@ -6,14 +6,20 @@ use App\Factories\Implementations\CourseManagerFactoryImpl;
 use App\Factories\Implementations\FrontManagerFactoryImpl;
 use App\Factories\Implementations\StudyPlanBuilderFactoryImpl;
 use App\Factories\Implementations\StudyPlanManagerFactoryImpl;
+use App\Factories\Implementations\UserFrontManagerFactoryImpl;
 use App\Factories\Interfaces\CourseManagerFactory;
 use App\Factories\Interfaces\FrontManagerFactory;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Factories\Interfaces\StudyPlanManagerFactory;
+use App\Factories\Interfaces\UserFrontManagerFactory;
+use App\Mappers\Implementations\ExamBlockInfoMapperImpl;
 use App\Mappers\Implementations\ExamBlockStudyPlanMapperImpl;
+use App\Mappers\Implementations\ExamInfoMapperImpl;
 use App\Mappers\Implementations\ExamStudyPlanMapperImpl;
 use App\Mappers\Implementations\TakenExamMapperImpl;
+use App\Mappers\Interfaces\ExamBlockInfoMapper;
 use App\Mappers\Interfaces\ExamBlockMapper;
+use App\Mappers\Interfaces\ExamInfoMapper;
 use App\Mappers\Interfaces\ExamStudyPlanMapper;
 use App\Mappers\Interfaces\TakenExamMapper;
 use App\Repositories\Implementations\CourseRepositoryImpl;
@@ -62,11 +68,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(FrontManagerFactory::class, FrontManagerFactoryImpl::class);
         $this->app->bind(StudyPlanBuilderFactory::class, StudyPlanBuilderFactoryImpl::class);
         $this->app->bind(StudyPlanManagerFactory::class, StudyPlanManagerFactoryImpl::class);
+        $this->app->bind(UserFrontManagerFactory::class, UserFrontManagerFactoryImpl::class);
         
         //---- Mappers
         $this->app->bind(ExamBlockMapper::class, ExamBlockStudyPlanMapperImpl::class);
         $this->app->bind(ExamStudyPlanMapper::class, ExamStudyPlanMapperImpl::class);
         $this->app->bind(TakenExamMapper::class, TakenExamMapperImpl::class);
+        $this->app->bind(ExamInfoMapper::class, ExamInfoMapperImpl::class);
+        $this->app->bind(ExamBlockInfoMapper::class, ExamBlockInfoMapperImpl::class);
         
         //---- Repositories
         $this->app->bind(SSDRepository::class, SSDRepositoryImpl::class);
@@ -80,7 +89,6 @@ class AppServiceProvider extends ServiceProvider
         //---- Services
         $this->app->bind(ExamDistance::class, ExamDistanceByName::class);
         $this->app->bind(StudyPlanBuilder::class, StudyPlanBuilderImpl::class);
-        $this->app->bind(UserFrontManager::class, UserFrontManagerImpl::class);
         $this->app->bind(UserManager::class, UserManagerImpl::class);
         $this->app->bind(FrontsSearchManager::class, FrontsSearchManagerImpl::class);
         $this->app->bind(YearCalculator::class, YearCalculatorImpl::class);

@@ -9,6 +9,7 @@
 namespace Tests\Feature\Services;
 
 use App\Domain\StudyPlan;
+use App\Factories\Interfaces\UserFrontManagerFactory;
 use App\Models\Course;
 use App\Models\Front;
 use App\Models\User;
@@ -32,6 +33,7 @@ class StudyPlanManagerImplTest extends TestCase{
     
     private Front $front;
     private UserFrontManager $ufManager;
+    private UserFrontManagerFactory $ufManagerFactory;
     private YearCalculator $yCalc;
     private StudyPlanManagerImpl $sut;
     
@@ -40,16 +42,18 @@ class StudyPlanManagerImplTest extends TestCase{
         
         $user = User::factory()->create();
         $this->front = Front::create(["user_id" => $user->id]);
+        $this->ufManagerFactory = $this->createMock(UserFrontManagerFactory::class);
         $this->ufManager = $this->createMock(UserFrontManager::class);
         $this->yCalc = $this->createMock(YearCalculator::class);
+
         
-        $this->sut = new StudyPlanManagerImpl($this->front, $this->ufManager,
+        $this->sut = new StudyPlanManagerImpl($this->front, $this->ufManagerFactory,
                 $this->yCalc);
     }
     
     public function test_getStudyPlan_with_course_not_set(){
-        $this->ufManager->expects($this->once())
-                ->method("setUserId")
+        $this->ufManagerFactory->expects($this->once())
+                ->method("get")
                 ->with($this->front->user_id)
                 ->willReturn($this->ufManager);
         
@@ -87,8 +91,8 @@ class StudyPlanManagerImplTest extends TestCase{
     }
     
     public function test_getCourseYear_failure(){
-        $this->ufManager->expects($this->once())
-                ->method("setUserId")
+        $this->ufManagerFactory->expects($this->once())
+                ->method("get")
                 ->with($this->front->user_id)
                 ->willReturn($this->ufManager);
         
@@ -121,8 +125,8 @@ class StudyPlanManagerImplTest extends TestCase{
         $this->front->course()->associate($course);
         $this->front->save();
         
-        $this->ufManager->expects($this->once())
-                ->method("setUserId")
+        $this->ufManagerFactory->expects($this->once())
+                ->method("get")
                 ->with($this->front->user_id)
                 ->willReturn($this->ufManager);
         

@@ -9,10 +9,13 @@ use App\Repositories\Interfaces\FrontRepository;
 use App\Services\Implementations\UserFrontManagerImpl;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\StudyPlanBuilder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class UserFrontManagerImplTest extends TestCase
 {
+    use RefreshDatabase;
+    
     private const FIXTURE_USER_ID = 2;
     private const FIXTURE_FRONT_ID = 27;
     
@@ -20,7 +23,6 @@ class UserFrontManagerImplTest extends TestCase
     private UserFrontManagerImpl $sut;
     private FrontManagerFactory $frontFactory;
     private StudyPlanBuilderFactory $spbFactory;
-//    private $authUser;
     
 
     protected function setUp():void
@@ -281,6 +283,12 @@ class UserFrontManagerImplTest extends TestCase
         $result = $this->sut->getStudyPlanBuilder();
         
         $this->assertNull($result);
+    }
+    
+    public function test_getUserId(){
+        $result = $this->sut->getUserId();
+        
+        $this->assertEquals($result, self::FIXTURE_USER_ID);
     }
 
 }

@@ -9,12 +9,11 @@
 namespace App\Factories\Implementations;
 
 use App\Factories\Interfaces\StudyPlanManagerFactory;
+use App\Factories\Interfaces\UserFrontManagerFactory;
 use App\Models\Front;
 use App\Services\Implementations\StudyPlanManagerImpl;
 use App\Services\Interfaces\StudyPlanManager;
-use App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\YearCalculator;
-use function app;
 
 /**
  * Description of StudyPlanManagerFactoryImpl
@@ -23,10 +22,18 @@ use function app;
  */
 class StudyPlanManagerFactoryImpl implements StudyPlanManagerFactory{
     
+    private UserFrontManagerFactory $ufManagerFactory;
+    private YearCalculator $yearCalcolator;
+    
+    public function __construct(UserFrontManagerFactory $ufManagerFactory,
+            YearCalculator $yearCalcolator) {
+        $this->ufManagerFactory = $ufManagerFactory;
+        $this->yearCalcolator = $yearCalcolator;
+    }
+
     public function get(Front $front): StudyPlanManager {
-        return new StudyPlanManagerImpl($front,
-                app()->make(UserFrontManager::class),
-                app()->make(YearCalculator::class));
+        return new StudyPlanManagerImpl($front, $this->ufManagerFactory,
+                $this->yearCalcolator);
     }
 
 }
