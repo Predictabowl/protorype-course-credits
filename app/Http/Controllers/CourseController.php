@@ -26,6 +26,18 @@ class CourseController extends Controller{
             "courses" => $this->coursesManager->getAllCourses($filters)
         ]);
      }
+     
+     public function show(Course $course) {
+         $this->authorize("view", $course);
+                 
+         return view("courses.input",["course" => $course]);
+     }
+     
+    public function newEntity() {
+        $this->authorize("create", Course::class);
+        
+        return view("courses.input");
+    }
     
     public function post() {
          $this->authorize("create", Course::class);

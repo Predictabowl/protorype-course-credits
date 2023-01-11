@@ -30,6 +30,13 @@
                         </x-nav-link>
                     </div>
                 @endcan
+                @can("viewAny",App\Models\Course::class)
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link :href="route('courseIndex')" :active="request()->routeIs('courseIndex')" id="courses-management-link">
+                            {{ __("Courses Management") }}
+                        </x-nav-link>
+                    </div>
+                @endcan
                 @if(auth()->user()->isStudent())
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link :href="route('frontPersonal')" :active="request()->routeIs('frontView')">
@@ -37,7 +44,7 @@
                         </x-nav-link>
                     </div>
                 @endif
-                
+
             </div>
 
             <!-- Settings Dropdown -->
@@ -102,7 +109,7 @@
                     {{ __("Users Management") }}
                 </x-responsive-nav-link>
             @endcan
-            @if(auth()->user()->isStudent())                
+            @if(auth()->user()->isStudent())
                 <x-responsive-nav-link :href="route('frontPersonal')" :active="request()->routeIs('frontView')">
                     Prospetto
                 </x-responsive-nav-link>

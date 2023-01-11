@@ -39,11 +39,23 @@ class CourseControllerTest extends TestCase
         ];
     }
     
-    public function test_index_authorization_forbidden(){
+    public function test_index_authorizations_forbidden(){
         $this->be(User::factory()->create());
         
-        $response = $this->get(route("courseIndex"));
-        $response->assertStatus(403);
+        $this->coursesManager->expects($this->never())
+                ->method("removeCourse");
+        $this->coursesManager->expects($this->never())
+                ->method("updateCourse");
+        $course = Course::first();
+        
+        $this->get(route("courseIndex"))->assertStatus(403);
+        $this->post(route("courseCreate"),[new Course([])])->assertForbidden();
+        $this->from((route("courseIndex")))->delete(route("courseDelete",[$course]))
+                ->assertForbidden();
+        $this->from((route("courseIndex")))->put(route("courseUpdate",[$course]))
+                ->assertForbidden();
+        $this->get(route("courseShow",[$course->id]))->assertForbidden();
+        $this->get(route("courseNew"))->assertForbidden();
     }
     
     public function test_index_auth_admin_success(){
@@ -75,15 +87,6 @@ class CourseControllerTest extends TestCase
         $response = $this->get(route("courseIndex",$filters));
         $response->assertOk();
         $response->assertViewHas(["courses" => $courses]);
-    }
-    
-    public function test_create_course_auth(){
-        $this->be(User::factory()->create());
-        
-        $course = new Course(["name" => "test name"]);
-        
-        $response = $this->post(route("courseCreate"),[$course]);
-        $response->assertForbidden();
     }
     
     public function test_create_course_success(){
@@ -128,28 +131,6 @@ class CourseControllerTest extends TestCase
         $response->assertRedirect(route("courseIndex"));
     }
     
-    public function test_deleteCourse_auth(){
-        $this->be(User::factory()->create());
-        
-        $this->coursesManager->expects($this->never())
-                ->method("removeCourse");
-        
-        $response = $this->from((route("courseIndex")))
-                ->delete(route("courseDelete",[Course::first()]));
-        $response->assertForbidden();
-    }
-    
-    public function test_updateCourse_auth(){
-        $this->be(User::factory()->create());
-        
-        $this->coursesManager->expects($this->never())
-                ->method("updateCourse");
-        
-        $response = $this->from((route("courseIndex")))
-                ->put(route("courseUpdate",[Course::first()]));
-        $response->assertForbidden();
-    }
-    
     public function test_updateCourse_success(){
         $this->beAdmin();
         $course = Course::first();
@@ -163,6 +144,24 @@ class CourseControllerTest extends TestCase
         $response = $this->from((route("courseIndex")))
                 ->put(route("courseUpdate",[Course::first()]),$this->courseAttributes);
         $response->assertRedirect(route("courseIndex"));
+    }
+    
+    public function test_showCourse(){
+        $this->beAdmin();
+        $course = Course::first();
+        
+        $response = $this->get(route("courseShow",[$course->id]));
+        
+        $response->assertViewIs("courses.input")
+                ->assertViewHas("course", $course);
+    }
+    
+    public function test_newEntity(){
+        $this->beAdmin();
+        $response = $this->get(route("courseNew"));
+        
+        $response->assertViewIs("courses.input")
+                ->assertViewMissing("course");
     }
     
     private function beAdmin(): User{
