@@ -13,7 +13,6 @@ class CourseController extends Controller{
 
     private CoursesAdminManager $coursesManager;
     
-    
     public function __construct(CoursesAdminManager $coursesManager) {
         $this->middleware(["auth","verified"]);
         $this->coursesManager = $coursesManager;

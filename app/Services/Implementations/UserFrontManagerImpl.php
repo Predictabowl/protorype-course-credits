@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class UserFrontManagerImpl implements UserFrontManager{
 
-    private $userId;
+    private int $userId;
     private FrontManagerFactory $fmFactory;
     private FrontRepository $frontRepo;
     private StudyPlanBuilderFactory $spbFactory;
@@ -23,13 +23,9 @@ class UserFrontManagerImpl implements UserFrontManager{
             FrontRepository $frontRepo,
             FrontManagerFactory $fmFactory,
             StudyPlanBuilderFactory $spbFactory,
-            $userId = null)
+            int $userId)
     {
-        if (isset($userId)){
-            $this->userId = $userId;
-        } else {
-            $this->userId = auth()->user()->id;
-        }
+        $this->userId = $userId;
         $this->frontRepo = $frontRepo;
         $this->fmFactory = $fmFactory;
         $this->spbFactory = $spbFactory;
@@ -74,16 +70,15 @@ class UserFrontManagerImpl implements UserFrontManager{
                 ->getStudyPlanBuilder($front->id, $front->course_id);
     }
 
-    public function setUserId($userId): UserFrontManager {
-        $this->userId = $userId;
-        return $this;
-    }
-
     private function getUpdatedFront(Front $front, $courseId): ?Front{
         if (isset($courseId) && $front->course_id != $courseId){
             $front = $this->frontRepo->updateCourse($front->id, $courseId);
         }
         return $front;
+    }
+
+    public function getUserId(): int {
+        return $this->userId;
     }
 
 }

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Ssd;
+use App\Support\Seeders\GenerateSSD;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SsdFactory extends Factory
@@ -22,7 +23,7 @@ class SsdFactory extends Factory
     public function definition()
     {
         return [
-            "code" => strtoupper($this->faker->bothify("???/##"))
+            "code" => strtoupper($this->faker->regexify(GenerateSSD::SSD_REGEX))
         ];
     }
 }

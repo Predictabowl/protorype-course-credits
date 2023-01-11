@@ -22,8 +22,6 @@ interface UserFrontManager {
     
     public function getFront(): ?Front;
 
-    public function setUserId($userId): UserFrontManager;
-    
     /**
      * Return a managing instance to extract info from the Front of the 
      * current user.
@@ -42,5 +40,7 @@ interface UserFrontManager {
      * @return StudyPlanBuilder|null
      */
     public function getStudyPlanBuilder(): ?StudyPlanBuilder;
+    
+    public function getUserId(): int;
 
 }

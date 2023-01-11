@@ -16,9 +16,9 @@ class NewExamBlockInfo {
     
     private int $maxExams;
     private int $cfu;
-    private int $courseYear;
+    private ?int $courseYear;
     
-    public function __construct(int $maxExams, int $cfu, int $courseYear) {
+    public function __construct(int $maxExams, int $cfu, ?int $courseYear) {
         $this->maxExams = $maxExams;
         $this->cfu = $cfu;
         $this->courseYear = $courseYear;
@@ -32,7 +32,7 @@ class NewExamBlockInfo {
         return $this->cfu;
     }
 
-    public function getCourseYear(): int {
+    public function getCourseYear(): ?int {
         return $this->courseYear;
     }
 }
