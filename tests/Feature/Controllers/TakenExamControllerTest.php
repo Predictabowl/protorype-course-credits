@@ -263,14 +263,6 @@ class TakenExamControllerTest extends TestCase
     
     private function setupMocksAndAuth(){
         $this->be($this->user);
-
-//        $managerFactory = $this->createMock(FrontManagerFactory::class);
-//        $this->manager = $this->createMock(FrontManager::class);
-//        app()->instance(FrontManagerFactory::class, $managerFactory);
-//        $managerFactory->expects($this->any())
-//                ->method("getFrontManager")
-//                ->with($this->front->id)
-//                ->willReturn($this->manager);
     }
     
 }
