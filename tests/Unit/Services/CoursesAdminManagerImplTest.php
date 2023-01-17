@@ -7,14 +7,12 @@
 
 namespace Tests\Unit\Services;
 
-use App\Domain\NewCourseInfo;
 use App\Exceptions\Custom\CourseNameAlreadyExistsException;
-use App\Exceptions\Custom\CourseNotFoundException;
-use App\Mappers\Interfaces\CourseInfoMapper;
 use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Services\Implementations\CoursesAdminManagerImpl;
 use Illuminate\Database\Eloquent\Collection;
+use InvalidArgumentException;
 use Tests\TestCase;
 use function collect;
 
@@ -96,7 +94,7 @@ class CoursesAdminManagerImplTest extends TestCase{
         $this->assertEquals(collect([$course1]),$result);
     }
     
-    public function test_addCourse_withDuplicateName_shjouldThrow(){
+    public function test_addCourse_withDuplicateName_shouldThrow(){
         $newCourse = new Course(["name" => "test"]);
         $course = new Course();
         
@@ -111,7 +109,7 @@ class CoursesAdminManagerImplTest extends TestCase{
     
     public function test_addCourse_success(){
         $courseInfo = new Course(["id" => 2, "name" => "test"]);
-        $modCourse = new Course(["id" => null, "name" => "test"]);
+        $modCourse = new Course(["name" => "test"]);
         $this->courseRepo->expects($this->once())
                 ->method("getFromName")
                 ->with("test")
@@ -136,23 +134,45 @@ class CoursesAdminManagerImplTest extends TestCase{
         $this->assertTrue($result);
     }
     
-    public function test_updateCourse_whenMissing_shouldThrow(){
-        $this->courseRepo->expects($this->once())
-                ->method("get")
-                ->with(3)
-                ->willReturn(null);
+    public function test_updateCourse_whenIdMissing_shouldThrow(){
+        $this->courseRepo->expects($this->never())
+                ->method("get");
         
-        $this->expectException(CourseNotFoundException::class);
-        $this->sut->updateCourse(new Course(["id" => 3]));
+        $this->expectException(InvalidArgumentException::class);
+        $this->sut->updateCourse(new Course());
+    }
+    
+    public function test_updateCourse_withDuplicateName_shouldThrow(){
+        $updatedCourse = new Course(["id" => 2, "name" => "test"]);
+        $course = new Course(["id" => 5, "name" => "test"]);
+        
+        $this->courseRepo->expects($this->once())
+                ->method("getFromName")
+                ->with("test")
+                ->willReturn($course);
+        $this->courseRepo->expects($this->never())
+                ->method("update");
+        
+        $this->expectException(CourseNameAlreadyExistsException::class);
+        $this->sut->updateCourse($updatedCourse);
+    }
+    
+    public function test_updateCourse_shouldIgnoreCurrentEntity_whenCheckingDuplication(){
+        $course = new Course(["id" => 2, "name" => "test", "cfu" => 18]);
+        $updatedCourse = new Course(["id" => 2, "name" => "test", "cfu" => 180]);
+        
+        $this->courseRepo->expects($this->once())
+                ->method("getFromName")
+                ->with("test")
+                ->willReturn($course);
+        $this->courseRepo->expects($this->once())
+                ->method("update")
+                ->with($updatedCourse);
+        
+        $this->sut->updateCourse($updatedCourse);
     }
     
     public function test_updateCourse_success(){
-        $oldCourse = new Course();
-        $this->courseRepo->expects($this->once())
-                ->method("get")
-                ->with(3)
-                ->willReturn($oldCourse);
-        
         $courseInfo = new Course([
             "id" => 3,
             "name" => "new name"

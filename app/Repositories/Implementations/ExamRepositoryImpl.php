@@ -12,7 +12,6 @@ use App\Exceptions\Custom\SsdNotFoundException;
 use App\Models\Exam;
 use App\Models\Ssd;
 use App\Repositories\Interfaces\ExamRepository;
-use App\Support\Seeders\ExamSupport;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
@@ -46,7 +45,7 @@ class ExamRepositoryImpl implements ExamRepository{
         return $exam;
     }
 
-    public function update(Exam $exam): Exam{
+    public function update(Exam $exam): void{
         $loaded = Exam::find($exam->id);
         if(!isset($loaded)){
             throw new ExamNotFoundException("Exam not found with id: ".$exam->id);
@@ -57,8 +56,8 @@ class ExamRepositoryImpl implements ExamRepository{
             throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
         }
 
-        $exam->save();
-        return $exam;
+        $loaded->setRawAttributes($exam->getAttributes());
+        $loaded->save();
     }
 
     public function delete(int $id): void {

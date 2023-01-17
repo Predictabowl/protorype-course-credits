@@ -17,7 +17,7 @@ use Illuminate\Support\Collection;
 interface ExamRepository {
     public function get($id): ?Exam;
     public function save(Exam $exam): Exam;
-    public function update(Exam $exam): Exam;
+    public function update(Exam $exam): void;
     public function delete(int $id): void;
     public function deleteBatch(Collection $ids): void;
 }

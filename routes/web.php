@@ -61,9 +61,9 @@ Route::put("/userUpdate/{user}",[UserController::class,"put"]);
 //-------------- Course (Admin only)
 Route::get("/course",[CourseController::class,"index"])->name("courseIndex");
 Route::post("/course",[CourseController::class,"post"])->name("courseCreate");
-Route::delete("/course/{course}",[CourseController::class,"delete"])->name("courseDelete");
-Route::get("/course/update/{course}",[CourseController::class,"show"])->name("courseShow");
-Route::get("/course/new",[CourseController::class,"newEntity"])->name("courseNew");
+Route::delete("/course/{courseId}",[CourseController::class,"delete"])->name("courseDelete");
+Route::get("/course/update/{course}",[CourseController::class,"updateCourseForm"])->name("courseShow");
+Route::get("/course/new",[CourseController::class,"newCourseForm"])->name("courseNew");
 Route::put("/course/{course}",[CourseController::class,"put"])->name("courseUpdate");
 Route::get("/course/{course}/examblock",[ExamBlockController::class,"index"])->name("courseDetails");
 Route::post("/course/{course}/examblock",[ExamBlockController::class,"post"])->name("examBlockCreate");

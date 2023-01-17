@@ -201,7 +201,7 @@ class CourseAdminManagerImplTest extends TestCase{
         $this->sut->deleteExamBlock(5);
     }
     
-    public function test_updateExam_whenExamIsMissing_shouldthrow(){
+    public function test_updateExam_whenExamId_isMissing_shouldthrow(){
         $examInfo = new NewExamInfo("new name", "IUS/01");
         $this->examRepo->expects($this->once())
                 ->method("get")

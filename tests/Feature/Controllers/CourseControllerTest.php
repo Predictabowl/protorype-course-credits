@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Exceptions\Custom\CourseNameAlreadyExistsException;
 use App\Models\Course;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\Interfaces\CoursesAdminManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 use function app;
 use function route;
@@ -96,13 +98,13 @@ class CourseControllerTest extends TestCase
                 ->method("addCourse")
                 ->with($course);
         
-        $response = $this->from((route("courseIndex")))
-                ->post(route("courseCreate"),$this->courseAttributes);
-        $response->assertRedirect(route("courseIndex"));
+        $response = $this->post(route("courseCreate"),$this->courseAttributes);
+        $response->assertRedirectToRoute("courseIndex");
     }
     
     public function test_create_course_validations(){
         $this->beAdmin();
+        Course::factory()->create(["name" => "existing name"]);
         $this->coursesManager->expects($this->never())
                 ->method("addCourse");
         
@@ -119,6 +121,19 @@ class CourseControllerTest extends TestCase
         $this->performPostValidationTest("cfuTresholdForYear","ch6");
     }
     
+    public function test_create_course_duplicateName(){
+        $this->beAdmin();
+        $this->coursesManager->expects($this->once())
+                ->method("addCourse")
+                ->willThrowException(new CourseNameAlreadyExistsException("test message"));
+        
+        $response = $this->from(self::FIXTURE_START_URI)
+                ->post(route("courseCreate"),$this->courseAttributes);
+        
+        $response->assertRedirect(self::FIXTURE_START_URI)
+                ->assertSessionHasErrors(["name" => "test message"]);
+    }
+        
     public function test_deleteCourse(){
         $this->beAdmin();
         $course = Course::first();
@@ -128,7 +143,7 @@ class CourseControllerTest extends TestCase
         
         $response = $this->from((route("courseIndex")))
                 ->delete(route("courseDelete",[$course->id]));
-        $response->assertRedirect(route("courseIndex"));
+        $response->assertRedirectToRoute("courseIndex");
     }
     
     public function test_updateCourse_success(){
@@ -141,27 +156,46 @@ class CourseControllerTest extends TestCase
                 ->method("updateCourse")
                 ->with($newCourse);
         
-        $response = $this->from((route("courseIndex")))
-                ->put(route("courseUpdate",[Course::first()]),$this->courseAttributes);
-        $response->assertRedirect(route("courseIndex"));
+        $response = $this->put(
+                route("courseUpdate",[Course::first()]),$this->courseAttributes);
+        $response->assertRedirectToRoute("courseShow",[$course->id]);
     }
     
-    public function test_showCourse(){
+    public function test_updateCourse_duplicateName(){
+        $this->beAdmin();
+        $course = Course::first();
+        $newCourse = new Course($this->courseAttributes);
+        $newCourse->id = $course->id;
+        
+        $this->coursesManager->expects($this->once())
+                ->method("updateCourse")
+                ->willThrowException(new CourseNameAlreadyExistsException("test message"));
+        
+        $response = $this->from(self::FIXTURE_START_URI)->put(
+                route("courseUpdate",[$course->id]),$this->courseAttributes);
+        
+        $response->assertRedirect(self::FIXTURE_START_URI)
+                ->assertSessionHasErrors(["name" => "test message"]);
+    }
+    
+    public function test_updateCourseForm(){
         $this->beAdmin();
         $course = Course::first();
         
         $response = $this->get(route("courseShow",[$course->id]));
         
         $response->assertViewIs("courses.input")
-                ->assertViewHas("course", $course);
+                ->assertViewHas("course", $course)
+                ->assertViewHas("action", route("courseUpdate",[$course->id]));
     }
     
-    public function test_newEntity(){
+    public function test_newCourseForm(){
         $this->beAdmin();
         $response = $this->get(route("courseNew"));
         
         $response->assertViewIs("courses.input")
-                ->assertViewMissing("course");
+            ->assertViewMissing("course")
+            ->assertViewHas("action", route("courseCreate"));
     }
     
     private function beAdmin(): User{
@@ -174,7 +208,7 @@ class CourseControllerTest extends TestCase
         return $admin;
     }
     
-    private function performPostValidationTest(string $attrName, $attrValue){
+    private function performPostValidationTest(string $attrName, $attrValue): TestResponse{
         $localAttributes = [
             "name" => "test name",
             "cfu" => 6,
@@ -186,9 +220,11 @@ class CourseControllerTest extends TestCase
         ];
         $localAttributes[$attrName] = $attrValue;
         
-        $response = $this->from((route("courseIndex")))
+        $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("courseCreate"),$localAttributes);
         
-        $response->assertRedirect(route("courseIndex"));
+        $response->assertRedirect(self::FIXTURE_START_URI)
+                ->assertSessionHasErrors($attrName);
+        return $response;
     }
 }

@@ -67,11 +67,13 @@ class CourseRepositoryImpl implements CourseRepository {
 
     public function update(Course $course): bool {
         $oldCourse = Course::find($course->id);
-        if(!isset($oldCourse)){
+        if(is_null($oldCourse)){
             throw new CourseNotFoundException("Course not found with id: ".$course->id);
         }
+        
+        $oldCourse->setRawAttributes($course->getAttributes());
         try{
-            return $course->save();
+            return $oldCourse->save();
         } catch (QueryException $exc){
             Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
             return false;

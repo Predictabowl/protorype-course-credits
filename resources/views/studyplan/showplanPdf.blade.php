@@ -24,7 +24,7 @@
         tfoot { display:table-footer-group }
 
         ul {
-            margin-top: 3px; 
+            margin-top: 3px;
             margin-bottom: 3px;
         }
 
@@ -122,7 +122,7 @@
                         <div>- Altre attività: {{ $activities }} cfu</div>
                     @endif
                     <div>- Prova Finale: {{ $front->course->finalExamCfu}} cfu</div>
-                    
+
                 </div>
             </section>
 
@@ -164,7 +164,7 @@
                                     <table class="table-prospetto no-break-table">
                                         <tr>
                                             <td class={{!$startBlock ? "border-t" : ""}}>
-                                                @if($option->getSsd() != null) 
+                                                @if($option->getSsd() != null)
                                                     {{$option->getSsd()}} |
                                                 @endif
                                                 {{ $option->getExamName() }}
@@ -179,15 +179,15 @@
                                                 @endif
                                             </td>
                                         </tr>
-                                        <tr>   
+                                        <tr>
                                             <td style="font-size: 12px;">
                                                 <ul>
                                                     @foreach($option->getTakenExams() as $taken)
                                                     <li>
-                                                        [{{ $taken->getSsd() }}] {{ $taken->getExamName() }}: 
+                                                        [{{ $taken->getSsd() }}] {{ $taken->getExamName() }}:
                                                         {{ $taken->getActualCfu()}}/{{$taken->getCfu()}}
                                                     </li>
-                                                
+
                                                     @endforeach
                                                 </ul>
                                             </td>

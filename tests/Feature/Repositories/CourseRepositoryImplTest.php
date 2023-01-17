@@ -165,9 +165,12 @@ class CourseRepositoryImplTest extends TestCase {
         $course = Course::factory()->create([
             "name" => "old name"
         ]);
-        $course->name = "new name";
+        $updatedCourse = Course::factory()->make([
+                "id" => $course->id,
+                "name" => "new name"
+            ]);
 
-        $result = $this->sut->update($course);
+        $result = $this->sut->update($updatedCourse);
 
         $this->assertTrue($result);
         $modified = Course::find($course->id);

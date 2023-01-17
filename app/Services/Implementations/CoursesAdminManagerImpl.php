@@ -8,12 +8,13 @@
 namespace App\Services\Implementations;
 
 use App\Exceptions\Custom\CourseNameAlreadyExistsException;
-use App\Exceptions\Custom\CourseNotFoundException;
 use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Services\Interfaces\CoursesAdminManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
+use function __;
 
 /**
  * Description of CourseAdminManagerImpl
@@ -37,12 +38,12 @@ class CoursesAdminManagerImpl implements CoursesAdminManager {
     }
 
     public function addCourse(Course $course): void{
-        $course->id = null;
+        unset($course["id"]);
         DB::transaction(function() use($course){
             $loadedCourse = $this->courseRepo->getFromName($course->name);
             if(!is_null($loadedCourse)){
                 throw new CourseNameAlreadyExistsException(
-                        "Duplicate course name: ".$course->name);
+                        __("Course Name already present").": ".$course->name);
             }
             $this->courseRepo->save($course);
         });
@@ -56,8 +57,14 @@ class CoursesAdminManagerImpl implements CoursesAdminManager {
 
     public function updateCourse(Course $course): void {
         DB::transaction(function() use($course){
-            if(is_null($this->courseRepo->get($course->id))){
-                throw new CourseNotFoundException("Course not found with id: ".$course->id);
+            if(is_null($course->id)){
+                throw new InvalidArgumentException("Course Id is not properly set");
+            }
+            
+            $nameCourse = $this->courseRepo->getFromName($course->name);
+            if(!is_null($nameCourse) && $nameCourse->id != $course->id){
+                throw new CourseNameAlreadyExistsException(
+                    __("Course Name already present").": ".$course->name);
             }
             $this->courseRepo->update($course);
         });

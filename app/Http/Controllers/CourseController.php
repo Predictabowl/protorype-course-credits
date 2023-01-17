@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\Custom\CourseNameAlreadyExistsException;
 use App\Models\Course;
 use App\Services\Interfaces\CoursesAdminManager;
+use Illuminate\Validation\ValidationException;
 use function back;
+use function redirect;
 use function request;
+use function route;
 use function view;
 
 
@@ -27,31 +31,38 @@ class CourseController extends Controller{
         ]);
      }
      
-     public function show(Course $course) {
-         $this->authorize("view", $course);
-                 
-         return view("courses.input",["course" => $course]);
+     public function updateCourseForm(Course $course) {
+        $this->authorize("view", $course);
+        
+        return view("courses.input",[
+            "course" => $course,
+            "action" => route("courseUpdate",[$course->id])]);
      }
      
-    public function newEntity() {
+    public function newCourseForm() {
         $this->authorize("create", Course::class);
         
-        return view("courses.input");
+        return view("courses.input",["action" => route("courseCreate")]);
     }
     
     public function post() {
          $this->authorize("create", Course::class);
          
          $attributes = $this->attributeValidation();
-         $this->coursesManager->addCourse(new Course($attributes));
-         return back()->with("success","Aggiunto: ".$attributes["name"]);
+         try{
+            $this->coursesManager->addCourse(new Course($attributes));
+         } catch (CourseNameAlreadyExistsException $ex){
+            throw ValidationException::withMessages(["name" => $ex->getMessage()]);
+         }
+         return redirect(route("courseIndex"))
+                 ->with("success","Aggiunto: ".$attributes["name"]);
      }
      
-     public function delete(Course $course){
+     public function delete(int $courseId){
          $this->authorize("delete", Course::class);
          
-         $this->coursesManager->removeCourse($course->id);
-         return back()->with("success","Eliminato: ".$course->name);
+         $this->coursesManager->removeCourse($courseId);
+         return back();
      }
      
      public function put(Course $course){
@@ -60,9 +71,14 @@ class CourseController extends Controller{
          $newCourse = new Course($attributes);
          $newCourse->id = $course->id;
          
-         $this->coursesManager->updateCourse($newCourse);
+         try{
+            $this->coursesManager->updateCourse($newCourse);
+         } catch (CourseNameAlreadyExistsException $ex){
+             throw ValidationException::withMessages(["name" => $ex->getMessage()]);
+         }
          
-         return back()->with("success","Aggiornato: ".$attributes["name"]);
+         return redirect(route("courseShow",[$course->id]))
+                 ->with("success","Aggiornato: ".$newCourse->name);
      }
      
      private function attributeValidation(): array{

@@ -56,7 +56,8 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         if(is_null($oldEB)){
             throw new ExamBlockNotFoundException("Couldn't find ExamBlock with id: ".$examBlock->id);
         }
-        $examBlock->save();
+        $oldEB->setRawAttributes($examBlock->getAttributes());
+        $oldEB->save();
     }
 
     public function delete(int $id): bool {

@@ -116,13 +116,15 @@ class ExamRepositoryImplTest extends TestCase{
         $loaded = Exam::first();
         $this->assertEquals("original name",$loaded->name);
         
-        $exam->name = "new name";
+        $updatedExam = Exam::factory()->make([
+                "id" => $exam->id,
+                "name" => "new name"
+            ]);
         
-        $bResult = $this->sut->update($exam);
+        $this->sut->update($updatedExam);
         
-        $this->assertEquals($bResult,$exam);
-        $this->assertDatabaseCount("exams",1);
         $modified = Exam::first();
+        $this->assertDatabaseCount("exams",1);
         $this->assertEquals("new name",$modified->name);
     }
     

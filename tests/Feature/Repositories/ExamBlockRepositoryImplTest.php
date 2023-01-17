@@ -194,9 +194,11 @@ class ExamBlockRepositoryImplTest extends TestCase
             "cfu" => 6,
         ]);
         $examBlock->save();
-        $newEB = $examBlock;
-        $newEB->max_exams = 3;
-        $newEB->cfu = 9;
+        $newEB = ExamBlock::factory()->make([
+            "id" => $examBlock->id,
+            "max_exams" => 3,
+            "cfu" => 9
+            ]);
      
         $this->sut->update($newEB);
         
