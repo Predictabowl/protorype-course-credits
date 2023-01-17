@@ -56,7 +56,8 @@ class ExamRepositoryImpl implements ExamRepository{
             throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
         }
 
-        $loaded->setRawAttributes($exam->getAttributes());
+        $loaded->name = $exam->name;
+        $loaded->ssd_id = $exam->ssd_id;
         $loaded->save();
     }
 

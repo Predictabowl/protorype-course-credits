@@ -56,7 +56,9 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         if(is_null($oldEB)){
             throw new ExamBlockNotFoundException("Couldn't find ExamBlock with id: ".$examBlock->id);
         }
-        $oldEB->setRawAttributes($examBlock->getAttributes());
+        $oldEB->max_exams = $examBlock->max_exams;
+        $oldEB->cfu = $examBlock->cfu;
+        $oldEB->courseYear = $examBlock->courseYear;
         $oldEB->save();
     }
 

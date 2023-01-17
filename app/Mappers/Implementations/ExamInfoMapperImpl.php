@@ -17,7 +17,7 @@ use App\Models\Exam;
  * @author piero
  */
 class ExamInfoMapperImpl implements ExamInfoMapper{
-    public function map(NewExamInfo $examInfo, int $examBlockId, ?int $ssdId): Exam {
+    public function map(NewExamInfo $examInfo, ?int $examBlockId, ?int $ssdId): Exam {
         return new Exam([
             "name" => $examInfo->getName(),
             "exam_block_id" => $examBlockId,

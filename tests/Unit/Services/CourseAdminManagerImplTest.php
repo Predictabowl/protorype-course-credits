@@ -11,7 +11,6 @@ use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
 use App\Exceptions\Custom\CourseNotFoundException;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
-use App\Exceptions\Custom\ExamNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
 use App\Mappers\Interfaces\ExamBlockInfoMapper;
 use App\Mappers\Interfaces\ExamInfoMapper;
@@ -201,28 +200,9 @@ class CourseAdminManagerImplTest extends TestCase{
         $this->sut->deleteExamBlock(5);
     }
     
-    public function test_updateExam_whenExamId_isMissing_shouldthrow(){
-        $examInfo = new NewExamInfo("new name", "IUS/01");
-        $this->examRepo->expects($this->once())
-                ->method("get")
-                ->with(3)
-                ->willReturn(null);
-        $this->ssdRepo->expects($this->never())
-                ->method("getSsdFromCode");
-        $this->examRepo->expects($this->never())
-                ->method("update");
-        
-        $this->expectException(ExamNotFoundException::class);
-        $this->sut->updateExam($examInfo, 3);
-    }
-    
     public function test_updateExam_withSsdMissing_shouldThrow(){
         $examInfo = new NewExamInfo("new name", "IUS/01");
         $examId = 3;
-        $this->examRepo->expects($this->once())
-                ->method("get")
-                ->with($examId)
-                ->willReturn(new Exam(["exam_block_id" => 7]));
         $this->ssdRepo->expects($this->once())
                 ->method("getSsdFromCode")
                 ->with("IUS/01")
@@ -237,17 +217,13 @@ class CourseAdminManagerImplTest extends TestCase{
     public function test_updateExam_success(){
         $examInfo = new NewExamInfo("new name", "IUS/01");
         $examId = 3;
-        $this->examRepo->expects($this->once())
-                ->method("get")
-                ->with($examId)
-                ->willReturn(new Exam(["exam_block_id" => 7]));
         $this->ssdRepo->expects($this->once())
                 ->method("getSsdFromCode")
                 ->with("IUS/01")
                 ->willReturn(new Ssd(["id" => 11]));        
         $this->examMapper->expects($this->once())
                 ->method("map")
-                ->with($examInfo, 7, 11)
+                ->with($examInfo, null, 11)
                 ->willReturn(new Exam());
         $this->examRepo->expects($this->once())
                 ->method("update")
@@ -255,30 +231,13 @@ class CourseAdminManagerImplTest extends TestCase{
         
         $this->sut->updateExam($examInfo, $examId);
     }      
-
-    public function test_updateExamBlock_withBlockMissing_shouldThrow() {
-        $ebInfo = new NewExamBlockInfo(3, 9, 2);
-        $this->ebRepo->expects($this->once())
-                ->method("get")
-                ->with(3)
-                ->willReturn(null);
-        $this->ebRepo->expects($this->never())
-                ->method("update");
-        
-        $this->expectException(ExamBlockNotFoundException::class);
-        $this->sut->updateExamBlock($ebInfo, 3);
-    }
     
     public function test_updateExamBlock_success() {
         $ebInfo = new NewExamBlockInfo(3, 9, 2);
         $ebId = 3;
-        $this->ebRepo->expects($this->once())
-                ->method("get")
-                ->with($ebId)
-                ->willReturn(new ExamBlock(["course_id" => 13]));
         $this->ebMapper->expects($this->once())
                 ->method("map")
-                ->with($ebInfo, 13)
+                ->with($ebInfo, null)
                 ->willReturn(new ExamBlock());
         $this->ebRepo->expects($this->once())
                 ->method("update")

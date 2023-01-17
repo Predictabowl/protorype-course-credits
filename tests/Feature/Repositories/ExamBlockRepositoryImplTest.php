@@ -192,19 +192,24 @@ class ExamBlockRepositoryImplTest extends TestCase
             "max_exams" => 2,
             "course_id" => $course->id,
             "cfu" => 6,
+            "courseYear" => 2
         ]);
         $examBlock->save();
         $newEB = ExamBlock::factory()->make([
             "id" => $examBlock->id,
             "max_exams" => 3,
-            "cfu" => 9
+            "cfu" => 9,
+            "courseYear" => 1,
+            "course_id" => $course->id+1
             ]);
      
         $this->sut->update($newEB);
         
-        $loaded = ExamBlock::all()->first();
+        $loaded = ExamBlock::first();
         $this->assertEquals(3, $loaded->max_exams);
         $this->assertEquals(9, $loaded->cfu);
+        $this->assertEquals($course->id, $loaded->course_id);
+        $this->assertEquals(1, $loaded->courseYear);
     }
 
     public function test_delete_whenMissing(){       

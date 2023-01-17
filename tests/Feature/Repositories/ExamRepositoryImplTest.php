@@ -14,7 +14,6 @@ use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Models\Ssd;
 use App\Repositories\Implementations\ExamRepositoryImpl;
-use App\Support\Seeders\ExamSupport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
@@ -113,12 +112,15 @@ class ExamRepositoryImplTest extends TestCase{
             "ssd_id" => Ssd::factory()->create()
         ]);
 
+        $ssd = Ssd::factory()->create();
         $loaded = Exam::first();
         $this->assertEquals("original name",$loaded->name);
         
-        $updatedExam = Exam::factory()->make([
+        $updatedExam = new Exam([
                 "id" => $exam->id,
-                "name" => "new name"
+                "name" => "new name",
+                "ssd_id" => $ssd->id,
+                "exam_block_id" => $exam->exam_block_id+1
             ]);
         
         $this->sut->update($updatedExam);
@@ -126,6 +128,8 @@ class ExamRepositoryImplTest extends TestCase{
         $modified = Exam::first();
         $this->assertDatabaseCount("exams",1);
         $this->assertEquals("new name",$modified->name);
+        $this->assertEquals($ssd->id, $modified->ssd_id);
+        $this->assertEquals($exam->exam_block_id, $modified->exam_block_id);
     }
     
     public function test_deleteExam(){

@@ -11,13 +11,10 @@ use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
 use App\Exceptions\Custom\CourseNotFoundException;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
-use App\Exceptions\Custom\ExamNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
 use App\Mappers\Interfaces\ExamBlockInfoMapper;
 use App\Mappers\Interfaces\ExamInfoMapper;
 use App\Models\Course;
-use App\Models\Exam;
-use App\Models\ExamBlock;
 use App\Models\Ssd;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
@@ -100,10 +97,8 @@ class CourseAdminManagerImpl implements CourseAdminManager {
 
     public function updateExam(NewExamInfo $examInfo, int $examId): void {
         DB::transaction(function() use($examInfo, $examId){
-            $exam = $this->getExamOrThrow($examId);
             $ssd = $this->getSsdOrThrow($examInfo->getSsd());
-            $newExam = $this->examMapper->map($examInfo, $exam->exam_block_id,
-                    $ssd->id);
+            $newExam = $this->examMapper->map($examInfo, null, $ssd->id);
             $newExam->id = $examId;
             $this->examRepo->update($newExam);
         });
@@ -111,8 +106,7 @@ class CourseAdminManagerImpl implements CourseAdminManager {
 
     public function updateExamBlock(NewExamBlockInfo $examBlockInfo, int $examBlockId): void {
         DB::transaction(function() use($examBlockInfo, $examBlockId){
-            $examBlock = $this->getExamBlockOrThrow($examBlockId);
-            $newExamBlock = $this->ebMapper->map($examBlockInfo, $examBlock->course_id);
+            $newExamBlock = $this->ebMapper->map($examBlockInfo, null);
             $newExamBlock->id = $examBlockId;
             $this->ebRepo->update($newExamBlock);
         });
@@ -124,21 +118,5 @@ class CourseAdminManagerImpl implements CourseAdminManager {
             throw new SsdNotFoundException("Ssd not found with code: ".$code);
         }
         return $ssd;
-    }
-    
-    private function getExamOrThrow(int $examId): Exam{
-        $exam = $this->examRepo->get($examId);
-        if(is_null($exam)){
-            throw new ExamNotFoundException("Could not find Exam with id: ".$examId);
-        }
-        return $exam;
-    }
-    
-    private function getExamBlockOrThrow(int $ebId): ExamBlock{
-        $examBlock = $this->ebRepo->get($ebId);
-        if(is_null($examBlock)){
-            throw new ExamBlockNotFoundException("Could not find Exam Block with id: ".$ebId);
-        }
-        return $examBlock;
     }
 }
