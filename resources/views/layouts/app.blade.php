@@ -12,6 +12,7 @@
 
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 
         <!-- Scripts (Apline) -->
         {{-- <script src="{{ asset('js/app.js') }}" defer></script> --}}

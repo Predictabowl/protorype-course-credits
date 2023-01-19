@@ -11,7 +11,6 @@
             <div class="flex justify-between">
                 <x-searchUserBar class="mb-4" filter="course" placeholder="Cerca per nome o email"/>
             </div>
-
             <div class="place-content-center">
                 <table class="min-w-full rounded-lg">
                     <thead>
@@ -62,7 +61,7 @@
                         @foreach($fronts as $front)
                         <tr class="hover:bg-blue-100 ">
                             <td>
-                                <a class="hover:bg-blue-700 hover:text-white hover:font-semibold" 
+                                <a class="hover:bg-blue-700 hover:text-white hover:font-semibold"
                                     href="{{ route('frontView',[$front])}}">
                                         {{ $front->user->name }}
                                 </a>

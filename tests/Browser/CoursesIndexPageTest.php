@@ -42,11 +42,24 @@ class CoursesIndexPageTest extends DuskTestCase
         Course::factory(2)->create();
         $this->browse(function($browser){
             $courses = Course::all();
-            $linkId = "#courses-management-link";
             $browser->loginAs($this->getAdmin())
                     ->visit(route("courseIndex"))
-                    ->assertSee($courses->get(0)->name)
-                    ->assertSee($courses->get(1)->name)
+                    ->assertSeeLink($courses->get(0)->name)
+                    ->assertSeeLink($courses->get(1)->name)
+                    ->clickLink($courses->get(1)->name)
+                    ->assertRouteIs("courseDetails",[$courses->get(1)->id])
+                    ->logout();
+        });
+    }
+    
+    public function test_newCourseButton(){
+        $this->browse(function($browser){
+            $link = "#new-course-link";
+            $browser->loginAs($this->getAdmin())
+                    ->visit(route("courseIndex"))
+                    ->assertPresent($link)
+                    ->click($link)
+                    ->assertRouteIs("courseNew")
                     ->logout();
         });
     }
