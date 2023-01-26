@@ -1,4 +1,21 @@
+/* General */
 .sticky-top{
     position: sticky;
     top: 0px;
+}
+
+/* Table Classes */
+
+.td-link{
+    color: navy;
+}
+
+.td-link:hover{
+    font-weight: 600;
+    color: white;
+    background-color: mediumblue;
+}
+
+.tr-body:hover{
+    background-color: rgb(219 234 254);
 }

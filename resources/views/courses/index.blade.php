@@ -27,10 +27,10 @@
                     </tr>
                 </x-slot>
                 @foreach ($courses as $course)
-                    <tr class="hover:bg-blue-100 ">
+                    {{-- <tr class="hover:bg-blue-100 "> --}}
+                    <tr class="tr-body">
                         <td>
-                            <a class="hover:bg-blue-700 hover:text-white hover:font-semibold"
-                                href="{{ route('courseDetails', [$course]) }}">
+                            <a class="td-link" href="{{ route('courseDetails', [$course]) }}">
                                 {{ $course->name }}
                             </a>
                         </td>

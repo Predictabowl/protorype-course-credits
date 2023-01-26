@@ -59,10 +59,9 @@
                     </thead>
                     <tbody>
                         @foreach($fronts as $front)
-                        <tr class="hover:bg-blue-100 ">
+                        <tr class="tr-body">
                             <td>
-                                <a class="hover:bg-blue-700 hover:text-white hover:font-semibold"
-                                    href="{{ route('frontView',[$front])}}">
+                                <a class="td-link" href="{{ route('frontView',[$front])}}">
                                         {{ $front->user->name }}
                                 </a>
                             </td>

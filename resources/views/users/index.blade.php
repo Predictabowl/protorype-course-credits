@@ -23,7 +23,7 @@
                     </thead>
                     <tbody>
                         @foreach($users as $user)
-                        <tr class="hover:bg-blue-100 active:bg-blue-400">
+                        <tr class="tr-body">
                             <td> {{ $user->name }} </td>
                             <td> {{ $user->email}} </td>
                             <td>
