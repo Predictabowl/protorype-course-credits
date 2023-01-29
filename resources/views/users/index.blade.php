@@ -43,11 +43,11 @@
                                 <form id="form-{{$user->id}}" method="POST" action="{{ route("userDelete",[$user]) }}">
                                     @csrf
                                     @method("DELETE")
-                                    <x-button-icon type="button"
+                                    <x-button-icon type="button" name="id" title="{{__('Delete')}}"
                                         x-on:click="
                                             showConfirmationBox = true;
                                             $refs.boxName.innerHTML = '{{$user->name}}';
-                                            formId = 'form-{{ $user->id }}'" name="id" title="{{__('Delete')}}">
+                                            formId = 'form-{{ $user->id }}'">
                                         <x-heroicon-m-trash class="h-5 w-5"/>
                                     </x-button-icon>
                                 </form>

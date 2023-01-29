@@ -1,10 +1,12 @@
-@props(['max_height' => 85, 'aria_label' => ''])
+@props(['max_height' => "85vh", 'aria_label' => ''])
 
-<div class="flex flex-col" style="max-height: {{ $max_height }}vh;">
+<div class="flex flex-col" style="max-height: {{ $max_height }};">
     <div class="overflow-y-scroll">
         <table class="min-w-full rounded-lg" :aria-label="$aria_label">
             <thead class="sticky-top">
-                {{ $header }}
+                <tr class="bg-gray-100">
+                    {{ $header }}
+                </tr>
             </thead>
             <tbody>
                 {{ $slot }}

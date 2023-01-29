@@ -16,15 +16,13 @@
             </div>
             <x-table-fixed-header aria_label="Tabella dei corsi disponibili">
                 <x-slot name="header">
-                    <tr class="bg-gray-100">
-                        <th scope="col">{{ __('Course') }}</th>
-                        <th scope="col">Cfu</th>
-                        <th scope="col">Prova finale</th>
-                        <th scope="col">Altre attività</th>
-                        <th scope="col">Anni</th>
-                        <th scope="col">Cfu Riconoscibili</th>
-                        <th scope="col">Cfu annuali</th>
-                    </tr>
+                    <th scope="col">{{ __('Course') }}</th>
+                    <th scope="col">Cfu</th>
+                    <th scope="col">Prova finale</th>
+                    <th scope="col">Altre attività</th>
+                    <th scope="col">Anni</th>
+                    <th scope="col">Cfu Riconoscibili</th>
+                    <th scope="col">Cfu annuali</th>
                 </x-slot>
                 @foreach ($courses as $course)
                     {{-- <tr class="hover:bg-blue-100 "> --}}

@@ -12,8 +12,8 @@
 
 .td-link:hover{
     font-weight: 600;
-    color: white;
-    background-color: mediumblue;
+    color: indigo;
+    text-decoration-line: underline;
 }
 
 .tr-body:hover{

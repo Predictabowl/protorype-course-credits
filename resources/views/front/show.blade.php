@@ -16,8 +16,8 @@
                         </header>
                         <div class="space-y-3">
                             <div class="mt-1">
-                                <x-input type="text" class="w-full" name="name" :placeholder="__('Teaching name')" :value="old('name')"
-                                    required />
+                                <x-input type="text" class="w-full" name="name"  :placeholder="__('Teaching name')"
+                                    :value="old('name')" required />
 
                                 @error('name')
                                     <span class="text-xs text-red-500">{{ $message }}</span>
@@ -62,7 +62,9 @@
                 <x-dropdown align="right" width="w-max">
                     <x-slot name="trigger">
                         <button
-                            class="flex items-center font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                            class="flex items-center font-medium text-gray-500 hover:text-gray-700
+                                hover:border-gray-300 focus:outline-none focus:text-gray-700
+                                focus:border-gray-300 transition duration-150 ease-in-out">
                             <div>
                                 @if (isset($front->course))
                                     {{ $front->course->name }}
@@ -70,15 +72,7 @@
                                     {{ __('None Selected') }}
                                 @endif
                             </div>
-
-                            <div class="ml-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
+                            <x-downArrow class="ml-1"/>
                         </button>
                         <x-flashStudyPlan />
                     </x-slot>

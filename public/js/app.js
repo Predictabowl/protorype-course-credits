@@ -19353,7 +19353,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 /* provided dependency */ var Buffer = __webpack_require__(/*! buffer */ "./node_modules/buffer/index.js")["Buffer"];
-// Axios v1.2.3 Copyright (c) 2023 Matt Zabriskie and contributors
+// Axios v1.2.6 Copyright (c) 2023 Matt Zabriskie and contributors
 
 
 function bind(fn, thisArg) {
@@ -21181,7 +21181,7 @@ class AxiosHeaders {
   }
 }
 
-AxiosHeaders.accessor(['Content-Type', 'Content-Length', 'Accept', 'Accept-Encoding', 'User-Agent']);
+AxiosHeaders.accessor(['Content-Type', 'Content-Length', 'Accept', 'Accept-Encoding', 'User-Agent', 'Authorization']);
 
 utils.freezeMethods(AxiosHeaders.prototype);
 utils.freezeMethods(AxiosHeaders);
@@ -21937,7 +21937,7 @@ function mergeConfig(config1, config2) {
   return config;
 }
 
-const VERSION = "1.2.3";
+const VERSION = "1.2.6";
 
 const validators$1 = {};
 
