@@ -19,6 +19,4 @@ interface FrontManager {
     
     public function getFront(): Front;
     
-    public function getCourses(): Collection;
-    
 }

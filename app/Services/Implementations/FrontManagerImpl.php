@@ -75,10 +75,6 @@ class FrontManagerImpl implements FrontManager{
         return $this->frontRepo->get($this->frontId);
     }
 
-    public function getCourses(): Collection {
-        return $this->courseRepo->getAll()->sortBy("name")->values()->collect();
-    }
-
     public function deleteAllTakenExams() {
         DB::transaction(function(){
             $this->takenExamRepo->deleteFromFront($this->frontId);

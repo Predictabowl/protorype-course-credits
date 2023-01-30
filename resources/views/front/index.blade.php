@@ -39,7 +39,9 @@
                                     {{ __('All') }}
                                 </x-dropdown-link>
                                 @foreach ($courses as $course)
-                                    <?php $link = route('frontIndex') . '/?' . http_build_query(array_replace(request()->except('page'), ['course' => $course->id]));
+                                    <?php
+                                        $link = route('frontIndex') . '/?' . http_build_query(
+                                            array_replace(request()->except('page'), ['course' => $course->id]));
                                     ?>
                                     <x-dropdown-link :href="$link">
                                         {{ $course->name }}

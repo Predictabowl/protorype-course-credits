@@ -34,7 +34,7 @@ class FrontsSearchManagerImpl implements FrontsSearchManager{
 
     
     public function getCourses(): Collection {
-        return $this->courseRepo->getAll();
+        return $this->courseRepo->getAll()->sortBy("name")->values()->collect();
     }
 
     public function getCurrentCourse(Request $request): ?Course {

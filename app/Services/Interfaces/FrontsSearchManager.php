@@ -3,9 +3,9 @@
 namespace App\Services\Interfaces;
 
 use App\Models\Course;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 /**
  * Test interface, not implemented 
