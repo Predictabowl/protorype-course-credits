@@ -2,19 +2,19 @@
 
 namespace Tests\Feature\Controllers;
 
-
+use App\Domain\TakenExamDTO;
+use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Course;
 use App\Models\Front;
-use App\Models\User;
-use App\Domain\TakenExamDTO;
 use App\Models\Role;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
 use App\Services\Interfaces\FrontManager;
-use App\Factories\Interfaces\FrontManagerFactory;
 use App\Services\Interfaces\FrontsSearchManager;
-
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use function app;
+use function collect;
+use function route;
 
 class FrontControllerTest extends TestCase
 {
@@ -133,7 +133,7 @@ class FrontControllerTest extends TestCase
                 ->method("getTakenExams")
                 ->willReturn($exams);
                 
-        $this->frontManager->expects($this->once())
+        $this->searchManager->expects($this->once())
                 ->method("getCourses")
                 ->willReturn($courses);
         

@@ -10,14 +10,12 @@ namespace Tests\Unit\Services;
 
 use App\Domain\TakenExamDTO;
 use App\Mappers\Interfaces\TakenExamMapper;
-use App\Models\Course;
 use App\Models\Front;
 use App\Models\TakenExam;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\FrontRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Services\Implementations\FrontManagerImpl;
-use Illuminate\Database\Eloquent\Collection;
 use Tests\TestCase;
 use function collect;
 
@@ -122,18 +120,6 @@ class FrontManagerImplTest extends TestCase{
         $result = $this->manager->setCourse($courseId);
 
         $this->assertFalse($result);
-    }
-
-    public function test_getCourses(){
-        $course1 = new Course(["name" => "element"]);
-        $course2 = new Course(["name" => "another"]);
-        $courses = new Collection([$course1, $course2]);
-        $this->courseRepo->expects($this->once())
-                ->method("getAll")
-                ->willReturn($courses);
-
-        $result = $this->manager->getCourses();
-        $this->assertEquals(collect([$course2, $course1]), $result);
     }
 
     public function test_deleteAllTakenExams(){
