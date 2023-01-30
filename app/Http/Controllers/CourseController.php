@@ -85,11 +85,11 @@ class CourseController extends Controller{
          return request()->validate([
             "name" => ["required", "string"],
             "cfu" => ["required", "numeric"],
-            "maxRecognizedCfu" => ["numeric"],
-            "otherActivitiesCfu" => ["numeric"],
+            "maxRecognizedCfu" => ["nullable", "numeric"],
+            "otherActivitiesCfu" => ["nullable", "numeric"],
             "finalExamCfu" => ["required","numeric"],
             "numberOfYears" => ["required", "numeric"],
-            "cfuTresholdForYear" => ["required", "numeric"]
+            "cfuTresholdForYear" => ["numeric"]
          ]);
      }
     

@@ -16,6 +16,10 @@
     text-decoration-line: underline;
 }
 
+.tr-head{
+    background-color: rgb(243 244 246);
+}
+
 .tr-body:hover{
     background-color: rgb(219 234 254);
 }

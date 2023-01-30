@@ -25,7 +25,6 @@
                     <th scope="col">Cfu annuali</th>
                 </x-slot>
                 @foreach ($courses as $course)
-                    {{-- <tr class="hover:bg-blue-100 "> --}}
                     <tr class="tr-body">
                         <td>
                             <a class="td-link" href="{{ route('courseDetails', [$course]) }}">
@@ -39,14 +38,10 @@
                         <td class="text-center">{{ $course->maxRecognizedCfu }}</td>
                         <td class="text-center">{{ $course->cfuTresholdForYear }}</td>
                         <td class="w-10">
-                            <x-button-icon>
+                            <x-link-icon href="{{route('courseShow',[$course->id])}}"
+                                    id="{{'edit-course-'.$course->id}}">
                                 <x-heroicon-m-pencil-square class="h-5 w-5" />
-                            </x-button-icon>
-                        </td>
-                        <td class="w-10">
-                            <x-button-icon>
-                                <x-heroicon-m-trash class="h-5 w-5" />
-                            </x-button-icon>
+                            </x-link-icon>
                         </td>
                     </tr>
                 @endforeach

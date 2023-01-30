@@ -27,6 +27,9 @@ class YearCalculatorImpl implements YearCalculator{
      */
     public function getCourseYear(Course $course, StudyPlan $plan): int {
         $cfu = $plan->getRecognizedCredits();
+        if($course->cfuTresholdForYear < 1){
+            return 1;
+        }
         return (int)min(($cfu / $course->cfuTresholdForYear)+1, $course->numberOfYears);
     }
     

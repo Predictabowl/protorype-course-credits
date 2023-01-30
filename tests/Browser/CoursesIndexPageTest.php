@@ -2,17 +2,19 @@
 
 namespace Tests\Browser;
 
+use App\Http\Controllers\CourseController;
 use App\Models\Course;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\DuskTestCase;
+use function app;
+use function route;
 
 class CoursesIndexPageTest extends DuskTestCase
 {
     
     use DatabaseMigrations;
-    
 
     public function test_coursesLink_hide_forNormalUsers(){
         $user = User::factory()->create();
@@ -60,6 +62,20 @@ class CoursesIndexPageTest extends DuskTestCase
                     ->assertPresent($link)
                     ->click($link)
                     ->assertRouteIs("courseNew")
+                    ->logout();
+        });
+    }
+    
+    public function test_editCourseLink(){
+        $this->browse(function($browser){
+            $courses = Course::factory(2)->create();
+            $link = "#edit-course-".$courses[0]->id;
+            $browser->loginAs($this->getAdmin())
+                    ->visit(route("courseIndex"))
+                    ->assertPresent($link)
+                    ->assertPresent("#edit-course-".$courses[1]->id)
+                    ->click($link)
+                    ->assertRouteIs("courseShow",[$courses[0]->id])
                     ->logout();
         });
     }

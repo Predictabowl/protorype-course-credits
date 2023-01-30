@@ -4,7 +4,7 @@
     <div class="overflow-y-scroll">
         <table class="min-w-full rounded-lg" :aria-label="$aria_label">
             <thead class="sticky-top">
-                <tr class="bg-gray-100">
+                <tr class="tr-head">
                     {{ $header }}
                 </tr>
             </thead>

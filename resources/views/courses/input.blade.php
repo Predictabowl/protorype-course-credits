@@ -77,12 +77,11 @@
                             <span>
                                 Numero di CFU richiesti per il riconoscimento di un anno
                                 accademico<span class="align-super text-xs">1</span>
-                                (Opzionale)
                         </x-label-input>
                     </div>
                     <ul class="mt-5 ml-3 text-xs list-decimal">
                         <li>Valore utilizzato per il calcolo della coorte,
-                        se omesso lo studente richiedente viene sempre immatricolato al 1° anno.</li>
+                        se posto a 0 o meno lo studente richiedente viene sempre immatricolato al 1° anno.</li>
                     </ul>
                     <div class="flex justify-end mt-4 pt-4 border-t border-gray-200">
                         <x-button>

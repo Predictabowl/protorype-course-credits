@@ -11,7 +11,7 @@
             <div class="md:flex justify-between mb-4">
                 <x-searchUserBar filter="course" class="justify-center" placeholder="Cerca per nome o email" />
                 <div class="flex bg-gray-100 rounded-xl px-3 py-2 items-center">
-                    <x-dropdown align="right" width="w-max" max_height="15rem">
+                    <x-dropdown align="sm_right" width="w-max" max_height="15rem">
                         <x-slot name="trigger">
                             <button
                                 class="flex items-center text-sm hover:text-blue-600

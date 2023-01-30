@@ -4,6 +4,6 @@
     {{ $slot }}
 </x-label>
 <x-input {{ $attributes->merge() }} :name="$name" />
-@error("{{ $name }}")
+@error($name)
     <span class="text-xs text-red-500">{{ $message }}</span>
 @enderror

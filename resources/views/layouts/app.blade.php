@@ -9,19 +9,7 @@
 
         <!-- Tailwind Dev Test Only ** REMOVE IT IN PRODUCTION ** -->
         @if (env("APP_ENV") == "local")
-            <link href="https://fonts.googleapis.com/css?family=Nunito:400,700&display=swap" rel="stylesheet">
-            <script src="https://cdn.tailwindcss.com">
-                const defaultTheme = require('tailwindcss/defaultTheme');
-                module.exports = {
-                    theme:{
-                        extend:{
-                            fontFamily: {
-                                sans: ['Nunito', ...defaultTheme.fontFamily.sans],
-                            }
-                        }
-                    }
-                }
-            </script>
+            <script src="https://cdn.tailwindcss.com"></script>
         @endif
 
         <!-- Styles -->

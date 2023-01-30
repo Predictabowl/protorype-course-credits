@@ -851,6 +851,9 @@ select{
 .justify-around{
   justify-content: space-around;
 }
+.justify-evenly{
+  justify-content: space-evenly;
+}
 .justify-items-center{
   justify-items: center;
 }
@@ -1011,6 +1014,9 @@ select{
 }
 .p-1{
   padding: 0.25rem;
+}
+.p-3{
+  padding: 0.75rem;
 }
 .px-4{
   padding-left: 1rem;
@@ -1466,6 +1472,9 @@ select{
   }
 }
 @media (min-width: 640px){
+  .sm\:right-0{
+    right: 0px;
+  }
   .sm\:-my-px{
     margin-top: -1px;
     margin-bottom: -1px;
