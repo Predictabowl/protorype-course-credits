@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamBlockController;
+use App\Http\Controllers\ExamBlockSsdController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\StudentController;
@@ -72,6 +73,10 @@ Route::put("/course/examblock/{examblock}",[ExamBlockController::class,"put"])->
 Route::post("/course/examblock/{examblock}/exam",[ExamController::class,"post"])->name("examCreate");
 Route::delete("/course/examblock/exam/{exam}",[ExamController::class,"delete"])->name("examDelete");
 Route::put("/course/examblock/exam/{exam}",[ExamController::class,"put"])->name("examUpdate");
+Route::get("/course/examblock/ssds/{examBlockId}",[ExamBlockSsdController::class,"show"])->name("examBlockSsds");
+Route::post("/course/examblock/ssds/{examBlockId}",[ExamBlockSsdController::class,"post"])->name("addExamBlockSsd");
+Route::delete("/course/examblock/ssds/{examBlock}/{ssdId}",[ExamBlockSsdController::class,"delete"])
+          ->name("delExamBlockSsd");
 
 //-------------- User Roles
 Route::put("/userRole/{user}",[UserController::class,"putRoles"])->name("userRoleUpdate");

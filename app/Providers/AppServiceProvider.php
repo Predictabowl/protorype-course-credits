@@ -38,6 +38,7 @@ use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Interfaces\UserRepository;
 use App\Services\Implementations\CourseAdminManagerImpl;
 use App\Services\Implementations\CoursesAdminManagerImpl;
+use App\Services\Implementations\ExamBlockSsdManagerImpl;
 use App\Services\Implementations\ExamDistanceByName;
 use App\Services\Implementations\FrontsSearchManagerImpl;
 use App\Services\Implementations\StudyPlanBuilderImpl;
@@ -45,6 +46,7 @@ use App\Services\Implementations\UserManagerImpl;
 use App\Services\Implementations\YearCalculatorImpl;
 use App\Services\Interfaces\CourseAdminManager;
 use App\Services\Interfaces\CoursesAdminManager;
+use App\Services\Interfaces\ExamBlockSsdManager;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Interfaces\FrontsSearchManager;
 use App\Services\Interfaces\StudyPlanBuilder;
@@ -92,6 +94,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(YearCalculator::class, YearCalculatorImpl::class);
         $this->app->bind(CourseAdminManager::class, CourseAdminManagerImpl::class);
         $this->app->bind(CoursesAdminManager::class, CoursesAdminManagerImpl::class);
+        $this->app->bind(ExamBlockSsdManager::class, ExamBlockSsdManagerImpl::class);
         
     }
 
