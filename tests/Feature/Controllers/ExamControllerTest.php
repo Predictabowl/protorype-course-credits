@@ -4,6 +4,7 @@ namespace Tests\Feature\Controllers;
 
 use App\Domain\NewExamInfo;
 use App\Exceptions\Custom\ExamNotFoundException;
+use App\Exceptions\Custom\SsdNotFoundException;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
@@ -21,6 +22,7 @@ class ExamControllerTest extends TestCase {
     use RefreshDatabase;
 
     const FIXTURE_START_URI = "course/examblock/exam";
+    const FIXTURE_SSD = "IUS/10";
 
     private CourseAdminManager $courseManager;
     private ExamBlock $examBlock;
@@ -30,7 +32,9 @@ class ExamControllerTest extends TestCase {
         parent::setUp();
         Course::factory()->create();
         $this->examBlock = ExamBlock::factory()->create();
-        $this->ssdFixture = Ssd::factory()->create();
+        $this->ssdFixture = Ssd::factory()->create([
+            "code" => self::FIXTURE_SSD
+        ]);
 
         $this->courseManager = $this->createMock(CourseAdminManager::class);
         app()->instance(CourseAdminManager::class, $this->courseManager);
@@ -42,8 +46,8 @@ class ExamControllerTest extends TestCase {
         $this->courseManager->expects($this->never())
                 ->method("saveExam");
 
-        $response = $this->post(route("examCreate", [$this->examBlock->id]));
-        $response->assertForbidden();
+        $this->post(route("examCreate", [$this->examBlock->id]))
+            ->assertForbidden();
     }
 
     public function test_post_success() {
@@ -57,10 +61,9 @@ class ExamControllerTest extends TestCase {
         $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("examCreate", [$this->examBlock->id]), [
             "name" => "test",
-            "ssd" => $this->ssdFixture->code,
-            "freeChoice" => false]);
+            "ssd" => $this->ssdFixture->code]);
 
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $response->assertNoContent();
     }
 
     public function test_post_validations() {
@@ -72,9 +75,6 @@ class ExamControllerTest extends TestCase {
         $this->postValidationTest("name", null);
         $this->postValidationTest("ssd", "I2US/07");
         $this->postValidationTest("ssd", "");
-        $this->postValidationTest("freeChoice", "");
-        $this->postValidationTest("freeChoice", "ads");
-        $this->postValidationTest("freeChoice", 3);
     }
     
     public function test_post_ssdNotRequired_ifFreeChoice() {
@@ -94,8 +94,25 @@ class ExamControllerTest extends TestCase {
         $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("examCreate", [$this->examBlock->id]), $examAttributes);
 
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $response->assertNoContent();
         
+    }
+    
+    public function test_post_whenSsdIsMissing_shouldReturnError(){
+        $this->beAdmin();
+        $examInfo = new NewExamInfo("test",$this->ssdFixture->code,false);
+
+        $this->courseManager->expects($this->once())
+                ->method("saveExam")
+                ->with($examInfo, $this->examBlock->id)
+                ->willThrowException(new SsdNotFoundException("test error"));
+
+        $response = $this->from(self::FIXTURE_START_URI)
+                ->post(route("examCreate", [$this->examBlock->id]), [
+            "name" => "test",
+            "ssd" => $this->ssdFixture->code]);
+
+        $response->assertUnprocessable();
     }
 
     public function test_delete_auth() {
@@ -105,8 +122,8 @@ class ExamControllerTest extends TestCase {
         $this->courseManager->expects($this->never())
                 ->method("deleteExam");
 
-        $response = $this->delete(route("examDelete", [$exam->id]));
-        $response->assertForbidden();
+        $this->delete(route("examDelete", [$exam->id]))
+            ->assertForbidden();
     }
 
     public function test_delete_success() {
@@ -130,11 +147,11 @@ class ExamControllerTest extends TestCase {
         $this->courseManager->expects($this->never())
                 ->method("updateExam");
 
-        $response = $this->put(route("examUpdate", [$exam->id]));
-        $response->assertForbidden();
+        $this->put(route("examUpdate", [$exam->id]))
+            ->assertForbidden();
     }
 
-    public function test_put_whenEntityIsMissing() {
+    public function test_put_whenExamBlockIsMissing_shouldReturnNotFound() {
         $this->beAdmin();
         $exam = Exam::factory()->create();
         
@@ -150,7 +167,7 @@ class ExamControllerTest extends TestCase {
         $response = $this->from(self::FIXTURE_START_URI)
                 ->put(route("examUpdate", [$exam->id]),$attributes);
 
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $response->assertNotFound();
     }
 
     public function test_put_success(){
@@ -158,19 +175,38 @@ class ExamControllerTest extends TestCase {
         $exam = Exam::factory()->create();
         $attributes = [
             "name" => "test",
-            "ssd" => $this->ssdFixture->code,
-            "freeChoice" => false
+            "ssd" => $this->ssdFixture->code
         ];
         
         $this->courseManager->expects($this->once())
                 ->method("updateExam")
-                ->with(new NewExamInfo("test", $this->ssdFixture->code, false),
+                ->with(new NewExamInfo("test", self::FIXTURE_SSD, false),
                         $exam->id);
         
         $response = $this->from(self::FIXTURE_START_URI)
                 ->put(route("examUpdate",[$exam->id]), $attributes);
         
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $response->assertNoContent();
+    }
+    
+    public function test_put_whenSsdIsMissing_shouldReturnError(){
+        $this->beAdmin();
+        $exam = Exam::factory()->create();
+        $attributes = [
+            "name" => "test",
+            "ssd" => $this->ssdFixture->code
+        ];
+        
+        $this->courseManager->expects($this->once())
+                ->method("updateExam")
+                ->with(new NewExamInfo("test", self::FIXTURE_SSD, false),
+                        $exam->id)
+                ->willThrowException(new SsdNotFoundException("error msg"));
+        
+        $response = $this->from(self::FIXTURE_START_URI)
+                ->put(route("examUpdate",[$exam->id]), $attributes);
+        
+        $response->assertUnprocessable();
     }
     
     private function beAdmin(): User {
@@ -186,15 +222,14 @@ class ExamControllerTest extends TestCase {
     private function postValidationTest(string $attrName, $attrValue) {
         $examAttributes = [
             "name" => "test name",
-            "ssd" => $this->ssdFixture->code,
-            "freeChoice" => false
+            "ssd" => self::FIXTURE_SSD
         ];
         $examAttributes[$attrName] = $attrValue;
 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("examCreate", [$this->examBlock->id]), $examAttributes);
 
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $response->assertUnprocessable();        
     }
 
 }

@@ -37,28 +37,34 @@ class ExamRepositoryImpl implements ExamRepository{
             throw new InvalidArgumentException("New exam id must not be set");
         }
         
-        $ssd = Ssd::find($exam->ssd_id);
-        if(!isset($ssd)){
-            throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
+        if(isset($exam->ssd_id)){
+            $ssd = Ssd::find($exam->ssd_id);
+            if(!isset($ssd)){
+                throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
+            }
         }
         $exam->save();
         return $exam;
     }
 
-    public function update(Exam $exam): void{
+    public function update(Exam $exam): Exam{
         $loaded = Exam::find($exam->id);
         if(!isset($loaded)){
             throw new ExamNotFoundException("Exam not found with id: ".$exam->id);
         }
 
-        $ssd = Ssd::find($exam->ssd_id);
-        if(!isset($ssd)){
-            throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
+        if(isset($exam->ssd_id)){
+            $ssd = Ssd::find($exam->ssd_id);
+            if(!isset($ssd)){
+                throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
+            }
         }
 
         $loaded->name = $exam->name;
         $loaded->ssd_id = $exam->ssd_id;
+        $loaded->free_choice = $exam->free_choice;
         $loaded->save();
+        return $loaded;
     }
 
     public function delete(int $id): void {

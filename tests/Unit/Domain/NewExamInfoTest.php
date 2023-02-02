@@ -10,7 +10,7 @@ namespace Tests\Unit\Domain;
 
 use App\Domain\NewExamInfo;
 use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 /**
  * Description of ExamBlockLinkerTest

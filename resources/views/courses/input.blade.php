@@ -83,10 +83,13 @@
                         <li>Valore utilizzato per il calcolo della coorte,
                         se posto a 0 o meno lo studente richiedente viene sempre immatricolato al 1° anno.</li>
                     </ul>
-                    <div class="flex justify-end mt-4 pt-4 border-t border-gray-200">
+                    <div class="flex justify-end mt-4 pt-4 gap-4 border-t border-gray-200">
                         <x-button>
                             {{ __('Ok') }}
                         </x-button>
+                        <x-button-link href="{{route('courseIndex')}}">
+                            {{ __('Cancel') }}
+                        </x-button-link>
                         <x-flash />
                     </div>
                 </form>

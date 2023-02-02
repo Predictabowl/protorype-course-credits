@@ -10,6 +10,7 @@ namespace App\Services\Interfaces;
 use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
 use App\Models\Course;
+use App\Models\Exam;
 
 /**
  *
@@ -21,7 +22,7 @@ interface CourseAdminManager {
     public function saveExamBlock(NewExamBlockInfo $examBlock, int $courseId): void;
     public function updateExamBlock(NewExamBlockInfo $examBlock, int $examBlockId): void;
     public function deleteExamBlock(int $examBlockId): void;
-    public function saveExam(NewExamInfo $exam, int $examBlockId): void;
-    public function updateExam(NewExamInfo $exam, int $examId): void;
+    public function saveExam(NewExamInfo $exam, int $examBlockId): Exam;
+    public function updateExam(NewExamInfo $exam, int $examId): Exam;
     public function deleteExam(int $examId): void;
 }

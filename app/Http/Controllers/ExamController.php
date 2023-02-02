@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Domain\NewExamInfo;
 use App\Exceptions\Custom\ExamNotFoundException;
+use App\Exceptions\Custom\SsdNotFoundException;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Services\Interfaces\CourseAdminManager;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 use function back;
 use function request;
 
@@ -23,13 +27,28 @@ class ExamController extends Controller
 
     public function post(ExamBlock $examblock){
         $this->authorize("create", Course::class);
-        $attr = $this->attributeValidation();
-        $examInfo = new NewExamInfo($attr["name"],
-                $attr["ssd"], $attr["freeChoice"]);
+        $validator = $this->attributeValidation();
+        if($validator->fails()){
+            return Response::view("components.courses.flash-error", [
+                "errors" => $validator->errors()->all()],422);
+        }
+        $attr = $validator->getData();
         
-        $this->courseManager->saveExam($examInfo, $examblock->id);
-        
-        return back();
+        try {
+            $examInfo = new NewExamInfo($attr["name"],
+                    $attr["ssd"], $attr["freeChoice"]);
+        } catch (InvalidArgumentException $exc) {
+            return Response::view("components.courses.flash-error", [
+                "errors" => [$exc->getMessage()]],422);
+        }
+
+        try {
+            $this->courseManager->saveExam($examInfo, $examblock->id);
+        } catch (SsdNotFoundException $exc) {
+            return Response::view("components.courses.flash-error", [
+                "errors" => [$exc->getMessage()]],422);
+        }
+        return Response::noContent();
     }
     
     public function delete(Exam $exam){
@@ -42,32 +61,47 @@ class ExamController extends Controller
     
     public function put(Exam $exam){
         $this->authorize("create", Course::class);
-        $attr = $this->attributeValidation();
-        $examInfo = new NewExamInfo($attr["name"], $attr["ssd"],
-                $attr["freeChoice"]);
+        $validator = $this->attributeValidation();
+        if($validator->fails()){
+            return Response::view("components.courses.flash-error", [
+                "errors" => $validator->errors()->all()],422);
+        }
+        $attr = $validator->getData();
         
+        try {
+            $examInfo = new NewExamInfo($attr["name"],
+                    $attr["ssd"], $attr["freeChoice"]);
+        } catch (InvalidArgumentException $exc) {
+            return Response::view("components.courses.flash-error", [
+                "errors" => [$exc->getMessage()]],422);
+        }
+
         try{
             $this->courseManager->updateExam($examInfo, $exam->id);
-        } catch(ExamNotFoundException $ex) {
-            return back()->with("error",__("Missing Entity"));
+        } catch(ExamNotFoundException $exc) {
+            return Response::view("components.courses.flash-error", [
+                "errors" => [$exc->getMessage()]],404);
+        } catch(SsdNotFoundException $exc) {
+            return Response::view("components.courses.flash-error", [
+                "errors" => [$exc->getMessage()]],422);
         }
-        return back();
+        return Response::noContent();
     }
     
-    private function attributeValidation(): array{
+    private function attributeValidation(): Validator{
         $validationRules = [
             "name" => ["required", "string"],
-            "ssd" => [Rule::exists("ssds","code")],
-            "freeChoice" => ["required","boolean"],
+            "ssd" => ["nullable"],
+            "freeChoice" => ["nullable"],
          ];
         $inputs = request()->all();
-        $freeChoice = $inputs["freeChoice"];
-        if ($freeChoice == true) {
-            $validationRules["ssd"] = ["string"];
-            $inputs["ssd"] = "";
-            request()->replace($inputs);
+        $freeChoice = isset($inputs["freeChoice"]) ? true : false;
+        if ($freeChoice) {
+            $inputs["ssd"] = null;
         }
-        
-        return request()->validate($validationRules);
+        $inputs["freeChoice"] = $freeChoice;
+        request()->replace($inputs);
+        $validator = ValidatorFacade::make(request()->all(), $validationRules);
+        return $validator;
      }    
 }

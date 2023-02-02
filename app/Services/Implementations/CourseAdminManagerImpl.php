@@ -15,6 +15,7 @@ use App\Exceptions\Custom\SsdNotFoundException;
 use App\Mappers\Interfaces\ExamBlockInfoMapper;
 use App\Mappers\Interfaces\ExamInfoMapper;
 use App\Models\Course;
+use App\Models\Exam;
 use App\Models\Ssd;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
@@ -55,8 +56,8 @@ class CourseAdminManagerImpl implements CourseAdminManager {
         return $this->courseRepo->get($courseId,true);
     }
 
-    public function saveExam(NewExamInfo $exam, int $examBlockId): void {
-        DB::transaction(function() use($exam, $examBlockId){
+    public function saveExam(NewExamInfo $exam, int $examBlockId): Exam{
+        return DB::transaction(function() use($exam, $examBlockId){
             if($exam->isFreeChoice()){
                 $ssdId = null;
             } else {
@@ -68,7 +69,7 @@ class CourseAdminManagerImpl implements CourseAdminManager {
                         "Exam Block not found with id: ".$examBlockId);
             }
             $modelExam = $this->examMapper->map($exam, $examBlockId, $ssdId);
-            $this->examRepo->save($modelExam);
+            return $this->examRepo->save($modelExam);
         });
     }
 
@@ -95,13 +96,17 @@ class CourseAdminManagerImpl implements CourseAdminManager {
         });
     }
 
-    public function updateExam(NewExamInfo $examInfo, int $examId): void {
-        DB::transaction(function() use($examInfo, $examId){
-            $ssd = $this->getSsdOrThrow($examInfo->getSsd());
-            $newExam = $this->examMapper->map($examInfo, null, $ssd->id);
+    public function updateExam(NewExamInfo $examInfo, int $examId): Exam{
+        return DB::transaction(function() use($examInfo, $examId){
+            $ssdId = null;
+            if(!is_null($examInfo->getSsd())){
+                $ssdId = $this->getSsdOrThrow($examInfo->getSsd())->id;
+            }
+            $newExam = $this->examMapper->map($examInfo, null, $ssdId);
             $newExam->id = $examId;
-            $this->examRepo->update($newExam);
+            return $this->examRepo->update($newExam);
         });
+        
     }
 
     public function updateExamBlock(NewExamBlockInfo $examBlockInfo, int $examBlockId): void {
@@ -115,7 +120,7 @@ class CourseAdminManagerImpl implements CourseAdminManager {
     private function getSsdOrThrow(string $code): Ssd{
         $ssd = $this->ssdRepo->getSsdFromCode($code);
         if (is_null($ssd)){
-            throw new SsdNotFoundException("Ssd not found with code: ".$code);
+            throw new SsdNotFoundException(__("SSD not found").": ".$code);
         }
         return $ssd;
     }

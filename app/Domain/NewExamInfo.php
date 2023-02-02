@@ -11,7 +11,7 @@ class NewExamInfo{
     private ?string $ssd;
     private bool $freeChoice;
 
-    public function __construct(string $name, string $ssd,
+    public function __construct(string $name, ?string $ssd,
             bool $freeChoice = false) {
         $this->name = $name;
         $this->freeChoice = $freeChoice;
@@ -37,7 +37,7 @@ class NewExamInfo{
     
     private function validateSelf(){
         if(!GenerateSSD::isPossibleSSD($this->ssd)){
-            throw new InvalidArgumentException("Invalid SSD format: ".$this->ssd);
+            throw new InvalidArgumentException(__("Invalid SSD format").": ".$this->ssd);
         }
     }
 }

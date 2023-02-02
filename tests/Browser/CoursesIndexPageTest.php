@@ -2,13 +2,11 @@
 
 namespace Tests\Browser;
 
-use App\Http\Controllers\CourseController;
 use App\Models\Course;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\DuskTestCase;
-use function app;
 use function route;
 
 class CoursesIndexPageTest extends DuskTestCase

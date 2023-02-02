@@ -104,12 +104,16 @@ class CourseAdminManagerImplTest extends TestCase{
                 ->with($examInfo, 2, 3)
                 ->willReturn($exam);
 
+        $createdExam = new Exam();
+        
         $this->examRepo->expects($this->once())
                 ->method("save")
                 ->with($exam)
-                ->willReturn(new Exam());
+                ->willReturn($createdExam);
 
-        $this->sut->saveExam($examInfo,2);
+        $result = $this->sut->saveExam($examInfo,2);
+        
+        $this->assertSame($createdExam, $result);
     }
     
     public function test_saveFreeChoiceExam_success(){
@@ -128,12 +132,15 @@ class CourseAdminManagerImplTest extends TestCase{
                 ->method("get")
                 ->with(2)
                 ->willReturn(new ExamBlock());
+        $createdExam = new Exam();
         $this->examRepo->expects($this->once())
                 ->method("save")
                 ->with($exam)
-                ->willReturn(new Exam());
+                ->willReturn($createdExam);
 
-        $this->sut->saveExam($examInfo,2);
+        $result = $this->sut->saveExam($examInfo,2);
+        
+        $this->assertSame($createdExam, $result);
     }
 
     public function test_getCourseFullData(){
@@ -225,12 +232,36 @@ class CourseAdminManagerImplTest extends TestCase{
                 ->method("map")
                 ->with($examInfo, null, 11)
                 ->willReturn(new Exam());
+        $updatedExam = new Exam(["id" => $examId]);
         $this->examRepo->expects($this->once())
                 ->method("update")
-                ->with(new Exam(["id" => $examId]));
+                ->with($updatedExam)
+                ->willReturn($updatedExam);
         
-        $this->sut->updateExam($examInfo, $examId);
+        $result = $this->sut->updateExam($examInfo, $examId);
+        
+        $this->assertSame($updatedExam, $result);
     }      
+    
+    public function test_updateExam_withSsd_NullId(){
+        $examInfo = new NewExamInfo("new name", null, true);
+        $examId = 3;
+        $this->ssdRepo->expects($this->never())
+                ->method("getSsdFromCode");
+        $this->examMapper->expects($this->once())
+                ->method("map")
+                ->with($examInfo, null, null)
+                ->willReturn(new Exam());
+        $updatedExam = new Exam(["id" => $examId]);
+        $this->examRepo->expects($this->once())
+                ->method("update")
+                ->with($updatedExam)
+                ->willReturn($updatedExam);
+        
+        $result = $this->sut->updateExam($examInfo, $examId);
+        
+        $this->assertSame($updatedExam, $result);
+    } 
     
     public function test_updateExamBlock_success() {
         $ebInfo = new NewExamBlockInfo(3, 9, 2);
