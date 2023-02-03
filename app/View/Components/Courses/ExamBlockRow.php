@@ -2,24 +2,24 @@
 
 namespace App\View\Components\Courses;
 
-use App\Models\Exam;
+use App\Models\ExamBlock;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 use function view;
 
-class ExamRow extends Component
+class ExamBlockRow extends Component
 {
-    public Exam $exam;
+    public ExamBlock $examBlock;
     
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct(Exam $exam)
+    public function __construct(ExamBlock $examBlock)
     {
-        $this->exam = $exam;
+        $this->examBlock = $examBlock;
     }
 
     /**
@@ -29,6 +29,6 @@ class ExamRow extends Component
      */
     public function render()
     {
-        return view('components.courses.exam-row');
+        return view('components.courses.exam-block-row');
     }
 }

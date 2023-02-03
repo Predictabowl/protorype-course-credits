@@ -54,16 +54,22 @@ class ExamControllerTest extends TestCase {
         $this->beAdmin();
         $examInfo = new NewExamInfo("test",$this->ssdFixture->code,false);
 
+        $returnedExam = Exam::factory()->make([
+            "id" => 3,
+            "free_choice" => false
+            ]);
         $this->courseManager->expects($this->once())
                 ->method("saveExam")
-                ->with($examInfo, $this->examBlock->id);
+                ->with($examInfo, $this->examBlock->id)
+                ->willReturn($returnedExam);
 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("examCreate", [$this->examBlock->id]), [
             "name" => "test",
             "ssd" => $this->ssdFixture->code]);
 
-        $response->assertNoContent();
+        $response->assertOk()
+                ->assertViewHas("exam", $returnedExam);
     }
 
     public function test_post_validations() {
@@ -79,7 +85,7 @@ class ExamControllerTest extends TestCase {
     
     public function test_post_ssdNotRequired_ifFreeChoice() {
         $this->beAdmin();
-        $examInfo = new NewExamInfo("test name", "", true);
+        $examInfo = new NewExamInfo("test name", null, true);
 
         $examAttributes = [
             "name" => "test name",
@@ -87,14 +93,21 @@ class ExamControllerTest extends TestCase {
             "ssd" => "anything"
         ];
         
+        $returnedExam = Exam::factory()->make([
+            "id" => 3,
+            "ssd_id" => null,
+            "free_choice" => true
+            ]);
         $this->courseManager->expects($this->once())
                 ->method("saveExam")
-                ->with($examInfo, $this->examBlock->id);
+                ->with($examInfo, $this->examBlock->id)
+                ->willReturn($returnedExam);
 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("examCreate", [$this->examBlock->id]), $examAttributes);
 
-        $response->assertNoContent();
+        $response->assertOk()
+                ->assertViewHas("exam", $returnedExam);
         
     }
     
@@ -134,10 +147,9 @@ class ExamControllerTest extends TestCase {
                 ->method("deleteExam")
                 ->with($exam->id);
 
-        $response = $this->from(self::FIXTURE_START_URI)
-                ->delete(route("examDelete", [$exam->id]));
-
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $this->from(self::FIXTURE_START_URI)
+                ->delete(route("examDelete", [$exam->id]))
+                ->assertNoContent();
     }
 
     public function test_put_auth() {

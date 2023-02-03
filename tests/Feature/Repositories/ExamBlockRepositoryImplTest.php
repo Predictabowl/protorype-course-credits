@@ -3,20 +3,15 @@
 namespace Tests\Feature\Repositories;
 
 use App\Exceptions\Custom\ExamBlockNotFoundException;
-use App\Exceptions\Custom\ExamNotFoundException;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
-use App\Models\ExamBlockOption;
 use App\Models\Ssd;
 use App\Repositories\Implementations\ExamBlockRepositoryImpl;
-use App\Repositories\Interfaces\ExamRepository;
-use App\Support\Seeders\ExamSupport;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
-use function collect;
 
 class ExamBlockRepositoryImplTest extends TestCase
 {
@@ -161,15 +156,17 @@ class ExamBlockRepositoryImplTest extends TestCase
         $attributes = [
             "max_exams" => 1,
             "course_id" => $course->id,
-            "cfu" => 6
+            "cfu" => 6,
+            "courseYear" => null
         ];
         $examBlock = ExamBlock::make($attributes);
         
-        $bResult = $this->sut->save($examBlock);
+        $result = $this->sut->save($examBlock);
         
-        $this->assertTrue($bResult);
+        $saved = ExamBlock::first();
         $this->assertDatabaseCount("exam_blocks", 1);
         $this->assertDatabaseHas("exam_blocks", $attributes);
+        $this->assertEquals($saved->attributesToArray(), $result->attributesToArray());
     }
     
     public function test_update_examBlock_whenBlockMissing_shouldThrow(){

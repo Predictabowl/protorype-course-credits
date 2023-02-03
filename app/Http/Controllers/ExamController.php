@@ -43,12 +43,13 @@ class ExamController extends Controller
         }
 
         try {
-            $this->courseManager->saveExam($examInfo, $examblock->id);
+            $exam = $this->courseManager->saveExam($examInfo, $examblock->id);
         } catch (SsdNotFoundException $exc) {
             return Response::view("components.courses.flash-error", [
                 "errors" => [$exc->getMessage()]],422);
         }
-        return Response::noContent();
+//        return Response::noContent();
+        return Response::view("components.courses.exam-row",["exam" => $exam]);
     }
     
     public function delete(Exam $exam){
@@ -56,7 +57,7 @@ class ExamController extends Controller
         
         $this->courseManager->deleteExam($exam->id);
         
-        return back();
+        return Response::noContent();
     }
     
     public function put(Exam $exam){

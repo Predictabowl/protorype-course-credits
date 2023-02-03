@@ -28,16 +28,22 @@
                     </x-button-icon>
                 </x-slot>
                 <x-slot name="content">
-                    <x-dropdown-button>
-                        {{__("Delete")}}
-                    </x-dropdown-button>
+                    <form action="" data-action="{{ route('examDelete',[$exam]) }}" data-examid="{{ $exam->id }}"
+                            data-method="DELETE" id="{{ 'form-delete-exam-'.$exam->id }}">
+                        @csrf
+                        @method("DELETE")
+                        <x-dropdown-button onclick="submitForm(event, this)">
+                            {{__("Delete")}}
+                        </x-dropdown-button>
+                    </form>
                 </x-slot>
             </x-dropdown>
         </div>
     </div>
     <!-- Hidden row -->
     <form class="table-row" x-show="showEditExam == {{$exam->id}}" style="display: none"
-            data-action="{{ route('examUpdate', [$exam]) }}">
+            data-action="{{ route('examUpdate', [$exam]) }}" data-examid="{{ $exam->id }}"
+            data-method="PUT" id="{{ 'form-edit-exam-'.$exam->id }}">
         @csrf
         @method("PUT")
         <div class="table-cell">
@@ -58,12 +64,13 @@
                 {{ $exam->free_choice ? "checked" : ""}}>
         </div>
         <div class="table-cell align-middle text-center w-8" title="{{__("Save")}}">
-            <x-buttons.confirmation-mini type="submit"/>
+            <x-buttons.confirmation-mini type="submit" onclick="submitForm(event, this)"/>
         </div>
         <div class="table-cell align-middle text-center w-8" title="{{__("Cancel")}}">
             <x-buttons.cancel-mini @click="showEditExam = (showEditExam == 0)
             ? showEditExam = {{$exam->id}} : showEditExam = 0" id="{{'cancel-button-'.$exam->id}}"/>
         </div>
+    {{-- </div> --}}
     </form>
 </div>
 

@@ -58,8 +58,7 @@ class CourseAdminManagerImplTest extends TestCase{
         $examInfo = new NewExamInfo("test name", "inf/02");
         $this->ssdRepo->expects($this->once())
                 ->method("getSsdFromCode")
-                ->with("INF/02")
-                ->willReturn(null);
+                ->with("INF/02");
         
         $this->expectException(SsdNotFoundException::class);
         $this->sut->saveExam($examInfo,2);
@@ -178,17 +177,29 @@ class CourseAdminManagerImplTest extends TestCase{
                 ->method("get")
                 ->with($courseId)
                 ->willReturn(new course());
-        $examBlock = new ExamBlock(["name" => "test name"]);
+        $examBlock = ExamBlock::make([
+                "id" => 5,
+                "course_id" => $courseId,
+                "max_exams" => 2
+            ]);
         $this->ebMapper->expects($this->once())
                 ->method("map")
                 ->with($ebInfo, $courseId)
                 ->willReturn($examBlock);
+        
+        $savedBlock = ExamBlock::make([
+                "id" => 7,
+                "course_id" => $courseId,
+                "max_exams" => 1
+            ]);
         $this->ebRepo->expects($this->once())
                 ->method("save")
                 ->with($examBlock)
-                ->willReturn(true);
+                ->willReturn($savedBlock);
 
-        $this->sut->saveExamBlock($ebInfo, $courseId);
+        $result = $this->sut->saveExamBlock($ebInfo, $courseId);
+        
+        $this->assertSame($savedBlock,$result);
     }
     
     public function test_deleteExam(){

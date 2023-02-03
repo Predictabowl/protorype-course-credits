@@ -7,8 +7,10 @@ use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Services\Interfaces\CourseAdminManager;
+use Illuminate\Support\Facades\Response;
 use function __;
 use function back;
+use function ddd;
 use function redirect;
 use function request;
 use function route;
@@ -45,9 +47,12 @@ class ExamBlockController extends Controller
                 $attributes["cfu"],
                 $attributes["courseYear"]);
         
-        $this->courseManager->saveExamBlock($ebInfo, $course->id);
+        $examBlock = $this->courseManager->saveExamBlock($ebInfo, $course->id);
         
-        return back()->with("success",__("Added Exam Block"));
+//        return back()->with("success",__("Added Exam Block"));
+        return Response::view("components.courses.exam-block-row",
+                ["examBlock" => $examBlock]);
+        
     }
     
     public function delete(ExamBlock $examblock){
@@ -77,7 +82,7 @@ class ExamBlockController extends Controller
     private function attributeValidation(): array{
          return request()->validate([
             "cfu" => ["required", "numeric"],
-            "courseYear" => ["numeric"],
+            "courseYear" => ["nullable", "numeric"],
             "maxExams" => ["required","numeric"],
          ]);
      }

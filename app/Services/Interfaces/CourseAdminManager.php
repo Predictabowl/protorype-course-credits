@@ -11,6 +11,7 @@ use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
 use App\Models\Course;
 use App\Models\Exam;
+use App\Models\ExamBlock;
 
 /**
  *
@@ -19,7 +20,7 @@ use App\Models\Exam;
 interface CourseAdminManager {
 
     public function getCourseFullData(int $courseId): ?Course;
-    public function saveExamBlock(NewExamBlockInfo $examBlock, int $courseId): void;
+    public function saveExamBlock(NewExamBlockInfo $examBlock, int $courseId): ExamBlock;
     public function updateExamBlock(NewExamBlockInfo $examBlock, int $examBlockId): void;
     public function deleteExamBlock(int $examBlockId): void;
     public function saveExam(NewExamInfo $exam, int $examBlockId): Exam;

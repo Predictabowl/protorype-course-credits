@@ -16,6 +16,7 @@ use App\Mappers\Interfaces\ExamBlockInfoMapper;
 use App\Mappers\Interfaces\ExamInfoMapper;
 use App\Models\Course;
 use App\Models\Exam;
+use App\Models\ExamBlock;
 use App\Models\Ssd;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
@@ -23,6 +24,7 @@ use App\Repositories\Interfaces\ExamRepository;
 use App\Repositories\Interfaces\SSDRepository;
 use App\Services\Interfaces\CourseAdminManager;
 use Illuminate\Support\Facades\DB;
+use function __;
 
 /**
  * Description of CourseAdminManagerImpl
@@ -73,14 +75,14 @@ class CourseAdminManagerImpl implements CourseAdminManager {
         });
     }
 
-    public function saveExamBlock(NewExamBlockInfo $examBlock, int $courseId): void {
-        DB::transaction(function() use($examBlock, $courseId){
+    public function saveExamBlock(NewExamBlockInfo $examBlock, int $courseId): ExamBlock {
+        return DB::transaction(function() use($examBlock, $courseId){
             $course = $this->courseRepo->get($courseId);
             if (is_null($course)){
                 throw new CourseNotFoundException("Course not found with id: ".$courseId);
             }
             $examBlock = $this->ebMapper->map($examBlock, $courseId);
-            $this->ebRepo->save($examBlock);
+            return $this->ebRepo->save($examBlock);
         });
     }
     

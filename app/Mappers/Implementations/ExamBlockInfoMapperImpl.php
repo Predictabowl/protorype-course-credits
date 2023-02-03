@@ -21,7 +21,7 @@ class ExamBlockInfoMapperImpl implements ExamBlockInfoMapper{
         return new ExamBlock([
             "max_exams" => $examBlock->getMaxExams(),
             "cfu" => $examBlock->getCfu(),
-            "course_year" => $examBlock->getCourseYear(),
+            "courseYear" => $examBlock->getCourseYear(),
             "course_id" => $courseId
         ]);
     }

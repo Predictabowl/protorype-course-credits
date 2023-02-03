@@ -79,9 +79,11 @@ class ExamBlockControllerTest extends TestCase {
         $this->beAdmin();
         $ebInfo = new NewExamBlockInfo(3, 7, 2);
 
+        $examBlock = ExamBlock::factory()->create();
         $this->courseManager->expects($this->once())
                 ->method("saveExamBlock")
-                ->with($ebInfo, $this->course->id);
+                ->with($ebInfo, $this->course->id)
+                ->willReturn($examBlock);
 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("examBlockCreate", [$this->course->id]), [
@@ -90,7 +92,8 @@ class ExamBlockControllerTest extends TestCase {
             "courseYear" => 2
         ]);
 
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $response->assertOk()
+                ->assertViewHas("examBlock", $examBlock);
     }
 
     public function test_post_validations() {

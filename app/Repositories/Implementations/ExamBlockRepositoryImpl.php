@@ -32,7 +32,7 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         return $course->examBlocks;
     }
 
-    public function save(ExamBlock $examBlock): bool {
+    public function save(ExamBlock $examBlock): ExamBlock{
         
         if(isset($examBlock->id)){
             throw new InvalidArgumentException("The id of a new ExamBlock must be null");
@@ -43,12 +43,8 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
             throw new InvalidArgumentException("Could not find Course with id: ".$examBlock->course_id);
         }
         
-        try{
-            return $examBlock->save();
-        } catch (QueryException $exc){
-            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
-            return false;
-        }
+        $examBlock->save();
+        return $examBlock;
     }
 
     public function update(ExamBlock $examBlock) {

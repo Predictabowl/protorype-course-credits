@@ -5,11 +5,6 @@ use App\Mappers\Implementations\ExamBlockInfoMapperImpl;
 use App\Models\ExamBlock;
 use PHPUnit\Framework\TestCase;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
- */
-
 /**
  * Description of ExamInfoMapperImplTest
  *
@@ -34,7 +29,7 @@ class ExamBlockInfoMapperImplTest extends TestCase{
             "max_exams" => 7,
             "course_id" => 5,
             "cfu" => 11,
-            "course_year" => 1
+            "courseYear" => 1
             ]),
             $examBlock);
     }
