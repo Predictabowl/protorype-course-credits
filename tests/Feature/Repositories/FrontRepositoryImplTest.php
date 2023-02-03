@@ -2,15 +2,15 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Models\Course;
 use App\Models\Front;
 use App\Models\User;
-use App\Models\Course;
 use App\Repositories\Implementations\FrontRepositoryImpl;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
+use Tests\TestCase;
 
 class FrontRepositoryImplTest extends TestCase
 {
@@ -20,13 +20,13 @@ class FrontRepositoryImplTest extends TestCase
     const FIXTURE_COURSE_NUM = 3;
 
 
-    private $repository;
+    private FrontRepositoryImpl $sut;
     
     protected function setUp(): void {
         parent::setUp();
         
         
-        $this->repository = new FrontRepositoryImpl();
+        $this->sut = new FrontRepositoryImpl();
     }
     
     private function populateData(){
@@ -42,7 +42,7 @@ class FrontRepositoryImplTest extends TestCase
             "course_id" => 2
         ]);
         
-        $result = $this->repository->save($front);
+        $result = $this->sut->save($front);
         
         $this->assertInstanceOf(Front::class, $result);
         $this->assertEquals(1, $result->id);
@@ -60,9 +60,9 @@ class FrontRepositoryImplTest extends TestCase
             "user_id" => 2
         ]);
         $new->id = 3;
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         
-        $result = $this->repository->save($new);
+        $result = $this->sut->save($new);
         
         $this->assertFalse($result);
         $this->assertDatabaseCount("fronts", 0);
@@ -76,7 +76,7 @@ class FrontRepositoryImplTest extends TestCase
         ]);
         Log::shouldReceive("error")->once();
         
-        $result = $this->repository->save($new);
+        $result = $this->sut->save($new);
         
         $this->assertNull($result);
         $this->assertDatabaseCount("fronts", 0);
@@ -96,7 +96,7 @@ class FrontRepositoryImplTest extends TestCase
             "user_id" => 2
         ]);
         
-        $result = $this->repository->save($new);
+        $result = $this->sut->save($new);
         
         $this->assertNull($result);
         
@@ -112,7 +112,7 @@ class FrontRepositoryImplTest extends TestCase
         $this->populateData();
         Front::factory()->create();
         
-        $result = $this->repository->delete(2);
+        $result = $this->sut->delete(2);
         
         $this->assertEquals(0,$result);
         $this->assertDatabaseCount("fronts", 1);
@@ -132,7 +132,7 @@ class FrontRepositoryImplTest extends TestCase
         ];
         Front::create($frontArray);
         
-        $result = $this->repository->delete(1);
+        $result = $this->sut->delete(1);
         
         $this->assertEquals(1, $result);
         $this->assertEquals([2,2,1], array_values($frontArray));
@@ -141,7 +141,7 @@ class FrontRepositoryImplTest extends TestCase
     }
     
     public function test_get_when_front_not_persent() {
-        $sut = $this->repository->get(1);
+        $sut = $this->sut->get(1);
         
         $this->assertNull($sut);
     }
@@ -155,7 +155,7 @@ class FrontRepositoryImplTest extends TestCase
         ];
         Front::factory()->create($frontArray);
         
-        $sut = $this->repository->get(5);
+        $sut = $this->sut->get(5);
         
         $this->assertEquals(array_values($frontArray),
                 [$sut["id"], $sut["course_id"], $sut["user_id"]]);
@@ -165,12 +165,12 @@ class FrontRepositoryImplTest extends TestCase
         $this->populateData();
         $this->expectException(ModelNotFoundException::class);
 
-        $this->repository->getFromUser(self::FIXTURE_USER_NUM+1);
+        $this->sut->getFromUser(self::FIXTURE_USER_NUM+1);
     }
     
     public function test_getFromUser_when_front_not_present() {
         $this->populateData();
-        $sut = $this->repository->getFromUser(1);
+        $sut = $this->sut->getFromUser(1);
         
         $this->assertEmpty($sut);
     }
@@ -184,7 +184,7 @@ class FrontRepositoryImplTest extends TestCase
         ];
         Front::factory()->create($frontArray);
          
-        $sut = $this->repository->getFromUser(3);
+        $sut = $this->sut->getFromUser(3);
         
         $this->assertInstanceOf(Front::class, $sut);
         $this->assertEquals(array_values($frontArray),
@@ -192,7 +192,7 @@ class FrontRepositoryImplTest extends TestCase
     }
     
     public function test_updateCourse_when_Front_not_present(){
-        $sut = $this->repository->updateCourse(1,1);
+        $sut = $this->sut->updateCourse(1,1);
         
         $this->assertNull($sut);
         $this->assertDatabaseCount("fronts", 0);
@@ -208,7 +208,7 @@ class FrontRepositoryImplTest extends TestCase
         Front::factory()->create($frontArray);
         Log::shouldReceive("error")->once();
         
-        $result = $this->repository->updateCourse(1,self::FIXTURE_COURSE_NUM+1);
+        $result = $this->sut->updateCourse(1,self::FIXTURE_COURSE_NUM+1);
         
         $this->assertNull($result);
         $this->assertDatabaseMissing("fronts", ["course_id" => self::FIXTURE_COURSE_NUM+1]);
@@ -226,7 +226,7 @@ class FrontRepositoryImplTest extends TestCase
             "user_id" => 3
         ]);
         
-        $sut = $this->repository->updateCourse(1,2);
+        $sut = $this->sut->updateCourse(1,2);
         
         $this->assertInstanceOf(Front::class,$sut);
         $this->assertEquals([1,2,3],
@@ -239,7 +239,7 @@ class FrontRepositoryImplTest extends TestCase
         Front::create(["user_id" => User::factory()->create()->id]);
         Front::create(["user_id" => User::factory()->create()->id]);
                 
-        $result = $this->repository->getAll([],25);
+        $result = $this->sut->getAll([],25);
 
         $this->assertCount(3, $result);
         $this->assertEquals(Front::with("user","course")->paginate(25), $result);
@@ -265,7 +265,7 @@ class FrontRepositoryImplTest extends TestCase
             ])->id
         ]);
                 
-        $result = $this->repository->getAll(["search" => "mar"]);
+        $result = $this->sut->getAll(["search" => "mar"]);
         
         $this->assertCount(2, $result);
         $this->assertEquals(Front::with("user","course")->first(), $result[0]);
@@ -281,7 +281,7 @@ class FrontRepositoryImplTest extends TestCase
             "course_id" => Course::factory()->create(["name" => "Corso di qualcosaltro"])
         ]);
                 
-        $result = $this->repository->getAll(["course" => 1]);
+        $result = $this->sut->getAll(["course" => 1]);
         
 
         
@@ -299,18 +299,19 @@ class FrontRepositoryImplTest extends TestCase
         ]);
         Front::factory()->create([
             "user_id" => User::factory()->create(["name" => "luigi"]),
-            "course_id" => 1
+            "course_id" => $course->id
         ]);
-        Front::factory()->create([
-            "user_id" => USer::factory()->create(["name" => "carlo"]),
-            "course_id" => 1
+        $front = Front::factory()->create([
+            "user_id" => User::factory()->create(["name" => "carlo"]),
+            "course_id" => $course->id
         ]);
                 
-        $result = $this->repository->getAll([
+        $result = $this->sut->getAll([
             "search" => "arl",
             "course" => $course->id]);
         
         $this->assertCount(1, $result);
-        $this->assertEquals(Front::with("user","course")->find(3), $result[0]);
+        $actual = Front::with("user","course")->find($front->id);
+        $this->assertEquals($actual, $result[0]);
     }
 }
