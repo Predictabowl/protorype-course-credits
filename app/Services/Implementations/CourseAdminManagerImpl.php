@@ -55,7 +55,12 @@ class CourseAdminManagerImpl implements CourseAdminManager {
     }
 
     public function getCourseFullData(int $courseId): ?Course {
-        return $this->courseRepo->get($courseId,true);
+        $course = $this->courseRepo->get($courseId,true);
+        $course->examBlocks = $course->examBlocks->sortBy("id")->values();
+        $course->examBlocks->each(function($item){
+                $item->exams = $item->exams->sortBy("name")->values();
+            });
+        return $course;
     }
 
     public function saveExam(NewExamInfo $exam, int $examBlockId): Exam{
@@ -111,11 +116,11 @@ class CourseAdminManagerImpl implements CourseAdminManager {
         
     }
 
-    public function updateExamBlock(NewExamBlockInfo $examBlockInfo, int $examBlockId): void {
-        DB::transaction(function() use($examBlockInfo, $examBlockId){
+    public function updateExamBlock(NewExamBlockInfo $examBlockInfo, int $examBlockId): ExamBlock{
+        return DB::transaction(function() use($examBlockInfo, $examBlockId){
             $newExamBlock = $this->ebMapper->map($examBlockInfo, null);
             $newExamBlock->id = $examBlockId;
-            $this->ebRepo->update($newExamBlock);
+            return $this->ebRepo->update($newExamBlock);
         });
     }
 

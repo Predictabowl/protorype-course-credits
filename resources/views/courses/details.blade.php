@@ -31,7 +31,7 @@
             </div>
         </x-panel>
         <x-panel class="block max-h-screen overflow-scroll"
-                x-data="{ showEditExam: 0, showNewExam: 0, showNewExamBlock: false }">
+                x-data="{ showEditExam: 0, showNewExam: 0, showNewExamBlock: false, showEditBlock: 0 }">
             @foreach ($course->examBlocks as $examBlock)
                 <x-courses.exam-block-row :examBlock="$examBlock" />
             @endforeach
@@ -42,7 +42,7 @@
                 <div class="border-2  rounded-xl table w-full p-5 my-2 text-center">
                     <div class="table-row">
                         <div class="table-cell">CFU</div>
-                        <div class="table-cell">N. esami selezionabili</div>
+                        <div class="table-cell">N. esami sceglibili</div>
                         <div class="table-cell">Anno di Corso</div>
                     </div>
                     <div class="table-row">
@@ -74,7 +74,7 @@
                 </x-button>
             </div>
         </x-panel>
-        <div id="flash-container"></div>
+        <div class="p-0 m-0" id="flash-container"></div>
     </x-mainpanel>
     <script src="{{ asset('js/course.js') }}" defer></script>
 </x-app-layout>

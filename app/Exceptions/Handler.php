@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Exceptions\Custom\SsdNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -34,6 +35,7 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
+        
         $this->reportable(function (Throwable $e) {
             //
         });

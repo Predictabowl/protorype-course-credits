@@ -12,8 +12,7 @@ use Illuminate\Support\Collection;
 interface ExamBlockRepository {
     
     public function get(int $id): ?ExamBlock;
-    public function getFilteredByCourse(int $courseId): Collection;
     public function save(ExamBlock $examBlock): ExamBlock;
-    public function update(ExamBlock $examBlock);
+    public function update(ExamBlock $examBlock): ExamBlock;
     public function delete(int $id): bool;
 }

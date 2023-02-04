@@ -237,6 +237,8 @@ class CourseRepositoryImplTest extends TestCase {
         $this->assertEquals(1,sizeof($relationships));
         $this->assertArrayHasKey("exam_blocks",$relationships);
         $this->assertArrayHasKey("exams",$relationships["exam_blocks"][0]);
+        $this->assertArrayHasKey("ssd",$relationships["exam_blocks"][0]["exams"][0]);
+        $this->assertArrayHasKey("ssds",$relationships["exam_blocks"][0]);
     }
 
 }

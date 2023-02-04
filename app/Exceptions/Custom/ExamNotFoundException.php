@@ -7,6 +7,14 @@
 
 namespace App\Exceptions\Custom;
 
-class ExamNotFoundException extends \Exception{
-    //put your code here
+use Exception;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Request;
+use function abort;
+
+class ExamNotFoundException extends Exception{
+    
+    public function render (Request $request): Response{
+        abort(404, $this->getMessage());
+    }
 }

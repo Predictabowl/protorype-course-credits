@@ -17,9 +17,7 @@ use Illuminate\Support\Collection;
  */
 interface CourseManager {
  
-    public function getExamBlocks(): Collection;
-
-    public function getExamOptions(): Collection;
-    
-    public function getCourse(): Course;
+    public function getExamBlocks(bool $cached = true): Collection;
+    public function getExamOptions(bool $cached = true): Collection;
+    public function getCourse(bool $cached = true): Course;
 }

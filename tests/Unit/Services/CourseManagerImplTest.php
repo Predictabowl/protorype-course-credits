@@ -8,15 +8,15 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\Course;
-use App\Repositories\Interfaces\CourseRepository;
 use App\Domain\ExamBlockStudyPlanDTO;
 use App\Domain\ExamStudyPlanDTO;
-use App\Models\ExamBlock;
-use App\Repositories\Interfaces\ExamBlockRepository;
-use App\Services\Implementations\CourseManagerImpl;
 use App\Mappers\Interfaces\ExamBlockMapper;
+use App\Models\Course;
+use App\Models\ExamBlock;
+use App\Services\Implementations\CourseManagerImpl;
+use App\Services\Interfaces\CourseAdminManager;
 use PHPUnit\Framework\TestCase;
+use function collect;
 
 /**
  * Description of FrontManagerImplTest
@@ -27,21 +27,19 @@ class CourseManagerImplTest extends TestCase{
 
     private const FIXTURE_COURSE_ID = 7;
     
-    private ExamBlockRepository $blockRepo;
     private CourseManagerImpl $sut;
     private ExamBlockMapper $mapper;
-    private CourseRepository $courseRepo;
+    private CourseAdminManager $courseAdminManager;
 
     
     protected function setUp():void
     {
         parent::setUp();
-        $this->blockRepo = $this->createMock(ExamBlockRepository::class);
         $this->mapper = $this->createMock(ExamBlockMapper::class);
-        $this->courseRepo = $this->createMock(CourseRepository::class);
+        $this->courseAdminManager = $this->createMock(CourseAdminManager::class);
         
         $this->sut = new CourseManagerImpl(self::FIXTURE_COURSE_ID, $this->mapper,
-                $this->blockRepo, $this->courseRepo);
+                $this->courseAdminManager);
     }
   
     
@@ -50,28 +48,38 @@ class CourseManagerImplTest extends TestCase{
             new ExamBlock(["id" => 1]), 
             new ExamBlock(["id" => 2])]);
         $blocks = collect([new ExamBlockStudyPlanDTO(1, 2, 9, null), new ExamBlockStudyPlanDTO(1, 1, 6, 3)]);
-        $this->blockRepo->expects($this->once())
-                ->method("getFilteredByCourse")
+        $course = new Course();
+        $course->setRelation("examBlocks", $models);
+        $this->courseAdminManager->expects($this->once())
+                ->method("getCourseFullData")
                 ->with(self::FIXTURE_COURSE_ID)
-                ->willReturn($models);
+                ->willReturn($course);
+        
         $this->mapper->expects($this->exactly(2))
                 ->method("toDTO")
                 ->withConsecutive([$models[0]], [$models[1]])
-                ->willReturnOnConsecutiveCalls($blocks[0],$blocks[1]);
+                ->willReturnOnConsecutiveCalls(
+                        $blocks[0],$blocks[1]);
         
-        $sut = $this->sut->getExamBlocks();
+        $result = $this->sut->getExamBlocks(false);
         
-        $this->assertEquals($blocks, $sut);
+        $this->assertEquals($blocks, $result);
+        
+        $this->sut->getExamBlocks(true);
     }
     
     public function test_getExamBlocks_when_course_not_set() {
-        $this->blockRepo->expects($this->once())
-                ->method("getFilteredByCourse")
-                ->willReturn(collect([]));
+        $course = new Course();
+        $course->setRelation("examBlocks", collect([]));
+        $this->courseAdminManager->expects($this->once())
+                ->method("getCourseFullData")
+                ->with(self::FIXTURE_COURSE_ID)
+                ->willReturn($course);
+                
         
-        $sut = $this->sut->getExamBlocks();
+        $result = $this->sut->getExamBlocks();
         
-        $this->assertEmpty($sut);
+        $this->assertEmpty($result);
     }
 
 
@@ -85,31 +93,41 @@ class CourseManagerImplTest extends TestCase{
             new ExamBlock(["name" => "test"]),
             new ExamBlock(["name" => "name"])]);
         
-        $this->blockRepo->expects($this->once())
-                ->method("getFilteredByCourse")
+        $course = new Course();
+        $course->setRelation("examBlocks", $models);
+        $this->courseAdminManager->expects($this->once())
+                ->method("getcourseFullData")
                 ->with(self::FIXTURE_COURSE_ID)
-                ->willReturn($models);
+                ->willReturn($course);
+        
         $this->mapper->expects($this->exactly(2))
                 ->method("toDTO")
                 ->withConsecutive([$models[0]], [$models[1]])
-                ->willReturnOnConsecutiveCalls($block1,$block2);
+                ->willReturnOnConsecutiveCalls($block1, $block2);
         
-        $result = $this->sut->getExamOptions();
+        $result = $this->sut->getExamOptions(false);
         
         $this->assertEquals(collect([$option1,$option2,$option3]), $result);
+        
+        $this->sut->getExamOptions(true);
         
     }
     
     public function test_getCourse(){
         $course = new Course();
-        $this->courseRepo->expects($this->once())
-                ->method("get")
+        $this->courseAdminManager->expects($this->exactly(2))
+                ->method("getCourseFullData")
                 ->with(self::FIXTURE_COURSE_ID)
                 ->willReturn($course);
         
-        $result = $this->sut->getCourse();
-        
+        $result = $this->sut->getCourse(false);
         $this->assertSame($course, $result);
+        
+        $result2 = $this->sut->getCourse(false);
+        $this->assertSame($course, $result2);
+        
+        $result3 = $this->sut->getCourse(true);
+        $this->assertSame($course, $result3);
     }
     
 }

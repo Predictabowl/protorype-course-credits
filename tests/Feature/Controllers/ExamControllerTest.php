@@ -190,15 +190,18 @@ class ExamControllerTest extends TestCase {
             "ssd" => $this->ssdFixture->code
         ];
         
+        $updatedExam = Exam::factory()->make(["id" => 7]);
         $this->courseManager->expects($this->once())
                 ->method("updateExam")
                 ->with(new NewExamInfo("test", self::FIXTURE_SSD, false),
-                        $exam->id);
+                        $exam->id)
+                ->willReturn($updatedExam);
         
         $response = $this->from(self::FIXTURE_START_URI)
                 ->put(route("examUpdate",[$exam->id]), $attributes);
         
-        $response->assertNoContent();
+        $response->assertOk()
+                ->assertViewHas("exam", $updatedExam);
     }
     
     public function test_put_whenSsdIsMissing_shouldReturnError(){

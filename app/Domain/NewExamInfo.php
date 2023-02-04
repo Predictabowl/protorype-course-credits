@@ -2,8 +2,9 @@
 
 namespace App\Domain;
 
+use App\Exceptions\Custom\InvalidInputException;
 use App\Support\Seeders\GenerateSSD;
-use InvalidArgumentException;
+use function __;
 
 class NewExamInfo{
 
@@ -37,7 +38,7 @@ class NewExamInfo{
     
     private function validateSelf(){
         if(!GenerateSSD::isPossibleSSD($this->ssd)){
-            throw new InvalidArgumentException(__("Invalid SSD format").": ".$this->ssd);
+            throw new InvalidInputException(__("Invalid SSD format").": ".$this->ssd);
         }
     }
 }

@@ -1,4 +1,4 @@
-<div class="table-row-group" id="{{'exam-row-'.$exam->id}}">
+<div class="table-row-group" id="{{'exam-row-'.$exam->id}}" x-init="showEditExam = 0">
     <div class="table-row tr-body" x-show="showEditExam != {{$exam->id}}">
         <div class="table-cell italic"> {{ $exam->name}} </div>
         <div class="table-cell text-center">
@@ -28,7 +28,8 @@
                     </x-button-icon>
                 </x-slot>
                 <x-slot name="content">
-                    <form action="" data-action="{{ route('examDelete',[$exam]) }}" data-examid="{{ $exam->id }}"
+                    <form data-action="{{ route('examDelete',[$exam]) }}"
+                            data-element-id="{{'exam-row-'.$exam->id}}"
                             data-method="DELETE" id="{{ 'form-delete-exam-'.$exam->id }}">
                         @csrf
                         @method("DELETE")
@@ -42,7 +43,8 @@
     </div>
     <!-- Hidden row -->
     <form class="table-row" x-show="showEditExam == {{$exam->id}}" style="display: none"
-            data-action="{{ route('examUpdate', [$exam]) }}" data-examid="{{ $exam->id }}"
+            data-action="{{ route('examUpdate', [$exam]) }}"
+            data-element-id="{{'exam-row-'.$exam->id}}"
             data-method="PUT" id="{{ 'form-edit-exam-'.$exam->id }}">
         @csrf
         @method("PUT")

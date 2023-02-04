@@ -10,14 +10,14 @@ namespace App\Exceptions\Custom;
 use App\Http\Controllers\Support\ControllerHelpers;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Description of SsdNotFoundException
+ * Description of InvalidInputException
  *
  * @author piero
  */
-class SsdNotFoundException extends Exception{
+class InvalidInputException extends Exception{
     
     public function render (Request $request): Response{
         return ControllerHelpers::flashResponse(

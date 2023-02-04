@@ -4,16 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Domain\NewExamInfo;
 use App\Exceptions\Custom\ExamNotFoundException;
-use App\Exceptions\Custom\SsdNotFoundException;
+use App\Http\Controllers\Support\ControllerHelpers;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Services\Interfaces\CourseAdminManager;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
-use Illuminate\Validation\Validator;
-use InvalidArgumentException;
-use function back;
+use Illuminate\Validation\ValidationException;
 use function request;
 
 class ExamController extends Controller
@@ -27,28 +25,13 @@ class ExamController extends Controller
 
     public function post(ExamBlock $examblock){
         $this->authorize("create", Course::class);
-        $validator = $this->attributeValidation();
-        if($validator->fails()){
-            return Response::view("components.courses.flash-error", [
-                "errors" => $validator->errors()->all()],422);
-        }
-        $attr = $validator->getData();
+        $attr = $this->attributeValidation();
         
-        try {
-            $examInfo = new NewExamInfo($attr["name"],
-                    $attr["ssd"], $attr["freeChoice"]);
-        } catch (InvalidArgumentException $exc) {
-            return Response::view("components.courses.flash-error", [
-                "errors" => [$exc->getMessage()]],422);
-        }
+        $examInfo = new NewExamInfo($attr["name"], 
+                $attr["ssd"],
+                $attr["freeChoice"]);
+        $exam = $this->courseManager->saveExam($examInfo, $examblock->id);
 
-        try {
-            $exam = $this->courseManager->saveExam($examInfo, $examblock->id);
-        } catch (SsdNotFoundException $exc) {
-            return Response::view("components.courses.flash-error", [
-                "errors" => [$exc->getMessage()]],422);
-        }
-//        return Response::noContent();
         return Response::view("components.courses.exam-row",["exam" => $exam]);
     }
     
@@ -62,34 +45,18 @@ class ExamController extends Controller
     
     public function put(Exam $exam){
         $this->authorize("create", Course::class);
-        $validator = $this->attributeValidation();
-        if($validator->fails()){
-            return Response::view("components.courses.flash-error", [
-                "errors" => $validator->errors()->all()],422);
-        }
-        $attr = $validator->getData();
+        $attr = $this->attributeValidation();
         
-        try {
-            $examInfo = new NewExamInfo($attr["name"],
-                    $attr["ssd"], $attr["freeChoice"]);
-        } catch (InvalidArgumentException $exc) {
-            return Response::view("components.courses.flash-error", [
-                "errors" => [$exc->getMessage()]],422);
-        }
-
-        try{
-            $this->courseManager->updateExam($examInfo, $exam->id);
-        } catch(ExamNotFoundException $exc) {
-            return Response::view("components.courses.flash-error", [
-                "errors" => [$exc->getMessage()]],404);
-        } catch(SsdNotFoundException $exc) {
-            return Response::view("components.courses.flash-error", [
-                "errors" => [$exc->getMessage()]],422);
-        }
-        return Response::noContent();
+        $examInfo = new NewExamInfo($attr["name"],
+                $attr["ssd"],
+                $attr["freeChoice"]);
+        
+        $editedExam = $this->courseManager->updateExam($examInfo, $exam->id);
+        return Response::view("components.courses.exam-row",[
+            "exam" => $editedExam]);
     }
     
-    private function attributeValidation(): Validator{
+    private function attributeValidation(): array{
         $validationRules = [
             "name" => ["required", "string"],
             "ssd" => ["nullable"],
@@ -101,8 +68,12 @@ class ExamController extends Controller
             $inputs["ssd"] = null;
         }
         $inputs["freeChoice"] = $freeChoice;
-        request()->replace($inputs);
-        $validator = ValidatorFacade::make(request()->all(), $validationRules);
-        return $validator;
-     }    
+        $validator = ValidatorFacade::make($inputs, $validationRules);
+        if($validator->fails()){
+            throw new ValidationException($validator, 
+                ControllerHelpers::flashResponse(
+                    $validator->errors()->all(), 422));
+        }
+        return $validator->getData();
+    }
 }

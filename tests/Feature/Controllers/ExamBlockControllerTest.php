@@ -172,14 +172,17 @@ class ExamBlockControllerTest extends TestCase {
             "courseYear" => 3
         ];        
         
+        $editedExamBlock = ExamBlock::factory()->make(["id" => 11]);
         $this->courseManager->expects($this->once())
                 ->method("updateExamBlock")
-                ->with(new NewExamBlockInfo(2, 6, 3));
+                ->with(new NewExamBlockInfo(2, 6, 3))
+                ->willReturn($editedExamBlock);
         
         $response = $this->from(self::FIXTURE_START_URI)
                 ->put(route("examBlockUpdate",[$examBlock->id]), $attributes);
         
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $response->assertOk()
+                ->assertViewHas("examBlock", $editedExamBlock);
     }
     
     public function test_put_validations() {

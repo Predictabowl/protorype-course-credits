@@ -68,7 +68,7 @@
                                         {{ $option->getExamName() }}
                                         <span class="{{$optionColorClass}}">
                                             {{ $bOptionCleared ? '[Esame Riconosciuto]' : ''}}
-                                            {{ $bOptionPartial ? '[Dovuta Integarzione]' : ''}}
+                                            {{ $bOptionPartial ? '[Dovuta Integrazione]' : ''}}
                                         </span>
                                     </td>
                                     <td class="text-sm">

@@ -6,16 +6,16 @@ use Illuminate\View\Component;
 
 class FlashError extends Component
 {
-    public $errors;
+    public $flashErrors;
     
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($errors)
+    public function __construct($flashErrors)
     {
-        $this->errors = $errors;
+        $this->flashErrors = $flashErrors;
     }
 
     /**

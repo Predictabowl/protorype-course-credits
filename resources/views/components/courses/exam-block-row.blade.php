@@ -1,16 +1,6 @@
-<div class="border-2 border-orange-300 rounded-xl p-3 my-2">
-    <div class="md:flex justify-evenly">
-        <div>CFU: {{ $examBlock->cfu }}</div>
-        <div>Numero di Esami sceglibili: {{ $examBlock->max_exams }}</div>
-        <div>Anno di Corso: {{ $examBlock->courseYear }}</div>
-    </div>
-    <div class="border rounded-md">
-        Compatibilità:
-        {{-- <div class="grid lg:grid-cols-12 md:grid-cols-6 col-auto gap-2 "> --}}
-        @foreach ($examBlock->ssds as $ssd)
-            <span class="mx-1">{{ $ssd->code }}</span>
-        @endforeach
-    </div>
+<div class="border-2 border-orange-300 rounded-xl p-3 my-2"
+        id="{{'exam-block-row-'.$examBlock->id}}">
+   <x-courses.exam-block-header :examBlock="$examBlock"/>
     <div class="mt-2">
         <div class="table w-full">
             <div class="table-row tr-head font-bold text-center">
@@ -24,7 +14,8 @@
             <meta class="insert-point">
             <!-- Add New Exam -->
             <form class="table-row" x-show="showNewExam == {{ $examBlock->id }}" style="display: none"
-                    data-action="{{ route('examCreate', [$examBlock]) }}" data-method="POST"
+                    data-action="{{ route('examCreate', [$examBlock]) }}"
+                    data-method="POST"
                     id="{{ 'form-new-exam-'.$examBlock->id }}">
                 @csrf
                 <div class="table-cell">

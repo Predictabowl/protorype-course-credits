@@ -13,6 +13,7 @@ use App\Mappers\Interfaces\ExamBlockMapper;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Services\Implementations\CourseManagerImpl;
+use App\Services\Interfaces\CourseAdminManager;
 use App\Services\Interfaces\CourseManager;
 use function app;
 
@@ -23,10 +24,19 @@ use function app;
  */
 class CourseManagerFactoryImpl implements CourseManagerFactory{
     
+    private ExamBlockMapper $examBlockMapper;
+    private CourseAdminManager $courseAdminManager;
+    
+    public function __construct(ExamBlockMapper $examBlockMapper,
+            CourseAdminManager $courseAdminManager) {
+        $this->examBlockMapper = $examBlockMapper;
+        $this->courseAdminManager = $courseAdminManager;
+    }
+
+    
     public function getCourseManager($courseId): CourseManager {
         return new CourseManagerImpl($courseId,
-                app()->make(ExamBlockMapper::class),
-                app()->make(ExamBlockRepository::class),
-                app()->make(CourseRepository::class));
+                $this->examBlockMapper,
+                $this->courseAdminManager);
     }
 }

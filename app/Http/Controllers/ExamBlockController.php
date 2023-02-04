@@ -71,12 +71,14 @@ class ExamBlockController extends Controller
                 $attributes["cfu"],
                 $attributes["courseYear"]);
         try{
-            $this->courseManager->updateExamBlock($ebInfo, $examblock->id);
+            $editedExamBlock = $this->courseManager
+                    ->updateExamBlock($ebInfo, $examblock->id);
         } catch (ExamBlockNotFoundException $ex) {
             return back()->with("error",__("Missing Entity"));
         }
         
-        return back();
+        return Response::view("components.courses.exam-block-header",
+                ["examBlock" => $editedExamBlock]);
     }
     
     private function attributeValidation(): array{

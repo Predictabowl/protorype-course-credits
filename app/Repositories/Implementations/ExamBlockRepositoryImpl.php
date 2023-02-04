@@ -2,14 +2,11 @@
 
 namespace App\Repositories\Implementations;
 
+use App\Exceptions\Custom\CourseNotFoundException;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Repositories\Interfaces\ExamBlockRepository;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 /**
@@ -23,15 +20,6 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         return ExamBlock::with("exams.ssd", "ssds")->find($id);
     }
 
-    public function getFilteredByCourse(int $courseId): Collection{
-        $course = Course::with("examBlocks.exams.ssd",
-                "examBlocks.ssds")->find($courseId);
-        if (!isset($course)){
-            throw new ModelNotFoundException("Could not find Course with id: ".$courseId);
-        }
-        return $course->examBlocks;
-    }
-
     public function save(ExamBlock $examBlock): ExamBlock{
         
         if(isset($examBlock->id)){
@@ -40,14 +28,14 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         
         $course = Course::find($examBlock->course_id);
         if (!isset($course)){
-            throw new InvalidArgumentException("Could not find Course with id: ".$examBlock->course_id);
+            throw new CourseNotFoundException("Could not find Course with id: ".$examBlock->course_id);
         }
         
         $examBlock->save();
         return $examBlock;
     }
 
-    public function update(ExamBlock $examBlock) {
+    public function update(ExamBlock $examBlock): ExamBlock {
         $oldEB = ExamBlock::find($examBlock->id);
         if(is_null($oldEB)){
             throw new ExamBlockNotFoundException("Couldn't find ExamBlock with id: ".$examBlock->id);
@@ -56,6 +44,7 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
         $oldEB->cfu = $examBlock->cfu;
         $oldEB->courseYear = $examBlock->courseYear;
         $oldEB->save();
+        return $oldEB;
     }
 
     public function delete(int $id): bool {

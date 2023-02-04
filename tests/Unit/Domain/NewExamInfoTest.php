@@ -9,7 +9,7 @@
 namespace Tests\Unit\Domain;
 
 use App\Domain\NewExamInfo;
-use InvalidArgumentException;
+use App\Exceptions\Custom\InvalidInputException;
 use Tests\TestCase;
 
 /**
@@ -27,7 +27,7 @@ class NewExamInfoTest extends TestCase{
     }
     
     public function test_ssd_wrongFormat_shouldThrow(){
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidInputException::class);
         $exam = new NewExamInfo("test name", "INF-/01");
     }
     

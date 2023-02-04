@@ -21,7 +21,7 @@ interface CourseAdminManager {
 
     public function getCourseFullData(int $courseId): ?Course;
     public function saveExamBlock(NewExamBlockInfo $examBlock, int $courseId): ExamBlock;
-    public function updateExamBlock(NewExamBlockInfo $examBlock, int $examBlockId): void;
+    public function updateExamBlock(NewExamBlockInfo $examBlock, int $examBlockId): ExamBlock;
     public function deleteExamBlock(int $examBlockId): void;
     public function saveExam(NewExamInfo $exam, int $examBlockId): Exam;
     public function updateExam(NewExamInfo $exam, int $examId): Exam;

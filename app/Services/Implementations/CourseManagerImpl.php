@@ -5,8 +5,7 @@ namespace App\Services\Implementations;
 use App\Domain\ExamBlockStudyPlanDTO;
 use App\Mappers\Interfaces\ExamBlockMapper;
 use App\Models\Course;
-use App\Repositories\Interfaces\CourseRepository;
-use App\Repositories\Interfaces\ExamBlockRepository;
+use App\Services\Interfaces\CourseAdminManager;
 use App\Services\Interfaces\CourseManager;
 use Illuminate\Support\Collection;
 use function collect;
@@ -20,29 +19,32 @@ class CourseManagerImpl implements CourseManager {
     
     private ExamBlockMapper $blockMapper;
     private $courseId;
-    private ExamBlockRepository $blockRepo;
-    private CourseRepository $courseRepo;
+    private CourseAdminManager $courseAdminManager;
+    private ?Course $course;
+    private ?Collection $examBlocksDTO;
     
     public function __construct(
             $courseId,
             ExamBlockMapper $blockMapper,
-            ExamBlockRepository $blockRepo,
-            CourseRepository $courseRepo)
+            CourseAdminManager $courseAdminManager)
     {
         $this->courseId = $courseId;
         $this->blockMapper = $blockMapper;
-        $this->blockRepo = $blockRepo;
-        $this->courseRepo = $courseRepo;
+        $this->courseAdminManager = $courseAdminManager;
+        $this->course = null;
+        $this->examBlocksDTO = null;
     }
 
-    public function getExamBlocks(): Collection {
-        return $this->blockRepo
-                ->getFilteredByCourse($this->courseId)
+    public function getExamBlocks(bool $cached = true): Collection {
+        if (is_null($this->examBlocksDTO) || !$cached){
+            $this->examBlocksDTO = $this->getCourse($cached)->examBlocks
                 ->map(fn($block) => $this->blockMapper->toDTO($block));
+        }
+        return $this->examBlocksDTO;
     }
 
-    public function getExamOptions(): Collection {
-        $options = $this->getExamBlocks()->map(fn(ExamBlockStudyPlanDTO $block) =>
+    public function getExamOptions(bool $cached = true): Collection {
+        $options = $this->getExamBlocks($cached)->map(fn(ExamBlockStudyPlanDTO $block) =>
                 $block->getExamOptions());
         if (isset($options)){
             $options = $options->flatten()->unique();
@@ -52,8 +54,12 @@ class CourseManagerImpl implements CourseManager {
         return $options;
     }
     
-    public function getCourse(): Course {
-        return $this->courseRepo->get($this->courseId);
+    public function getCourse(bool $cached = true): Course {
+        if(is_null($this->course) || !$cached) {
+            $this->course = $this->courseAdminManager
+                    ->getCourseFullData($this->courseId);
+        }
+        return $this->course;
     }
 
 }

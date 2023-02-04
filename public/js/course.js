@@ -4,6 +4,7 @@ $(document).ready(function(){
         event.preventDefault();
         submitForm(event, this);
     });
+    
 });
 
 function submitForm(event, button) {
@@ -14,7 +15,7 @@ function submitForm(event, button) {
     }
     var url = form.attr('data-action');
     var method = form.attr("data-method");
-    var rowElement = $("#exam-row-" + form.attr("data-examid"));
+    var workingElement = $("#"+form.attr("data-element-id"));
 
     $.ajaxSetup({
         headers: {
@@ -33,22 +34,30 @@ function submitForm(event, button) {
         {
             switch (method) {
                 case "DELETE":
-                    rowElement.remove();
+                    workingElement.remove();
                     break;
                 case "POST":
                     form.trigger("reset");
                     form.parent().children("meta.insert-point")
                             .first().before(response);
                     break;
-                default: //PUT
+                case "PUT":
+                    workingElement.parent().find("form").trigger("reset");
+                    workingElement.replaceWith(response);
+                    break;
+                default:
                     location.reload();
             }
         },
         error: function (response) {
-            if (response.status !== 422) {
-//                location.reload();
+            switch (response.status){
+                case 422:
+                    $("#flash-container").html(response.responseText);
+                    break;
+                default:
+                    document.write(response.responseText);
+                    console.log(response);
             }
-            $("#flash-container").html(response.responseText);
         }
     });
 }
