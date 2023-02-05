@@ -8,7 +8,7 @@ use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Models\Role;
 use App\Models\User;
-use App\Services\Interfaces\CourseAdminManager;
+use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\ExamBlockManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -21,7 +21,7 @@ class ExamBlockControllerTest extends TestCase {
 
     const FIXTURE_START_URI = "course/examblock";
 
-    private CourseAdminManager $courseManager;
+    private CourseManager $courseManager;
     private ExamBlockManager $ebManager;
     private Course $course;
 
@@ -30,8 +30,8 @@ class ExamBlockControllerTest extends TestCase {
         $this->course = Course::factory()->create();
 
         $this->ebManager = $this->createMock(ExamBlockManager::class);
-        $this->courseManager = $this->createMock(CourseAdminManager::class);
-        app()->instance(CourseAdminManager::class, $this->courseManager);
+        $this->courseManager = $this->createMock(CourseManager::class);
+        app()->instance(CourseManager::class, $this->courseManager);
         app()->instance(ExamBlockManager::class, $this->ebManager);
     }
 
@@ -47,7 +47,7 @@ class ExamBlockControllerTest extends TestCase {
 
         $course = Course::first();
         $this->courseManager->expects($this->once())
-                ->method("getCourseFullData")
+                ->method("getCourseFullDepth")
                 ->with($course->id)
                 ->willReturn($course);
 
@@ -61,7 +61,7 @@ class ExamBlockControllerTest extends TestCase {
 
         $course = Course::first();
         $this->courseManager->expects($this->once())
-                ->method("getCourseFullData")
+                ->method("getCourseFullDepth")
                 ->with($course->id)
                 ->willReturn(null);
 

@@ -17,5 +17,5 @@ use App\Services\Interfaces\StudyPlanBuilder;
  */
 interface StudyPlanBuilderFactory {
     
-    public function get(int $frontId, Course $course): StudyPlanBuilder;
+    public function get(int $frontId, int $courseId): StudyPlanBuilder;
 }

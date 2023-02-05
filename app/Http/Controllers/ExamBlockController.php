@@ -6,7 +6,7 @@ use App\Domain\NewExamBlockInfo;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Models\Course;
 use App\Models\ExamBlock;
-use App\Services\Interfaces\CourseAdminManager;
+use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\ExamBlockManager;
 use Illuminate\Support\Facades\Response;
 use function __;
@@ -18,10 +18,10 @@ use function view;
 
 class ExamBlockController extends Controller
 {
-    private CourseAdminManager $courseManager;
+    private CourseManager $courseManager;
     private ExamBlockManager $ebManager;
     
-    public function __construct(CourseAdminManager $courseManager,
+    public function __construct(CourseManager $courseManager,
             ExamBlockManager $ebManager) {
         $this->middleware(["auth","verified"]);
         $this->courseManager = $courseManager;

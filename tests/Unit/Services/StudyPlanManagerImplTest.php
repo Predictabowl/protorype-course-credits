@@ -112,11 +112,12 @@ class StudyPlanManagerImplTest extends TestCase{
     
     private function setupStudyPlan(?StudyPlan $plan){
         $course = new Course(["id" => self::FIXTURE_COURSE_ID]);
+        $this->front->course_id = self::FIXTURE_COURSE_ID;
         $this->front->setRelation("course",$course);
         
         $this->spbFactory->expects($this->once())
                 ->method("get")
-                ->with($this->front->id, $course)
+                ->with($this->front->id, self::FIXTURE_COURSE_ID)
                 ->willReturn($this->studyPlanBuilder);
         
         $this->studyPlanBuilder->expects($this->once())
