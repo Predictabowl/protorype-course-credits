@@ -6,16 +6,14 @@
  * and open the template in the editor.
  */
 
-namespace Tests\Feature\Services;
+namespace Tests\Unit\Services;
 
 use App\Domain\StudyPlan;
-use App\Factories\Interfaces\UserFrontManagerFactory;
+use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Models\Course;
 use App\Models\Front;
-use App\Models\User;
 use App\Services\Implementations\StudyPlanManagerImpl;
 use App\Services\Interfaces\StudyPlanBuilder;
-use App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\YearCalculator;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,35 +29,36 @@ class StudyPlanManagerImplTest extends TestCase{
     
     use RefreshDatabase;
     
+    private const FIXTURE_COURSE_ID = 7;
+    private const FIXTURE_USER_ID = 3;
+    private const FIXTURE_FRONT_ID = 5;
+    
     private Front $front;
-    private UserFrontManager $ufManager;
-    private UserFrontManagerFactory $ufManagerFactory;
+    private StudyPlanBuilderFactory $spbFactory;
+    private StudyPlanBuilder $studyPlanBuilder;
     private YearCalculator $yCalc;
     private StudyPlanManagerImpl $sut;
     
     protected function setUp(): void {
         parent::setUp();
         
-        $user = User::factory()->create();
-        $this->front = Front::create(["user_id" => $user->id]);
-        $this->ufManagerFactory = $this->createMock(UserFrontManagerFactory::class);
-        $this->ufManager = $this->createMock(UserFrontManager::class);
+        $this->front = new Front([
+            "id" => self::FIXTURE_FRONT_ID,
+            "user_id" => self::FIXTURE_USER_ID]);
+        $this->spbFactory = $this->createMock(StudyPlanBuilderFactory::class);
         $this->yCalc = $this->createMock(YearCalculator::class);
-
+        $this->studyPlanBuilder = $this->createMock(StudyPlanBuilder::class);
         
-        $this->sut = new StudyPlanManagerImpl($this->front, $this->ufManagerFactory,
+        $this->sut = new StudyPlanManagerImpl($this->front, $this->spbFactory,
                 $this->yCalc);
     }
     
     public function test_getStudyPlan_with_course_not_set(){
-        $this->ufManagerFactory->expects($this->once())
-                ->method("get")
-                ->with($this->front->user_id)
-                ->willReturn($this->ufManager);
+        $this->spbFactory->expects($this->never())
+                ->method("get");
         
-        $this->ufManager->expects($this->once())
-                ->method("getStudyPlanBuilder")
-                ->willReturn(null);
+        $this->studyPlanBuilder->expects($this->never())
+                ->method("getStudyPlan");
         
         $plan = $this->sut->getStudyPlan();
         
@@ -91,15 +90,6 @@ class StudyPlanManagerImplTest extends TestCase{
     }
     
     public function test_getCourseYear_failure(){
-        $this->ufManagerFactory->expects($this->once())
-                ->method("get")
-                ->with($this->front->user_id)
-                ->willReturn($this->ufManager);
-        
-        $this->ufManager->expects($this->once())
-                ->method("getStudyPlanBuilder")
-                ->willReturn(null);        
-
         $this->yCalc->expects($this->never())
                 ->method("getCourseYear");
         
@@ -121,22 +111,15 @@ class StudyPlanManagerImplTest extends TestCase{
     }
     
     private function setupStudyPlan(?StudyPlan $plan){
-        $course = Course::factory()->create();
-        $this->front->course()->associate($course);
-        $this->front->save();
+        $course = new Course(["id" => self::FIXTURE_COURSE_ID]);
+        $this->front->setRelation("course",$course);
         
-        $this->ufManagerFactory->expects($this->once())
+        $this->spbFactory->expects($this->once())
                 ->method("get")
-                ->with($this->front->user_id)
-                ->willReturn($this->ufManager);
+                ->with($this->front->id, $course)
+                ->willReturn($this->studyPlanBuilder);
         
-        $builder = $this->createMock(StudyPlanBuilder::class);
-        
-        $this->ufManager->expects($this->once())
-                ->method("getStudyPlanBuilder")
-                ->willReturn($builder);
-        
-        $builder->expects($this->once())
+        $this->studyPlanBuilder->expects($this->once())
                 ->method("getStudyPlan")
                 ->willReturn($plan);
         

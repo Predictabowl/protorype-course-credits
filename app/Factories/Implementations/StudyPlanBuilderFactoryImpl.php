@@ -8,13 +8,13 @@
 
 namespace App\Factories\Implementations;
 
-use App\Factories\Interfaces\CourseManagerFactory;
-use App\Factories\Interfaces\FrontManagerFactory;
+use App\Factories\Interfaces\CourseDataBuilderFactory;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
+use App\Models\Course;
 use App\Services\Implementations\StudyPlanBuilderImpl;
 use App\Services\Interfaces\ExamDistance;
+use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\StudyPlanBuilder;
-use function app;
 
 /**
  * Description of StudyPlanBuilderFactoryImpl
@@ -23,20 +23,24 @@ use function app;
  */
 class StudyPlanBuilderFactoryImpl implements StudyPlanBuilderFactory {
 
-    private FrontManagerFactory $frontFactory;
-    private CourseManagerFactory $courseFactory;
+    private FrontManager $frontManager;
+    private CourseDataBuilderFactory $courseDataBuilderFactory;
+    private ExamDistance $examDistance;
     
-    public function __construct(FrontManagerFactory $frontFactory, 
-            CourseManagerFactory $courseFactory) {
-        $this->frontFactory = $frontFactory;
-        $this->courseFactory = $courseFactory;
+    public function __construct(FrontManager $frontManager,
+            CourseDataBuilderFactory $courseDataBuilderFactory,
+            ExamDistance $examDistance) {
+        $this->frontManager = $frontManager;
+        $this->courseDataBuilderFactory = $courseDataBuilderFactory;
+        $this->examDistance = $examDistance;
     }
-    
-    public function getStudyPlanBuilder($frontId, $courseId): StudyPlanBuilder {
-        $frontManager = $this->frontFactory->getFrontManager($frontId);
-        $courseManager = $this->courseFactory->getCourseManager($courseId);
-        return new StudyPlanBuilderImpl($frontManager, $courseManager, 
-                app()->make(ExamDistance::class));
+
+
+    public function get(int $frontId, Course $course): StudyPlanBuilder {
+        return new StudyPlanBuilderImpl(
+                $this->frontManager->getTakenExams($frontId),
+                $this->courseDataBuilderFactory->get($course),
+                $this->examDistance);
     }
 
 }

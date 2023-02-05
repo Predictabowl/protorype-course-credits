@@ -3,7 +3,6 @@
 namespace Tests\Feature\Controllers;
 
 use App\Domain\TakenExamDTO;
-use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Course;
 use App\Models\Front;
 use App\Models\Role;
@@ -35,27 +34,18 @@ class FrontControllerTest extends TestCase
             "user_id" => $this->user->id
         ]);
         
-        $factory = $this->createMock(FrontManagerFactory::class);
         $this->frontManager = $this->createMock(FrontManager::class);
         $this->searchManager = $this->createMock(FrontsSearchManager::class);
-        app()->instance(FrontManagerFactory::class, $factory);
+        app()->instance(FrontManager::class, $this->frontManager);
         app()->instance(FrontsSearchManager::class, $this->searchManager);
-        
-        $factory->expects($this->any())
-                ->method("getFrontManager")
-                ->with($this->front->id)
-                ->willReturn($this->frontManager);
     }
     
     public function test_access_redirect_without_authentication(){
-        $response = $this->get(route("frontIndex",1));
-        $response->assertRedirect(route("login"));
+        $this->get(route("frontIndex",1))->assertRedirect(route("login"));
         
-        $response = $this->get(route("frontView",1));
-        $response->assertRedirect(route("login"));
+        $this->get(route("frontView",1))->assertRedirect(route("login"));
         
-        $response = $this->put(route("frontView",1), []);
-        $response->assertRedirect(route("login"));
+        $this->put(route("frontView",1), [])->assertRedirect(route("login"));
     }
     
     public function test_index_authorization(){
@@ -131,6 +121,7 @@ class FrontControllerTest extends TestCase
         $this->be($this->user);
         $this->frontManager->expects($this->once())
                 ->method("getTakenExams")
+                ->with($this->front->id)
                 ->willReturn($exams);
                 
         $this->searchManager->expects($this->once())
@@ -152,7 +143,7 @@ class FrontControllerTest extends TestCase
         $this->be($this->user);
         $this->frontManager->expects($this->once())
                 ->method("setCourse")
-                ->with(3);
+                ->with($this->front->id, 3);
                 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->put(route("frontView",[$this->front]),["courseId" => 3]);

@@ -18,9 +18,9 @@ interface UserFrontManager {
      * @param type $courseId
      * @return bool false if it fails
      */
-    public function getOrCreateFront($courseId = null): ?Front;
+//    public function getOrCreateFront($courseId = null): Front;
     
-    public function getFront(): ?Front;
+//    public function getFront(): ?Front;
 
     /**
      * Return a managing instance to extract info from the Front of the 
@@ -30,7 +30,7 @@ interface UserFrontManager {
      * @param bool $createFront if true will create a Front
      * @return FrontManager
      */
-    public function getFrontManager(): ?FrontManager;
+//    public function getFrontManager(): ?FrontManager;
     
     /**
      * It will fail and return null if the front is not associated to
@@ -39,8 +39,8 @@ interface UserFrontManager {
      * 
      * @return StudyPlanBuilder|null
      */
-    public function getStudyPlanBuilder(): ?StudyPlanBuilder;
+//    public function getStudyPlanBuilder(): ?StudyPlanBuilder;
     
-    public function getUserId(): int;
+//    public function getUserId(): int;
 
 }

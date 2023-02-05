@@ -2,12 +2,11 @@
 
 namespace App\Services\Implementations;
 
-use App\Domain\TakenExamDTO;
 use App\Domain\ExamStudyPlanDTO;
 use App\Domain\StudyPlan;
+use App\Domain\TakenExamDTO;
+use App\Services\Interfaces\CourseDataBuilder;
 use App\Services\Interfaces\ExamDistance;
-use App\Services\Interfaces\FrontManager;
-use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\StudyPlanBuilder;
 use Illuminate\Support\Collection;
 
@@ -48,36 +47,33 @@ use Illuminate\Support\Collection;
      */
 class StudyPlanBuilderImpl implements StudyPlanBuilder {
 
-    private FrontManager $frontManager;
-    private CourseManager $courseManager;
+    private CourseDataBuilder $courseDataBuilder;
     private StudyPlan $studyPlan;
     private ExamDistance $eDistance;
     public Collection $declaredExams;
     private Collection $examOptions;
 
-    public function __construct(FrontManager $frontManager, CourseManager $courseManager,
+    public function __construct(
+            Collection $declaredExams,
+            CourseDataBuilder $courseDataBuilder,
             ExamDistance $eDistance) {
-        $this->frontManager = $frontManager;
-        $this->courseManager = $courseManager;
+        $this->courseDataBuilder = $courseDataBuilder;
         $this->eDistance = $eDistance;
-        $this->examOptions = collect([]);
+        $this->declaredExams = $declaredExams;
     }
 
+    public function prepareBuilder(){
+        $this->examOptions = $this->courseDataBuilder->getExamOptions();
+        $examBlocks = $this->courseDataBuilder->getExamBlocks();
+        $maxCfu = $this->courseDataBuilder->getCourse()->maxRecognizedCfu;
+        $this->studyPlan = new StudyPlan($examBlocks, $maxCfu);
+    }
+    
     public function getStudyPlan(): StudyPlan {
-        $this->refreshStudyPlan()->buildStudyPlan();
+        $this->prepareBuilder();
+        $this->buildStudyPlan();
         return $this->studyPlan;
     }
-
-    public function refreshStudyPlan(): StudyPlanBuilder {
-        $examBlocks = $this->courseManager->getExamBlocks();
-        $this->declaredExams = $this->frontManager->getTakenExams();
-        $this->examOptions = $this->courseManager->getExamOptions();
-        $maxCfu = $this->courseManager->getCourse()->maxRecognizedCfu;
-        $this->studyPlan = new StudyPlan($examBlocks, $maxCfu);
-        return $this;
-    }
-
-
 
     private function buildStudyPlan() {
         // First it checks direct ssd corrispondency

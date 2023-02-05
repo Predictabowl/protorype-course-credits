@@ -40,30 +40,23 @@ class TakenExamControllerTest extends TestCase
             "grade" => 22
         ];
         
-        $managerFactory = $this->createMock(FrontManagerFactory::class);
         $this->manager = $this->createMock(FrontManager::class);
-        $managerFactory->expects($this->any())
-                ->method("getFrontManager")
-                ->with($this->front->id)
-                ->willReturn($this->manager);
-        app()->instance(FrontManagerFactory::class, $managerFactory);
+        app()->instance(FrontManager::class, $this->manager);
     }
     
     public function test_access_redirect_without_authentication(){
-        $response = $this->post(route("postTakenExam",1), []);
+        $this->post(route("postTakenExam",1), [])
+            ->assertRedirect(route("login"));
         
-        $response->assertRedirect(route("login"));
-        
-        $response = $this->delete(route("deleteTakenExam",1), []);
-        
-        $response->assertRedirect(route("login"));
+        $this->delete(route("deleteTakenExam",1), [])
+            ->assertRedirect(route("login"));
     }
     
     public function test_create_successful(){
         $this->setupMocksAndAuth();
         $this-> manager->expects($this->once())
                 ->method("saveTakenExam")
-                ->with($this->createAttributes);
+                ->with($this->createAttributes, $this->front->id);
 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("postTakenExam",[$this->front]), $this->createAttributes);
@@ -240,7 +233,8 @@ class TakenExamControllerTest extends TestCase
     public function test_deleteFromFront_success(){
         $this->setupMocksAndAuth();
         $this->manager->expects($this->once())
-                ->method("deleteAllTakenExams");
+                ->method("deleteAllTakenExams")
+                ->with($this->front->id);
 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->delete(route("deleteFrontTakenExam",[$this->front]));

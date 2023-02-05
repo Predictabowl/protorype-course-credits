@@ -2,51 +2,49 @@
 
 namespace App\Services\Implementations;
 
-use \App\Models\Front;
-use App\Factories\Interfaces\FrontManagerFactory;
+use App\Factories\Interfaces\StudyPlanBuilderFactory;
+use App\Models\Front;
 use App\Repositories\Interfaces\FrontRepository;
-use \App\Services\Interfaces\UserFrontManager;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\StudyPlanBuilder;
-use App\Factories\Interfaces\StudyPlanBuilderFactory;
+use App\Services\Interfaces\UserFrontManager;
 use Illuminate\Support\Facades\DB;
 
 
 class UserFrontManagerImpl implements UserFrontManager{
 
     private int $userId;
-    private FrontManagerFactory $fmFactory;
+    private FrontManager $frontManager;
     private FrontRepository $frontRepo;
     private StudyPlanBuilderFactory $spbFactory;
 
     public function __construct(
             FrontRepository $frontRepo,
-            FrontManagerFactory $fmFactory,
+            FrontManager $frontManager,
             StudyPlanBuilderFactory $spbFactory,
             int $userId)
     {
         $this->userId = $userId;
         $this->frontRepo = $frontRepo;
-        $this->fmFactory = $fmFactory;
+        $this->frontManager = $frontManager;
         $this->spbFactory = $spbFactory;
     }
 
-    public function getOrCreateFront($courseId = null): ?Front{
-        $transaction = DB::transaction(function() use($courseId){
+    public function getOrCreateFront($courseId = null): Front{
+        return DB::transaction(function() use($courseId){
             $front = $this->frontRepo->getFromUser($this->userId);
             if (isset($front)){
                 return $this->getUpdatedFront($front, $courseId);
             }
 
-            $front = new Front([
+            $newFront = new Front([
                 "user_id" => $this->userId,
                 "course_id" => $courseId
             ]);
 
-            $front = $this->frontRepo->save($front);
-            return isset($front) ? $front : null;
+            $createdFront = $this->frontRepo->save($newFront);
+            return isset($createdFront) ? $createdFront : null;
         });
-        return $transaction;
     }
 
     public function getFront(): ?Front {
@@ -58,7 +56,7 @@ class UserFrontManagerImpl implements UserFrontManager{
         if(!isset($front)){
             return null;
         }
-        return $this->fmFactory->getFrontManager($front->id);
+        return $this->frontManager;
     }
 
     public function getStudyPlanBuilder(): ?StudyPlanBuilder {
@@ -67,7 +65,7 @@ class UserFrontManagerImpl implements UserFrontManager{
             return null;
         }
         return $this->spbFactory
-                ->getStudyPlanBuilder($front->id, $front->course_id);
+                ->get($front->id, $front->course_id);
     }
 
     private function getUpdatedFront(Front $front, $courseId): ?Front{

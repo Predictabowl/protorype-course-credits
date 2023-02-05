@@ -3,12 +3,12 @@
 namespace Tests\Feature\Controllers;
 
 use App\Exceptions\Custom\ExamBlockNotFoundException;
-use App\Exceptions\Custom\SsdNotFoundException;
 use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Models\Role;
 use App\Models\Ssd;
 use App\Models\User;
+use App\Services\Interfaces\ExamBlockManager;
 use App\Services\Interfaces\ExamBlockSsdManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -21,7 +21,7 @@ class ExamBlockSsdControllerTest extends TestCase {
 
     const FIXTURE_START_URI = "course/examblock/ssds";
 
-    private ExamBlockSsdManager $ebSsdManager;
+    private ExamBlockManager $ebSsdManager;
 
     protected function setUp(): void {
         parent::setUp();
@@ -29,8 +29,8 @@ class ExamBlockSsdControllerTest extends TestCase {
         ExamBlock::factory()->create([
             "course_id" => Course::factory()->create()
         ]);
-        $this->ebSsdManager= $this->createMock(ExamBlockSsdManager::class);
-        app()->instance(ExamBlockSsdManager::class, $this->ebSsdManager);
+        $this->ebSsdManager= $this->createMock(ExamBlockManager::class);
+        app()->instance(ExamBlockManager::class, $this->ebSsdManager);
     }
 
     public function test_authorization_forbidden() {

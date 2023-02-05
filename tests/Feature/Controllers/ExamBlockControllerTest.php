@@ -9,6 +9,7 @@ use App\Models\ExamBlock;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\Interfaces\CourseAdminManager;
+use App\Services\Interfaces\ExamBlockManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use function app;
@@ -21,14 +22,17 @@ class ExamBlockControllerTest extends TestCase {
     const FIXTURE_START_URI = "course/examblock";
 
     private CourseAdminManager $courseManager;
+    private ExamBlockManager $ebManager;
     private Course $course;
 
     protected function setUp(): void {
         parent::setUp();
         $this->course = Course::factory()->create();
 
+        $this->ebManager = $this->createMock(ExamBlockManager::class);
         $this->courseManager = $this->createMock(CourseAdminManager::class);
         app()->instance(CourseAdminManager::class, $this->courseManager);
+        app()->instance(ExamBlockManager::class, $this->ebManager);
     }
 
     public function test_index_authorization_forbidden() {
@@ -68,7 +72,7 @@ class ExamBlockControllerTest extends TestCase {
     public function test_post_auth() {
         $this->be(User::factory()->create());
 
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("saveExamBlock");
 
         $response = $this->post(route("examBlockCreate", [$this->course->id]));
@@ -80,7 +84,7 @@ class ExamBlockControllerTest extends TestCase {
         $ebInfo = new NewExamBlockInfo(3, 7, 2);
 
         $examBlock = ExamBlock::factory()->create();
-        $this->courseManager->expects($this->once())
+        $this->ebManager->expects($this->once())
                 ->method("saveExamBlock")
                 ->with($ebInfo, $this->course->id)
                 ->willReturn($examBlock);
@@ -98,7 +102,7 @@ class ExamBlockControllerTest extends TestCase {
 
     public function test_post_validations() {
         $this->beAdmin();
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("saveExamBlock");
 
         $this->postValidationTest("cfu", "a4");
@@ -112,7 +116,7 @@ class ExamBlockControllerTest extends TestCase {
         $this->be(User::factory()->create());
         $examBlock = ExamBlock::factory()->create();
 
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("deleteExamBlock");
 
         $response = $this->delete(route("examBlockDelete", [$examBlock->id]));
@@ -123,7 +127,7 @@ class ExamBlockControllerTest extends TestCase {
         $this->beAdmin();
         $examBlock = ExamBlock::factory()->create();
 
-        $this->courseManager->expects($this->once())
+        $this->ebManager->expects($this->once())
                 ->method("deleteExamBlock")
                 ->with($examBlock->id);
 
@@ -137,7 +141,7 @@ class ExamBlockControllerTest extends TestCase {
         $this->be(User::factory()->create());
         $examBlock = ExamBlock::factory()->create();
 
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("updateExamBlock");
 
         $response = $this->put(route("examBlockUpdate", [$examBlock->id]));
@@ -153,7 +157,7 @@ class ExamBlockControllerTest extends TestCase {
             "courseYear" => 3
         ];
 
-        $this->courseManager->expects($this->once())
+        $this->ebManager->expects($this->once())
                 ->method("updateExamBlock")
                 ->willThrowException(new ExamBlockNotFoundException());
 
@@ -173,7 +177,7 @@ class ExamBlockControllerTest extends TestCase {
         ];        
         
         $editedExamBlock = ExamBlock::factory()->make(["id" => 11]);
-        $this->courseManager->expects($this->once())
+        $this->ebManager->expects($this->once())
                 ->method("updateExamBlock")
                 ->with(new NewExamBlockInfo(2, 6, 3))
                 ->willReturn($editedExamBlock);
@@ -188,7 +192,7 @@ class ExamBlockControllerTest extends TestCase {
     public function test_put_validations() {
         $this->beAdmin();
         $examBlock = ExamBlock::factory()->create();
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("updateExamBlock");
 
         $this->putValidationTest("cfu", "a4", $examBlock->id);

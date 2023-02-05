@@ -57,7 +57,7 @@ class CourseManagerImpl implements CourseManager {
     public function getCourse(bool $cached = true): Course {
         if(is_null($this->course) || !$cached) {
             $this->course = $this->courseAdminManager
-                    ->getCourseFullData($this->courseId);
+                    ->getCourseFullDepth($this->courseId);
         }
         return $this->course;
     }

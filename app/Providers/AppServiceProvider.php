@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
+use App\Factories\Implementations\CourseDatabuilderFactoryImpl;
 use App\Factories\Implementations\CourseManagerFactoryImpl;
-use App\Factories\Implementations\FrontManagerFactoryImpl;
 use App\Factories\Implementations\StudyPlanBuilderFactoryImpl;
 use App\Factories\Implementations\StudyPlanManagerFactoryImpl;
 use App\Factories\Implementations\UserFrontManagerFactoryImpl;
+use App\Factories\Interfaces\CourseDataBuilderFactory;
 use App\Factories\Interfaces\CourseManagerFactory;
-use App\Factories\Interfaces\FrontManagerFactory;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Factories\Interfaces\StudyPlanManagerFactory;
 use App\Factories\Interfaces\UserFrontManagerFactory;
@@ -38,16 +38,20 @@ use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Interfaces\UserRepository;
 use App\Services\Implementations\CourseAdminManagerImpl;
 use App\Services\Implementations\CoursesAdminManagerImpl;
-use App\Services\Implementations\ExamBlockSsdManagerImpl;
+use App\Services\Implementations\ExamBlockManagerImpl;
 use App\Services\Implementations\ExamDistanceByName;
+use App\Services\Implementations\ExamManagerImpl;
+use App\Services\Implementations\FrontManagerImpl;
 use App\Services\Implementations\FrontsSearchManagerImpl;
 use App\Services\Implementations\StudyPlanBuilderImpl;
 use App\Services\Implementations\UserManagerImpl;
 use App\Services\Implementations\YearCalculatorImpl;
 use App\Services\Interfaces\CourseAdminManager;
 use App\Services\Interfaces\CoursesAdminManager;
-use App\Services\Interfaces\ExamBlockSsdManager;
+use App\Services\Interfaces\ExamBlockManager;
 use App\Services\Interfaces\ExamDistance;
+use App\Services\Interfaces\ExamManager;
+use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\FrontsSearchManager;
 use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Interfaces\UserManager;
@@ -65,10 +69,10 @@ class AppServiceProvider extends ServiceProvider
     {
         //---- Factories
         $this->app->bind(CourseManagerFactory::class, CourseManagerFactoryImpl::class);
-        $this->app->bind(FrontManagerFactory::class, FrontManagerFactoryImpl::class);
         $this->app->bind(StudyPlanBuilderFactory::class, StudyPlanBuilderFactoryImpl::class);
         $this->app->bind(StudyPlanManagerFactory::class, StudyPlanManagerFactoryImpl::class);
         $this->app->bind(UserFrontManagerFactory::class, UserFrontManagerFactoryImpl::class);
+        $this->app->bind(CourseDataBuilderFactory::class, CourseDatabuilderFactoryImpl::class);
         
         //---- Mappers
         $this->app->bind(ExamBlockMapper::class, ExamBlockStudyPlanMapperImpl::class);
@@ -94,7 +98,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(YearCalculator::class, YearCalculatorImpl::class);
         $this->app->bind(CourseAdminManager::class, CourseAdminManagerImpl::class);
         $this->app->bind(CoursesAdminManager::class, CoursesAdminManagerImpl::class);
-        $this->app->bind(ExamBlockSsdManager::class, ExamBlockSsdManagerImpl::class);
+        $this->app->bind(ExamBlockManager::class, ExamBlockManagerImpl::class);
+        $this->app->bind(ExamManager::class, ExamManagerImpl::class);
+        $this->app->bind(FrontManager::class, FrontManagerImpl::class);
         
     }
 

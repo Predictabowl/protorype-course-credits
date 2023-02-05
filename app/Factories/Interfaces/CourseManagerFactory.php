@@ -9,7 +9,6 @@
 namespace App\Factories\Interfaces;
 
 use App\Services\Interfaces\CourseManager;
-use App\Models\Course;
 
 /**
  *

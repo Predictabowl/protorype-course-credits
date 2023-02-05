@@ -8,13 +8,17 @@
 
 namespace App\Repositories\Implementations;
 
-use App\Repositories\Interfaces\FrontRepository;
+use App\Exceptions\Custom\CourseNotFoundException;
+use App\Exceptions\Custom\UserNotFoundException;
+use App\Models\Course;
 use App\Models\Front;
 use App\Models\User;
+use App\Repositories\Interfaces\FrontRepository;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 
 /**
  *
@@ -28,15 +32,27 @@ class FrontRepositoryImpl implements FrontRepository{
 
     public function save(Front $front): ?Front{
         if (isset($front->id)){
-            throw new \InvalidArgumentException("The id of a new Front must be null");
+            throw new InvalidArgumentException("The id of a new Front must be null");
         }
         
-        try {
-            return $front->save() ? $front : null;
-        } catch(QueryException $exc){
-            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
+        $user = User::with("front")->find($front->user_id);
+        if (!isset($user)){
+            throw new UserNotFoundException("User not found with id: ".$front->user_id);
+        }
+        
+        if(isset($user->front)){
             return null;
         }
+        
+        $course = Course::find($front->course_id);
+        if (!isset($course)){
+            throw new CourseNotFoundException(
+                    "Could not find Course with id: ".$front->course_id);
+        }
+        
+        
+        $front->save();
+        return $front;
     }
 
     public function updateCourse($id, $courseId): ?Front {

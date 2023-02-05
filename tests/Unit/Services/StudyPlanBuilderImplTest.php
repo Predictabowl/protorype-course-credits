@@ -7,47 +7,46 @@ use App\Domain\ExamStudyPlanDTO;
 use App\Domain\TakenExamDTO;
 use App\Models\Course;
 use App\Services\Implementations\StudyPlanBuilderImpl;
+use App\Services\Interfaces\CourseDataBuilder;
 use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Interfaces\FrontManager;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 use function collect;
 
 class StudyPlanBuilderImplTest extends TestCase
 {
-    private FrontManager $frontManager;
-    private CourseManager $courseManager;
+    private const FIXTURE_MAX_CFU = 110;
+    
     private ExamDistance $examDistance;
-    private StudyPlanBuilderImpl $planBuilder;
-    private $takenExams;
+    private CourseDataBuilder $courseDataBuilder;
+    private Collection $takenExams;
     private $blocks;
-    private $options;
+    private Collection $options;
 
     protected function setUp(): void
     {
-        $this->frontManager = $this->createMock(FrontManager::class);
-        $this->courseManager = $this->createMock(CourseManager::class);
         $this->examDistance = $this->createMock(ExamDistance::class);
+        $this->courseDataBuilder = $this->createMock(CourseDataBuilder::class);
         $this->setupData();
-        
-        $this->planBuilder = new StudyPlanBuilderImpl($this->frontManager,
-                $this->courseManager,
-                $this->examDistance);
     }
     
     
-    private function setupMocks(){
-        $this->frontManager->expects($this->any())
-                ->method("getTakenExams")
-                ->willReturn($this->takenExams);
-        
-        $this->courseManager->expects($this->any())
+    private function setupMocks(): StudyPlanBuilderImpl {
+        $this->courseDataBuilder->expects($this->once())
                 ->method("getExamOptions")
                 ->willReturn($this->options);
-
-        $this->courseManager->expects($this->any())
+        
+        $this->courseDataBuilder->expects($this->once())
                 ->method("getExamBlocks")
                 ->willReturn(collect($this->blocks));
+        
+        $this->courseDataBuilder->expects($this->once())
+                ->method("getCourse")
+                ->willReturn(new Course(["maxRecognizedCfu" => self::FIXTURE_MAX_CFU]));
+        return new StudyPlanBuilderImpl($this->takenExams,$this->courseDataBuilder,
+                $this->examDistance);
     }
     
      public function test_getOptionsBySsd_when_no_ssd_associated() {
@@ -56,38 +55,39 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->options = collect([$option1]);
         $this->examDistance->expects($this->never())
                 ->method("calculateDistance");
-        $this->setupMocks();
         
-        $this->planBuilder->refreshStudyPlan();
-        
-        $orederedOptions = $this->planBuilder->getOptionsBySsd($takenExam);
+        $sut = $this->setupMocks();
+        $sut->prepareBuilder();
+        $orederedOptions = $sut->getOptionsBySsd($takenExam);
         
         $this->assertEmpty($orederedOptions);
     }
 
     public function test_getOptionsBySsd() {
         $takenExam = new TakenExamDTO(17,"test exam 01","IUS/01",5,23);
+        $this->takenExams = collect([$takenExam]);
         $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], "IUS/01");
         $option2 = new ExamStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
         $option3 = new ExamStudyPlanDTO(3,"test 3", $this->blocks[1], "IUS/01");
         $option4 = new ExamStudyPlanDTO(4,"test 4", $this->blocks[2], "IUS/01");
         $this->options = collect([$option1,$option2,$option3,$option4]);
-        $this->examDistance->expects($this->exactly(3))                
+        $this->examDistance->expects($this->exactly(3))
                 ->method("calculateDistance")
                 ->will($this->onConsecutiveCalls(7,9,3));
-        $this->setupMocks();
         
-        $this->planBuilder->refreshStudyPlan();
+        $sut = $this->setupMocks();
+
+        $sut->prepareBuilder();
+        $orderedOptions = $sut->getOptionsBySsd($takenExam);
         
-        $orederedOptions = $this->planBuilder->getOptionsBySsd($takenExam);
-        
-        $this->assertCount(3, $orederedOptions);
-        $this->assertEquals($option4, $orederedOptions->first());
-        $this->assertEquals($option3, $orederedOptions->last());
+        $this->assertCount(3, $orderedOptions);
+        $this->assertEquals($option4, $orderedOptions->first());
+        $this->assertEquals($option3, $orderedOptions->last());
     }
     
     public function test_getOptionsByCompatibility() {
         $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5,25);
+        $this->takenExams = collect([$takenExam]);
         $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], null);
         $option2 = new ExamStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
         $option3 = new ExamStudyPlanDTO(3,"test 3", $this->blocks[1], "IUS/07");
@@ -99,9 +99,11 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->examDistance->expects($this->exactly(3))
                 ->method("calculateDistance")
                 ->will($this->onConsecutiveCalls(7,4,5));
-        $this->setupMocks();
-        $this->planBuilder->refreshStudyPlan();
-        $orederedOptions = $this->planBuilder->getOptionsByCompatibility($takenExam);
+        
+        $sut = $this->setupMocks();
+        $sut->prepareBuilder();
+        $orederedOptions = $sut->getOptionsByCompatibility($takenExam);
+        
         $this->assertCount(3, $orederedOptions);
         $this->assertEquals($option2, $orederedOptions->first());
         $this->assertEquals($option4, $orederedOptions->get(1));
@@ -110,6 +112,7 @@ class StudyPlanBuilderImplTest extends TestCase
     
     public function test_getFreeChoiceOptions() {
         $takenExam = new TakenExamDTO(17,"test exam 01","IUS/02",5,22);
+        $this->takenExams = collect([$takenExam]);
         $option1 = new ExamStudyPlanDTO(1,"test 1", $this->blocks[0], null, true);
         $option2 = new ExamStudyPlanDTO(2,"test 2", $this->blocks[0], "IUS/09");
         $option3 = new ExamStudyPlanDTO(3,"test 3", $this->blocks[1], "MAT/01", true);
@@ -121,11 +124,10 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->examDistance->expects($this->exactly(2))                
                 ->method("calculateDistance")
                 ->will($this->onConsecutiveCalls(7,5));
-        $this->setupMocks();
         
-        $this->planBuilder->refreshStudyPlan();
-        
-        $orederedOptions = $this->planBuilder->getFreeChoiceOptions($takenExam);
+        $sut = $this->setupMocks();
+        $sut->prepareBuilder();
+        $orederedOptions = $sut->getFreeChoiceOptions($takenExam);
         
         $this->assertCount(2, $orederedOptions);
         $this->assertEquals($option3, $orederedOptions->first());
@@ -149,13 +151,13 @@ class StudyPlanBuilderImplTest extends TestCase
         ]);        
         $block2->addCompatibleOption("IUS/03");
         
-        $this->setupMocks();
+        $sut = $this->setupMocks();
         // is called once for each pass in the free choices loops
         $this->examDistance->expects($this->exactly(2))                
                 ->method("calculateDistance")
                 ->willReturn(1);
         
-        $studyPlan = $this->planBuilder->getStudyPlan();
+        $studyPlan = $sut->getStudyPlan();
 
         $this->assertEquals(12, $studyPlan->getExam(1)->getIntegrationValue());
         $this->assertEquals(12, $studyPlan->getExam(2)->getIntegrationValue());
@@ -167,7 +169,7 @@ class StudyPlanBuilderImplTest extends TestCase
         
     }
     
-        public function test_getStudyPlan_with_free_choice_exam_should_prioritize_whole_exams() {
+    public function test_getStudyPlan_with_free_choice_exam_should_prioritize_whole_exams() {
         $testExam = new TakenExamDTO(2,"Test whole CFU","IUS/01",12,22);
         $this->takenExams = collect([
             new TakenExamDTO(1,"Test fractioned Cfu","IUS/01",18,22,2,12),
@@ -186,14 +188,14 @@ class StudyPlanBuilderImplTest extends TestCase
         ]);        
         $block2->addCompatibleOption("IUS/03");
         
-        $this->setupMocks();
+        $sut = $this->setupMocks();
         // On the first pass the fraction CFU is not considered, and so is called only once
         // On the second pass they're both called.
         $this->examDistance->expects($this->exactly(3))                
                 ->method("calculateDistance")
                 ->willReturn(1);
         
-        $studyPlan = $this->planBuilder->getStudyPlan();
+        $studyPlan = $sut->getStudyPlan();
 
         $this->assertEquals(0, $studyPlan->getExam(1)->getIntegrationValue());
         $this->assertEquals(12, $studyPlan->getExam(2)->getIntegrationValue());
@@ -225,12 +227,12 @@ class StudyPlanBuilderImplTest extends TestCase
         ]);        
         $block2->addCompatibleOption("IUS/03");
         
-        $this->setupMocks();
+        $sut = $this->setupMocks();
         $this->examDistance->expects($this->once())                
                 ->method("calculateDistance")
                 ->willReturn(1);
         
-        $studyPlan = $this->planBuilder->getStudyPlan();
+        $studyPlan = $sut->getStudyPlan();
 
         $this->assertEquals(0, $studyPlan->getExam(1)->getIntegrationValue());
         $this->assertEquals(12, $studyPlan->getExam(2)->getIntegrationValue());
@@ -248,26 +250,22 @@ class StudyPlanBuilderImplTest extends TestCase
         $this->blocks = collect([]);
         $this->options = collect([]);
         $this->takenExams = collect([]);
-        $this->setupMocks();
+        $sut = $this->setupMocks();
         
-        $this->courseManager->expects($this->any())
-                ->method("getCourse")
-                ->willReturn($course);
+        $studyPlan = $sut->getStudyPlan();
         
-        $studyPlan = $this->planBuilder->getStudyPlan();
-        
-        $this->assertEquals(15, $studyPlan->getMaxCfu());
+        $this->assertEquals(self::FIXTURE_MAX_CFU, $studyPlan->getMaxCfu());
     }
     
     
     public function test_getStudyPlan() {
         
-        $this->setupMocks();
         $this->examDistance->expects($this->exactly(12))                
                 ->method("calculateDistance")
                 ->willReturn(1);
+        $sut = $this->setupMocks();
         
-        $studyPlan = $this->planBuilder->getStudyPlan();
+        $studyPlan = $sut->getStudyPlan();
 
         $this->assertEquals(3, $studyPlan->getExam(1)->getIntegrationValue());
         $this->assertEquals(6, $studyPlan->getExam(2)->getIntegrationValue());
@@ -290,17 +288,26 @@ class StudyPlanBuilderImplTest extends TestCase
     public function test_getStudyPlan_with_max_cfu() {
         $course = new Course();
         $course->maxRecognizedCfu = 15;
+        $this->courseDataBuilder->expects($this->once())
+                ->method("getExamOptions")
+                ->willReturn($this->options);
         
-        $this->courseManager->expects($this->any())
+        $this->courseDataBuilder->expects($this->once())
+                ->method("getExamBlocks")
+                ->willReturn(collect($this->blocks));
+        
+        $this->courseDataBuilder->expects($this->once())
                 ->method("getCourse")
                 ->willReturn($course);
         
-        $this->setupMocks();
+        $sut = new  StudyPlanBuilderImpl($this->takenExams,$this->courseDataBuilder,
+                $this->examDistance);
+        
         $this->examDistance->expects($this->exactly(12))                
                 ->method("calculateDistance")
                 ->willReturn(1);
         
-        $studyPlan = $this->planBuilder->getStudyPlan();
+        $studyPlan = $sut->getStudyPlan();
 
         $this->assertEquals(15, $studyPlan->getRecognizedCredits());
         $this->assertEquals(0, $studyPlan->getLeftoverAllottedCfu());

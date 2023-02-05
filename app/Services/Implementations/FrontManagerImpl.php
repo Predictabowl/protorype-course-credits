@@ -26,32 +26,31 @@ use Webmozart\Assert\InvalidArgumentException;
  */
 class FrontManagerImpl implements FrontManager{
 
-    private $frontId;
     private TakenExamMapper $mapper;
     private TakenExamRepository $takenExamRepo;
     private FrontRepository $frontRepo;
     private CourseRepository $courseRepo;
 
-    public function __construct($frontId, TakenExamMapper $mapper,
-            TakenExamRepository $takenExamRepo, FrontRepository $frontRepo,
+    public function __construct(TakenExamMapper $mapper,
+            TakenExamRepository $takenExamRepo,
+            FrontRepository $frontRepo,
             CourseRepository $courseRepo) {
         $this->mapper = $mapper;
         $this->takenExamRepo = $takenExamRepo;
         $this->frontRepo = $frontRepo;
         $this->courseRepo = $courseRepo;
-        $this->frontId = $frontId;
     }
 
-    public function getTakenExams(): Collection {
-        $exams = $this->takenExamRepo->getFromFront($this->frontId);
+    public function getTakenExams(int $frontId): Collection {
+        $exams = $this->takenExamRepo->getFromFront($frontId);
         return $exams->map(
                 fn($exam) => $this->mapper->toDTO($exam));
     }
 
-    public function saveTakenExam($attributes) {
+    public function saveTakenExam($attributes, int $frontId) {
         $exam = new TakenExamDTO(0, $attributes["name"], $attributes["ssd"],
                 $attributes["cfu"], $attributes["grade"]);
-        $takenExam = $this->mapper->toModel($exam, $this->frontId);
+        $takenExam = $this->mapper->toModel($exam, $frontId);
         if(!isset($takenExam)){
             throw new InvalidArgumentException();//message missing
         }
@@ -60,25 +59,53 @@ class FrontManagerImpl implements FrontManager{
         });
     }
 
-    public function deleteTakenExam($examId) {
+    public function deleteTakenExam(int $examId) {
         DB::transaction(function() use($examId){
             $this->takenExamRepo->delete($examId);
         });
     }
 
-    public function setCourse($courseId): bool {
-        $front = $this->frontRepo->updateCourse($this->frontId, $courseId);
-        return isset($front) ? true : false;
-    }
-
-    public function getFront(): Front {
-        return $this->frontRepo->get($this->frontId);
-    }
-
-    public function deleteAllTakenExams() {
-        DB::transaction(function(){
-            $this->takenExamRepo->deleteFromFront($this->frontId);
+    public function setCourse(int $frontId, int $courseId): bool {
+        return DB::transaction(function() use($frontId, $courseId){
+            $front = $this->frontRepo->updateCourse($frontId, $courseId);
+            return isset($front) ? true : false;
         });
     }
 
+    public function getFront(int $frontId): ?Front {
+        return $this->frontRepo->get($frontId);
+    }
+
+    public function deleteAllTakenExams(int $frontId) {
+        DB::transaction(function() use($frontId){
+            $this->takenExamRepo->deleteFromFront($frontId);
+        });
+    }
+
+    public function getOrCreateFront(int $userId, ?int $courseId = null): Front {
+        return DB::transaction(function() use($userId, $courseId){
+            $front = $this->frontRepo->getFromUser($userId);
+            if(isset($front)){
+                return $this->updateFront($front, $courseId);
+            }
+
+            return $this->createFront($userId, $courseId);
+        });
+        
+    }
+
+    private function createFront(int $userId, ?int $courseId): Front{
+        $newFront = new Front([
+            "user_id" => $userId,
+            "course_id" => $courseId
+        ]);
+        return $this->frontRepo->save($newFront);
+    }
+    
+    private function updateFront(Front $front, ?int $courseId): Front{
+        if (isset($courseId) && $front->course_id != $courseId){
+            return $this->frontRepo->updateCourse($front->id, $courseId);
+        }
+        return $front;
+    }
 }

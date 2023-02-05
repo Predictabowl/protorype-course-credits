@@ -8,13 +8,15 @@
 
 namespace App\Factories\Interfaces;
 
-use App\Services\Interfaces\FrontManager;
+use App\Mappers\Interfaces\ExamBlockMapper;
+use App\Models\Course;
+use App\Services\Interfaces\CourseDataBuilder;
 
 /**
  *
  * @author piero
  */
-interface FrontManagerFactory {
+interface CourseDataBuilderFactory {
     
-    public function getFrontManager($frontId): FrontManager;
+    public function get(Course $course): CourseDataBuilder;
 }

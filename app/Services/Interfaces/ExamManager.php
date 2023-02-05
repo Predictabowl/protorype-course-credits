@@ -7,18 +7,15 @@
 
 namespace App\Services\Interfaces;
 
-use App\Domain\NewExamBlockInfo;
 use App\Domain\NewExamInfo;
-use App\Models\Course;
 use App\Models\Exam;
-use App\Models\ExamBlock;
 
 /**
  *
  * @author piero
  */
-interface CourseAdminManager {
-
-    public function getCourse(int $coruseId): ?Course;
-    public function getCourseFullDepth(int $courseId): ?Course;
+interface ExamManager {
+    public function saveExam(NewExamInfo $exam, int $examBlockId): Exam;
+    public function updateExam(NewExamInfo $exam, int $examId): Exam;
+    public function deleteExam(int $examId): void;
 }

@@ -3,10 +3,10 @@
 namespace Tests\Unit\Factory;
 
 use App\Factories\Implementations\UserFrontManagerFactoryImpl;
-use App\Factories\Interfaces\FrontManagerFactory;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Repositories\Interfaces\FrontRepository;
 use App\Services\Implementations\UserFrontManagerImpl;
+use App\Services\Interfaces\FrontManager;
 use Tests\TestCase;
 
 class UserFrontManagerFactoryImplTest extends TestCase
@@ -15,12 +15,12 @@ class UserFrontManagerFactoryImplTest extends TestCase
     
     protected function setUp(): void {
         parent::setUp();
-        $fmFactory = $this->createMock(FrontManagerFactory::class);
+        $frontManager = $this->createMock(FrontManager::class);
         $frontRepo = $this->createMock(FrontRepository::class);
         $spbFactory = $this->createMock(StudyPlanBuilderFactory::class);
         
         $this->sut = new UserFrontManagerFactoryImpl($frontRepo,
-                $fmFactory, $spbFactory);
+                $frontManager, $spbFactory);
     }
 
     

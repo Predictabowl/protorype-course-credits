@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Exceptions\Custom\CourseNotFoundException;
+use App\Exceptions\Custom\UserNotFoundException;
 use App\Models\Course;
 use App\Models\Front;
 use App\Models\User;
@@ -70,18 +72,31 @@ class FrontRepositoryImplTest extends TestCase
     
     public function test_save_when_course_id_not_exists()
     {
+        $user = User::factory()->create();
+        
         $new = new Front([
-            "user_id" => 2,
+            "user_id" => $user->id,
             "course_id" => self::FIXTURE_COURSE_NUM+1
         ]);
-        Log::shouldReceive("error")->once();
+//        Log::shouldReceive("error")->once();
         
-        $result = $this->sut->save($new);
+        $this->expectException(CourseNotFoundException::class);
+        $this->sut->save($new);
         
-        $this->assertNull($result);
         $this->assertDatabaseCount("fronts", 0);
     }
 
+    public function test_save_when_user_id_NotExists()
+    {
+        $new = new Front([
+            "course_id" => 1,
+            "user_id" => 2
+        ]);
+        
+        $this->expectException(UserNotFoundException::class);
+        $this->sut->save($new);
+        
+    }
     
     public function test_save_when_user_id_already_present()
     {

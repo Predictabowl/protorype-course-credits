@@ -7,10 +7,10 @@ use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Services\Interfaces\CourseAdminManager;
+use App\Services\Interfaces\ExamBlockManager;
 use Illuminate\Support\Facades\Response;
 use function __;
 use function back;
-use function ddd;
 use function redirect;
 use function request;
 use function route;
@@ -19,16 +19,19 @@ use function view;
 class ExamBlockController extends Controller
 {
     private CourseAdminManager $courseManager;
+    private ExamBlockManager $ebManager;
     
-    public function __construct(CourseAdminManager $courseManager) {
+    public function __construct(CourseAdminManager $courseManager,
+            ExamBlockManager $ebManager) {
         $this->middleware(["auth","verified"]);
         $this->courseManager = $courseManager;
+        $this->ebManager = $ebManager;
     }
     
     public function index(Course $course){
         $this->authorize("viewAny", $course);
         
-        $courseData = $this->courseManager->getCourseFullData($course->id);
+        $courseData = $this->courseManager->getCourseFullDepth($course->id);
         if(is_null($courseData)){
             return redirect(route("courseIndex"))->with("error",__("Could not found Course."));
         }
@@ -47,9 +50,8 @@ class ExamBlockController extends Controller
                 $attributes["cfu"],
                 $attributes["courseYear"]);
         
-        $examBlock = $this->courseManager->saveExamBlock($ebInfo, $course->id);
+        $examBlock = $this->ebManager->saveExamBlock($ebInfo, $course->id);
         
-//        return back()->with("success",__("Added Exam Block"));
         return Response::view("components.courses.exam-block-row",
                 ["examBlock" => $examBlock]);
         
@@ -58,7 +60,7 @@ class ExamBlockController extends Controller
     public function delete(ExamBlock $examblock){
         $this->authorize("delete", Course::class);
         
-        $this->courseManager->deleteExamBlock($examblock->id);
+        $this->ebManager->deleteExamBlock($examblock->id);
         
         return back();
     }
@@ -71,7 +73,7 @@ class ExamBlockController extends Controller
                 $attributes["cfu"],
                 $attributes["courseYear"]);
         try{
-            $editedExamBlock = $this->courseManager
+            $editedExamBlock = $this->ebManager
                     ->updateExamBlock($ebInfo, $examblock->id);
         } catch (ExamBlockNotFoundException $ex) {
             return back()->with("error",__("Missing Entity"));

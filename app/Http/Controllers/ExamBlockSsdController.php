@@ -5,14 +5,18 @@ namespace App\Http\Controllers;
 use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Models\Course;
 use App\Models\ExamBlock;
-use App\Services\Interfaces\ExamBlockSsdManager;
+use App\Services\Interfaces\ExamBlockManager;
+use function back;
+use function redirect;
 use function request;
+use function route;
+use function view;
 
 class ExamBlockSsdController extends Controller
 {
-    private ExamBlockSsdManager $ebSsdManager;
+    private ExamBlockManager $ebSsdManager;
     
-    public function __construct(ExamBlockSsdManager $ebSsdManager) {
+    public function __construct(ExamBlockManager $ebSsdManager) {
         $this->middleware(["auth","verified"]);
         $this->ebSsdManager = $ebSsdManager;
     }

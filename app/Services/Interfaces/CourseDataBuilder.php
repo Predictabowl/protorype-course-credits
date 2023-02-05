@@ -6,16 +6,18 @@
  * and open the template in the editor.
  */
 
-namespace App\Factories\Interfaces;
+namespace App\Services\Interfaces;
 
 use App\Models\Course;
-use App\Services\Interfaces\StudyPlanBuilder;
+use Illuminate\Support\Collection;
 
 /**
  *
  * @author piero
  */
-interface StudyPlanBuilderFactory {
-    
-    public function get(int $frontId, Course $course): StudyPlanBuilder;
+interface CourseDataBuilder {
+ 
+    public function getExamBlocks(): Collection;
+    public function getExamOptions(): Collection;
+    public function getCourse(): Course;
 }

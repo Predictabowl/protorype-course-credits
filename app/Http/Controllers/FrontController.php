@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Front;
+use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\FrontsSearchManager;
 use function back;
 use function request;
@@ -12,10 +12,10 @@ use function view;
 class FrontController extends Controller
 {
     
-    private FrontManagerFactory $frontManagerFactory;
+    private FrontManager $frontManager;
     private FrontsSearchManager $frontsSearchManager;
     
-    public function __construct(FrontManagerFactory $frontManagerFactory,
+    public function __construct(FrontManager $frontManager,
             FrontsSearchManager $frontsSearchManager) {
         
         $this->middleware(["auth","verified"]);
@@ -23,7 +23,7 @@ class FrontController extends Controller
         // It's better to use the $this->authorize() method
         //$this->middleware("can:view,front");
         //$this->middleware("can:viewAny,App/Front");
-        $this->frontManagerFactory = $frontManagerFactory;
+        $this->frontManager = $frontManager;
         $this->frontsSearchManager = $frontsSearchManager;
     }
     
@@ -41,9 +41,8 @@ class FrontController extends Controller
     {   
         $this->authorize("view",$front);
         
-        $manager = $this->frontManagerFactory->getFrontManager($front->id);
         return view("front.show",[
-            "exams" => $manager->getTakenExams(),
+            "exams" => $this->frontManager->getTakenExams($front->id),
             "front" => $front,
             "courses" => $this->frontsSearchManager->getCourses()
         ]);
@@ -52,8 +51,8 @@ class FrontController extends Controller
     public function put(Front $front)
     {   
         $this->authorize("update",$front);
-        $this->frontManagerFactory->getFrontManager($front->id)
-                ->setCourse(request()->get("courseId"));
+        $this->frontManager->setCourse(
+                $front->id, request()->get("courseId"));
         return back();
     }
     

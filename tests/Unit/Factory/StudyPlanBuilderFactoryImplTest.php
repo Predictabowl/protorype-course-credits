@@ -3,30 +3,52 @@
 namespace Tests\Unit\Factory;
 
 use App\Factories\Implementations\StudyPlanBuilderFactoryImpl;
-use App\Factories\Interfaces\CourseManagerFactory;
-use App\Factories\Interfaces\FrontManagerFactory;
-use App\Services\Interfaces\StudyPlanBuilder;
+use App\Factories\Interfaces\CourseDataBuilderFactory;
+use App\Models\Course;
+use App\Models\Front;
+use App\Services\Implementations\StudyPlanBuilderImpl;
+use App\Services\Interfaces\CourseAdminManager;
+use App\Services\Interfaces\CourseDataBuilder;
+use App\Services\Interfaces\ExamDistance;
+use App\Services\Interfaces\FrontManager;
 use Tests\TestCase;
 
 class StudyPlanBuilderFactoryImplTest extends TestCase
 {
+    
     private StudyPlanBuilderFactoryImpl $sut;
-    private FrontManagerFactory $fmFactory;
-    private CourseManagerFactory $cmFactory;
+    private FrontManager $frontManager;
+    private ExamDistance $examDistance;
+    private CourseDataBuilderFactory $courseDataBuilderFactory;
     
     protected function setUp(): void {
         parent::setUp();
-        $this->fmFactory = $this->createMock(FrontManagerFactory::class);
-        $this->cmFactory = $this->createMock(CourseManagerFactory::class);
+        $this->frontManager = $this->createMock(FrontManager::class);
+        $this->examDistance = $this->createMock(ExamDistance::class);
+        $this->courseDataBuilderFactory = $this->createMock(CourseDataBuilderFactory::class);
         
-        $this->sut = new StudyPlanBuilderFactoryImpl($this->fmFactory, $this->cmFactory);
+        $this->sut = new StudyPlanBuilderFactoryImpl(
+                $this->frontManager,
+                $this->courseDataBuilderFactory,
+                $this->examDistance);
     }
 
     
     public function test_factory_instance(){
+        $this->frontManager->expects($this->once())
+                ->method("getTakenExams")
+                ->with(3)
+                ->willReturn(collect([]));
         
-        $instance = $this->sut->getStudyPlanBuilder(3,2);
+        $course = new Course();
+        $courseDataBuilder = $this->createMock(CourseDataBuilder::class);
+        $this->courseDataBuilderFactory->expects($this->once())
+                ->method("get")
+                ->with($course)
+                ->willReturn($courseDataBuilder);
         
-        $this->assertInstanceOf(StudyPlanBuilder::class, $instance);
+        $instance = $this->sut->get(3, $course);
+        
+        $this->assertInstanceOf(StudyPlanBuilderImpl::class, $instance);
     }
 }

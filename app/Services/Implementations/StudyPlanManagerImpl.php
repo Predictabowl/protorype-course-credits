@@ -9,6 +9,7 @@
 namespace App\Services\Implementations;
 
 use App\Domain\StudyPlan;
+use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Factories\Interfaces\UserFrontManagerFactory;
 use App\Models\Front;
 use App\Services\Interfaces\StudyPlanManager;
@@ -25,14 +26,16 @@ class StudyPlanManagerImpl implements StudyPlanManager{
     private YearCalculator $yearCalc;
     private Front $front;
     private $plan;
-    private UserFrontManagerFactory $ufManagerFactory;
+//    private UserFrontManagerFactory $ufManagerFactory;
+    private StudyPlanBuilderFactory $spbFactory;
     
-    public function __construct(Front $front,
-            UserFrontManagerFactory $ufManagerFactory,
+    public function __construct(
+            Front $front,
+            StudyPlanBuilderFactory $spbFactory,
             YearCalculator $yearCalc) {
         $this->front = $front;
         $this->yearCalc = $yearCalc;
-        $this->ufManagerFactory = $ufManagerFactory;
+        $this->spbFactory = $spbFactory;
     }
     
     public function getStudyPlan(): ?StudyPlan {
@@ -43,11 +46,10 @@ class StudyPlanManagerImpl implements StudyPlanManager{
     }
     
     private function buildStudyPlan(): ?StudyPlan{
-        $builder = $this->ufManagerFactory->get($this->front->user_id)
-                ->getStudyPlanBuilder();
-        if (!isset($builder)){
+        if (!isset($this->front->course)){
             return null;
         }
+        $builder = $this->spbFactory->get($this->front->id, $this->front->course);
         return $builder->getStudyPlan();
     }
 

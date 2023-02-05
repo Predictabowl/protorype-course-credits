@@ -7,13 +7,18 @@
 
 namespace App\Services\Interfaces;
 
+use App\Domain\NewExamBlockInfo;
 use App\Models\ExamBlock;
 
 /**
  *
  * @author piero
  */
-interface ExamBlockSsdManager {
+interface ExamBlockManager {
+    
+    public function saveExamBlock(NewExamBlockInfo $examBlock, int $courseId): ExamBlock;
+    public function updateExamBlock(NewExamBlockInfo $examBlock, int $examBlockId): ExamBlock;
+    public function deleteExamBlock(int $examBlockId): void;
     public function addSsd(int $examBlockId, string $ssd): void;
     public function removeSsd(int $examBlockId, int $ssdId): void;
     public function eagerLoadExamBlock(int $examBlockId): ExamBlock;

@@ -11,7 +11,7 @@ use App\Models\ExamBlock;
 use App\Models\Role;
 use App\Models\Ssd;
 use App\Models\User;
-use App\Services\Interfaces\CourseAdminManager;
+use App\Services\Interfaces\ExamManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use function app;
@@ -24,7 +24,7 @@ class ExamControllerTest extends TestCase {
     const FIXTURE_START_URI = "course/examblock/exam";
     const FIXTURE_SSD = "IUS/10";
 
-    private CourseAdminManager $courseManager;
+    private ExamManager $examManager;
     private ExamBlock $examBlock;
     private Ssd $ssdFixture;
 
@@ -36,14 +36,14 @@ class ExamControllerTest extends TestCase {
             "code" => self::FIXTURE_SSD
         ]);
 
-        $this->courseManager = $this->createMock(CourseAdminManager::class);
-        app()->instance(CourseAdminManager::class, $this->courseManager);
+        $this->examManager = $this->createMock(ExamManager::class);
+        app()->instance(ExamManager::class, $this->examManager);
     }
 
     public function test_post_auth() {
         $this->be(User::factory()->create());
 
-        $this->courseManager->expects($this->never())
+        $this->examManager->expects($this->never())
                 ->method("saveExam");
 
         $this->post(route("examCreate", [$this->examBlock->id]))
@@ -58,7 +58,7 @@ class ExamControllerTest extends TestCase {
             "id" => 3,
             "free_choice" => false
             ]);
-        $this->courseManager->expects($this->once())
+        $this->examManager->expects($this->once())
                 ->method("saveExam")
                 ->with($examInfo, $this->examBlock->id)
                 ->willReturn($returnedExam);
@@ -74,7 +74,7 @@ class ExamControllerTest extends TestCase {
 
     public function test_post_validations() {
         $this->beAdmin();
-        $this->courseManager->expects($this->never())
+        $this->examManager->expects($this->never())
                 ->method("saveExam");
 
         $this->postValidationTest("name", "");
@@ -98,7 +98,7 @@ class ExamControllerTest extends TestCase {
             "ssd_id" => null,
             "free_choice" => true
             ]);
-        $this->courseManager->expects($this->once())
+        $this->examManager->expects($this->once())
                 ->method("saveExam")
                 ->with($examInfo, $this->examBlock->id)
                 ->willReturn($returnedExam);
@@ -115,7 +115,7 @@ class ExamControllerTest extends TestCase {
         $this->beAdmin();
         $examInfo = new NewExamInfo("test",$this->ssdFixture->code,false);
 
-        $this->courseManager->expects($this->once())
+        $this->examManager->expects($this->once())
                 ->method("saveExam")
                 ->with($examInfo, $this->examBlock->id)
                 ->willThrowException(new SsdNotFoundException("test error"));
@@ -132,7 +132,7 @@ class ExamControllerTest extends TestCase {
         $this->be(User::factory()->create());
         $exam = Exam::factory()->create();
 
-        $this->courseManager->expects($this->never())
+        $this->examManager->expects($this->never())
                 ->method("deleteExam");
 
         $this->delete(route("examDelete", [$exam->id]))
@@ -143,7 +143,7 @@ class ExamControllerTest extends TestCase {
         $this->beAdmin();
         $exam = Exam::factory()->create();
 
-        $this->courseManager->expects($this->once())
+        $this->examManager->expects($this->once())
                 ->method("deleteExam")
                 ->with($exam->id);
 
@@ -156,7 +156,7 @@ class ExamControllerTest extends TestCase {
         $this->be(User::factory()->create());
         $exam = Exam::factory()->create();
 
-        $this->courseManager->expects($this->never())
+        $this->examManager->expects($this->never())
                 ->method("updateExam");
 
         $this->put(route("examUpdate", [$exam->id]))
@@ -172,7 +172,7 @@ class ExamControllerTest extends TestCase {
             "freeChoice" => true,
         ];
 
-        $this->courseManager->expects($this->once())
+        $this->examManager->expects($this->once())
                 ->method("updateExam")
                 ->willThrowException(new ExamNotFoundException());
 
@@ -191,7 +191,7 @@ class ExamControllerTest extends TestCase {
         ];
         
         $updatedExam = Exam::factory()->make(["id" => 7]);
-        $this->courseManager->expects($this->once())
+        $this->examManager->expects($this->once())
                 ->method("updateExam")
                 ->with(new NewExamInfo("test", self::FIXTURE_SSD, false),
                         $exam->id)
@@ -212,7 +212,7 @@ class ExamControllerTest extends TestCase {
             "ssd" => $this->ssdFixture->code
         ];
         
-        $this->courseManager->expects($this->once())
+        $this->examManager->expects($this->once())
                 ->method("updateExam")
                 ->with(new NewExamInfo("test", self::FIXTURE_SSD, false),
                         $exam->id)

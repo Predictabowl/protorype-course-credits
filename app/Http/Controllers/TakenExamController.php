@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Front;
 use App\Services\Interfaces\FrontManager;
 use Illuminate\Validation\Rule;
@@ -12,11 +11,11 @@ use function request;
 class TakenExamController extends Controller
 {
     
-    private FrontManagerFactory $frontManagerFactory;
+    private FrontManager $frontManager;
     
-    public function __construct(FrontManagerFactory $frontManagerFactory) {
+    public function __construct(FrontManager $frontManager) {
         $this->middleware(["auth","verified"]);
-        $this->frontManagerFactory = $frontManagerFactory;
+        $this->frontManager = $frontManager;
     }
 
     /* Effectively the SSD validation that check it's existence is 
@@ -41,7 +40,7 @@ class TakenExamController extends Controller
             "ssd" => ["required", Rule::exists("ssds", "code")],
             "grade" => ["required", "numeric", "min:18", "max:30"]
         ]);
-        $this->getFrontManager($front)->saveTakenExam($attributes);
+        $this->frontManager->saveTakenExam($attributes, $front->id);
         return back()->with("success", "Aggiunto: ".$attributes["name"]);
     }
     
@@ -49,7 +48,7 @@ class TakenExamController extends Controller
         $this->authorize("delete",$front);
         
         $exam = unserialize(request()->get("exam"));
-        $this->getFrontManager($front)->deleteTakenExam($exam->getId());
+        $this->frontManager->deleteTakenExam($exam->getId());
         
         return back()->with("success", "Eliminato: ".$exam->getExamName());
     }
@@ -57,14 +56,9 @@ class TakenExamController extends Controller
     public function deleteFromFront(Front $front){
         $this->authorize("delete",$front);
         
-        $this->getFrontManager($front)->deleteAllTakenExams();
+        $this->frontManager->deleteAllTakenExams($front->id);
         
         return back()->with("success", "Eliminati tutti gli esami");
-    }
-    
-    
-    private function getFrontManager(Front $front): FrontManager {
-        return $this->frontManagerFactory->getFrontManager($front->id);
     }
     
 }

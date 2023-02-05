@@ -84,7 +84,7 @@ class StudyPlan implements Serializable{
         }
         return null;
     }
-
+    
     public function serialize(): string {
         return serialize([
             "examBlocks" => $this->examBlocks,
