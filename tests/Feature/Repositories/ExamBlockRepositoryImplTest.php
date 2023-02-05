@@ -56,7 +56,7 @@ class ExamBlockRepositoryImplTest extends TestCase
         $this->assertEquals(2, sizeof($result->getRelations()));
     }
     
-    public function test_save_withNoCourse_shoulThrow(){
+    public function test_save_withNoCourse_shouldThrow(){
         $attributes = [
             "max_exams" => 1,
             "course_id" => 2,
@@ -65,7 +65,7 @@ class ExamBlockRepositoryImplTest extends TestCase
         
         $examBlock = ExamBlock::make($attributes);
         
-        $this->expectException(CourseNotFoundException::arclass);
+        $this->expectException(CourseNotFoundException::class);
         $this->sut->save($examBlock);
         
         $this->assertDatabaseCount("exam_blocks",0);
