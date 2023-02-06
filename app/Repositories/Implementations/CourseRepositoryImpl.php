@@ -50,36 +50,28 @@ class CourseRepositoryImpl implements CourseRepository {
         return $course;
     }
 
-    public function save(Course $course): bool {
+    public function save(Course $course): Course{
         if (isset($course->id)){
             throw new InvalidArgumentException("The id of a new Course must be empty");
         }
 
-        try{
-            return $course->save();
-        } catch (QueryException $exc){
-            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
-            return false;
-        }
+        $course->save();
+        return $course;
     }
 
     public function getAll(array $filters = []): Collection {
         return Course::filter($filters)->get();
     }
 
-    public function update(Course $course): bool {
+    public function update(Course $course): Course{
         $oldCourse = Course::find($course->id);
         if(is_null($oldCourse)){
             throw new CourseNotFoundException("Course not found with id: ".$course->id);
         }
         
         $oldCourse->setRawAttributes($course->getAttributes());
-        try{
-            return $oldCourse->save();
-        } catch (QueryException $exc){
-            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
-            return false;
-        }
+        $oldCourse->save();
+        return $oldCourse;
     }
 
     public function getFromName(string $name): ?Course {

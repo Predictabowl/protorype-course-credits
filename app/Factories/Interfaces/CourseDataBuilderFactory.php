@@ -8,7 +8,6 @@
 
 namespace App\Factories\Interfaces;
 
-use App\Mappers\Interfaces\ExamBlockMapper;
 use App\Models\Course;
 use App\Services\Interfaces\CourseDataBuilder;
 

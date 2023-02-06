@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\Custom\CourseNameAlreadyExistsException;
 use App\Models\Course;
+use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\CoursesAdminManager;
 use Illuminate\Validation\ValidationException;
 use function back;
@@ -15,11 +16,11 @@ use function view;
 
 class CourseController extends Controller{
 
-    private CoursesAdminManager $coursesManager;
+    private CourseManager $courseManager;
     
-    public function __construct(CoursesAdminManager $coursesManager) {
+    public function __construct(CourseManager $courseManager) {
         $this->middleware(["auth","verified"]);
-        $this->coursesManager = $coursesManager;
+        $this->courseManager = $courseManager;
     }
     
     public function index() {
@@ -27,7 +28,7 @@ class CourseController extends Controller{
         
         $filters = request(["search"]);
         return view("courses.index", [
-            "courses" => $this->coursesManager->getAllCourses($filters)
+            "courses" => $this->courseManager->getAllCourses($filters)
         ]);
      }
      
@@ -50,7 +51,7 @@ class CourseController extends Controller{
          
          $attributes = $this->attributeValidation();
          try{
-            $this->coursesManager->addCourse(new Course($attributes));
+            $this->courseManager->addCourse(new Course($attributes));
          } catch (CourseNameAlreadyExistsException $ex){
             throw ValidationException::withMessages(["name" => $ex->getMessage()]);
          }
@@ -61,7 +62,7 @@ class CourseController extends Controller{
      public function delete(int $courseId){
          $this->authorize("delete", Course::class);
          
-         $this->coursesManager->removeCourse($courseId);
+         $this->courseManager->removeCourse($courseId);
          return back();
      }
      
@@ -72,7 +73,7 @@ class CourseController extends Controller{
          $newCourse->id = $course->id;
          
          try{
-            $this->coursesManager->updateCourse($newCourse);
+            $this->courseManager->updateCourse($newCourse);
          } catch (CourseNameAlreadyExistsException $ex){
              throw ValidationException::withMessages(["name" => $ex->getMessage()]);
          }

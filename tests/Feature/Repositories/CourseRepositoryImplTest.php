@@ -6,10 +6,10 @@ use App\Exceptions\Custom\CourseNotFoundException;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
-use App\Models\ExamBlockOption;
 use App\Models\Ssd;
 use App\Repositories\Implementations\CourseRepositoryImpl;
 use App\Repositories\Interfaces\ExamBlockRepository;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
@@ -63,7 +63,9 @@ class CourseRepositoryImplTest extends TestCase {
 
         $result = $this->sut->save($course);
 
-        $this->assertTrue($result);
+        $realCourse = Course::first();
+        $this->assertEquals($realCourse->attributesToArray(),
+                $result->attributesToArray());
         $this->assertDatabaseCount("courses", 1);
         $this->assertDatabaseHas("courses", $attributes);
     }
@@ -89,7 +91,7 @@ class CourseRepositoryImplTest extends TestCase {
         $this->assertFalse($saved);
     }
 
-    public function test_save_with_duplicate_name_should_fail() {
+    public function test_save_with_duplicate_name_shouldThrow() {
         $attributes = [
             "name" => "test name",
             "cfu" => 180,
@@ -104,9 +106,9 @@ class CourseRepositoryImplTest extends TestCase {
         ];
         $course = Course::make($attributes2);
 
-        $result = $this->sut->save($course);
+        $this->expectException(QueryException::class);
+        $this->sut->save($course);
 
-        $this->assertFalse($result);
         $this->assertDatabaseCount("courses", 1);
         $this->assertDatabaseMissing("courses", $attributes2);
     }
@@ -172,7 +174,8 @@ class CourseRepositoryImplTest extends TestCase {
 
         $result = $this->sut->update($updatedCourse);
 
-        $this->assertTrue($result);
+        $realCourse = Course::first();
+        $this->assertEquals($realCourse->all(), $result->all());
         $modified = Course::find($course->id);
         $this->assertEquals("new name", $modified->name);
     }

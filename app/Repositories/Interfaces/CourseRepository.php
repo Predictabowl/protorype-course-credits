@@ -23,9 +23,9 @@ interface CourseRepository {
     
     public function getAll(array $filters = []): Collection;
 
-    public function save(Course $course): bool;
+    public function save(Course $course): Course;
 
-    public function update(Course $course): bool;
+    public function update(Course $course): Course;
 
     public function delete(int $id): bool;
 }

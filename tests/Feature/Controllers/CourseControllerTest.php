@@ -6,6 +6,7 @@ use App\Exceptions\Custom\CourseNameAlreadyExistsException;
 use App\Models\Course;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\CoursesAdminManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
@@ -19,7 +20,7 @@ class CourseControllerTest extends TestCase
     
     const FIXTURE_START_URI = "course";
     
-    private CoursesAdminManager $coursesManager;
+    private CourseManager $courseManager;
     private array $courseAttributes;
     
     protected function setUp(): void {
@@ -27,8 +28,8 @@ class CourseControllerTest extends TestCase
         
         $this->course = Course::factory()->create();
         
-        $this->coursesManager = $this->createMock(CoursesAdminManager::class);
-        app()->instance(CoursesAdminManager::class, $this->coursesManager);
+        $this->courseManager = $this->createMock(CourseManager::class);
+        app()->instance(CourseManager::class, $this->courseManager);
         
         $this->courseAttributes = [
             "name" => "test name",
@@ -44,9 +45,9 @@ class CourseControllerTest extends TestCase
     public function test_index_authorizations_forbidden(){
         $this->be(User::factory()->create());
         
-        $this->coursesManager->expects($this->never())
+        $this->courseManager->expects($this->never())
                 ->method("removeCourse");
-        $this->coursesManager->expects($this->never())
+        $this->courseManager->expects($this->never())
                 ->method("updateCourse");
         $course = Course::first();
         
@@ -65,7 +66,7 @@ class CourseControllerTest extends TestCase
         
         Course::factory(3)->create();
         $courses = Course::all();
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("getallCourses")
                 ->with([])
                 ->willReturn($courses);
@@ -81,7 +82,7 @@ class CourseControllerTest extends TestCase
         
         Course::factory(3)->create();
         $courses = Course::all();
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("getallCourses")
                 ->with($filters)
                 ->willReturn($courses);
@@ -94,7 +95,7 @@ class CourseControllerTest extends TestCase
     public function test_create_course_success(){
         $this->beAdmin();
         $course = new Course($this->courseAttributes);
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("addCourse")
                 ->with($course);
         
@@ -105,7 +106,7 @@ class CourseControllerTest extends TestCase
     public function test_create_course_validations(){
         $this->beAdmin();
         Course::factory()->create(["name" => "existing name"]);
-        $this->coursesManager->expects($this->never())
+        $this->courseManager->expects($this->never())
                 ->method("addCourse");
         
         $this->performPostValidationTest("name",null);
@@ -123,7 +124,7 @@ class CourseControllerTest extends TestCase
     
     public function test_create_course_duplicateName(){
         $this->beAdmin();
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("addCourse")
                 ->willThrowException(new CourseNameAlreadyExistsException("test message"));
         
@@ -137,7 +138,7 @@ class CourseControllerTest extends TestCase
     public function test_deleteCourse(){
         $this->beAdmin();
         $course = Course::first();
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("removeCourse")
                 ->with($course->id);
         
@@ -152,7 +153,7 @@ class CourseControllerTest extends TestCase
         $newCourse = new Course($this->courseAttributes);
         $newCourse->id = $course->id;
         
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("updateCourse")
                 ->with($newCourse);
         
@@ -167,7 +168,7 @@ class CourseControllerTest extends TestCase
         $newCourse = new Course($this->courseAttributes);
         $newCourse->id = $course->id;
         
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("updateCourse")
                 ->willThrowException(new CourseNameAlreadyExistsException("test message"));
         

@@ -588,14 +588,14 @@ select{
 .z-50{
   z-index: 50;
 }
-.col-auto{
-  grid-column: auto;
-}
 .m-auto{
   margin: auto;
 }
 .m-2{
   margin: 0.5rem;
+}
+.m-0{
+  margin: 0px;
 }
 .mx-auto{
   margin-left: auto;
@@ -786,6 +786,9 @@ select{
 .w-80{
   width: 20rem;
 }
+.w-24{
+  width: 6rem;
+}
 .min-w-full{
   min-width: 100%;
 }
@@ -810,6 +813,9 @@ select{
 }
 .flex-initial{
   flex: 0 1 auto;
+}
+.flex-auto{
+  flex: 1 1 auto;
 }
 .flex-shrink-0{
   flex-shrink: 0;
@@ -883,9 +889,6 @@ select{
 }
 .justify-around{
   justify-content: space-around;
-}
-.justify-evenly{
-  justify-content: space-evenly;
 }
 .justify-items-center{
   justify-items: center;
@@ -1442,9 +1445,21 @@ select{
   --tw-bg-opacity: 1;
   background-color: rgb(153 27 27 / var(--tw-bg-opacity));
 }
+.hover\:bg-red-700:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(185 28 28 / var(--tw-bg-opacity));
+}
+.hover\:bg-blue-700:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
+}
 .hover\:bg-blue-400:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(96 165 250 / var(--tw-bg-opacity));
+}
+.hover\:bg-green-700:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(21 128 61 / var(--tw-bg-opacity));
 }
 .hover\:bg-gray-50:hover{
   --tw-bg-opacity: 1;
@@ -1485,10 +1500,6 @@ select{
 .hover\:text-blue-700:hover{
   --tw-text-opacity: 1;
   color: rgb(29 78 216 / var(--tw-text-opacity));
-}
-.hover\:text-green-600:hover{
-  --tw-text-opacity: 1;
-  color: rgb(22 163 74 / var(--tw-text-opacity));
 }
 .hover\:text-gray-800:hover{
   --tw-text-opacity: 1;
@@ -1617,9 +1628,17 @@ select{
   --tw-text-opacity: 1;
   color: rgb(252 165 165 / var(--tw-text-opacity));
 }
-.active\:text-blue-300:active{
+.active\:text-red-200:active{
   --tw-text-opacity: 1;
-  color: rgb(147 197 253 / var(--tw-text-opacity));
+  color: rgb(254 202 202 / var(--tw-text-opacity));
+}
+.active\:text-blue-200:active{
+  --tw-text-opacity: 1;
+  color: rgb(191 219 254 / var(--tw-text-opacity));
+}
+.active\:text-green-200:active{
+  --tw-text-opacity: 1;
+  color: rgb(187 247 208 / var(--tw-text-opacity));
 }
 .active\:text-white:active{
   --tw-text-opacity: 1;
@@ -1698,9 +1717,6 @@ select{
   .md\:flex{
     display: flex;
   }
-  .md\:grid-cols-6{
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
 }
 @media (min-width: 1024px){
   .lg\:inline-flex{
@@ -1708,9 +1724,6 @@ select{
   }
   .lg\:max-h-screen{
     max-height: 100vh;
-  }
-  .lg\:grid-cols-12{
-    grid-template-columns: repeat(12, minmax(0, 1fr));
   }
   .lg\:px-8{
     padding-left: 2rem;

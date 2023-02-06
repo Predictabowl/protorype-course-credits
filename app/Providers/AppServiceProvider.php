@@ -3,11 +3,9 @@
 namespace App\Providers;
 
 use App\Factories\Implementations\CourseDatabuilderFactoryImpl;
-use App\Factories\Implementations\CourseManagerFactoryImpl;
 use App\Factories\Implementations\StudyPlanBuilderFactoryImpl;
 use App\Factories\Implementations\StudyPlanManagerFactoryImpl;
 use App\Factories\Interfaces\CourseDataBuilderFactory;
-use App\Factories\Interfaces\CourseManagerFactory;
 use App\Factories\Interfaces\StudyPlanBuilderFactory;
 use App\Factories\Interfaces\StudyPlanManagerFactory;
 use App\Mappers\Implementations\ExamBlockInfoMapperImpl;
@@ -35,23 +33,19 @@ use App\Repositories\Interfaces\SSDRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Repositories\Interfaces\UserRepository;
 use App\Services\Implementations\CourseManagerImpl;
-use App\Services\Implementations\CoursesAdminManagerImpl;
 use App\Services\Implementations\ExamBlockManagerImpl;
 use App\Services\Implementations\ExamDistanceByName;
 use App\Services\Implementations\ExamManagerImpl;
 use App\Services\Implementations\FrontManagerImpl;
 use App\Services\Implementations\FrontsSearchManagerImpl;
-use App\Services\Implementations\StudyPlanBuilderImpl;
 use App\Services\Implementations\UserManagerImpl;
 use App\Services\Implementations\YearCalculatorImpl;
 use App\Services\Interfaces\CourseManager;
-use App\Services\Interfaces\CoursesAdminManager;
 use App\Services\Interfaces\ExamBlockManager;
 use App\Services\Interfaces\ExamDistance;
 use App\Services\Interfaces\ExamManager;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\FrontsSearchManager;
-use App\Services\Interfaces\StudyPlanBuilder;
 use App\Services\Interfaces\UserManager;
 use App\Services\Interfaces\YearCalculator;
 use Illuminate\Support\ServiceProvider;
@@ -88,12 +82,10 @@ class AppServiceProvider extends ServiceProvider
     
         //---- Services
         $this->app->bind(ExamDistance::class, ExamDistanceByName::class);
-        $this->app->bind(StudyPlanBuilder::class, StudyPlanBuilderImpl::class);
         $this->app->bind(UserManager::class, UserManagerImpl::class);
         $this->app->bind(FrontsSearchManager::class, FrontsSearchManagerImpl::class);
         $this->app->bind(YearCalculator::class, YearCalculatorImpl::class);
         $this->app->bind(CourseManager::class, CourseManagerImpl::class);
-        $this->app->bind(CoursesAdminManager::class, CoursesAdminManagerImpl::class);
         $this->app->bind(ExamBlockManager::class, ExamBlockManagerImpl::class);
         $this->app->bind(ExamManager::class, ExamManagerImpl::class);
         $this->app->bind(FrontManager::class, FrontManagerImpl::class);
