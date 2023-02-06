@@ -10,6 +10,7 @@ use App\Models\ExamBlock;
 use App\Models\Ssd;
 use App\Repositories\Implementations\ExamBlockRepositoryImpl;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Tests\TestCase;
 
@@ -130,23 +131,19 @@ class ExamBlockRepositoryImplTest extends TestCase
             "courseYear" => 2
         ]);
         $examBlock->save();
-        $newEB = ExamBlock::factory()->make([
+        $attributes = [
             "id" => $examBlock->id,
             "max_exams" => 3,
             "cfu" => 9,
             "courseYear" => 1,
-            "course_id" => $course->id+1
-            ]);
+            ];
+        $newEB = ExamBlock::factory()->make($attributes);
+        $newEB->course_id = $course->id+1;
      
         $result = $this->sut->update($newEB);
         
-        $loaded = ExamBlock::first();
-        $this->assertEquals(3, $loaded->max_exams);
-        $this->assertEquals(9, $loaded->cfu);
-        $this->assertEquals($course->id, $loaded->course_id);
-        $this->assertEquals(1, $loaded->courseYear);
-        $this->assertEquals($loaded->attributesToArray(),
-                $result->attributesToArray());
+        $this->assertDatabaseHas("exam_blocks", $attributes);
+        $this->assertEquals(ExamBlock::first()->all(), $result->all());
     }
 
     public function test_delete_whenMissing(){       
@@ -167,5 +164,37 @@ class ExamBlockRepositoryImplTest extends TestCase
         $this->assertTrue($result);
         $this->assertDatabaseCount("exams", 0);
         $this->assertDatabaseCount("exam_blocks", 0);
+    }
+    
+    public function test_attachSsd(){
+        $ssd = Ssd::factory()->create();
+        Course::factory()->create();
+        $examBlock = ExamBlock::factory()->create();
+        
+        $this->sut->attachSsd($examBlock->id, $ssd->id);
+        
+        $this->assertDatabaseHas("exam_block_ssd", [
+            "ssd_id" => $ssd->id,
+            "exam_block_id" => $examBlock->id]);
+    }
+    
+    public function test_detachSsd(){
+        $ssd = Ssd::factory()->create();
+        $ssd2 = Ssd::factory()->create();
+        Course::factory()->create();
+        $examBlock = ExamBlock::factory()->create();
+        $examBlock->ssds()->attach($ssd);
+        $examBlock->ssds()->attach($ssd2);
+        $examBlock->save();
+        
+        $this->sut->detachSsd($examBlock->id, $ssd->id);
+        
+        $this->assertDatabaseCount("exam_block_ssd", 1);
+        $this->assertDatabaseMissing("exam_block_ssd", [
+            "ssd_id" => $ssd->id,
+            "exam_block_id" => $examBlock->id]);
+        $this->assertDatabaseHas("exam_block_ssd", [
+            "ssd_id" => $ssd2->id,
+            "exam_block_id" => $examBlock->id]);
     }
 }

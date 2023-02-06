@@ -44,7 +44,7 @@ class FrontController extends Controller
         return view("front.show",[
             "exams" => $this->frontManager->getTakenExams($front->id),
             "front" => $front,
-            "courses" => $this->frontsSearchManager->getCourses()
+            "courses" => $this->frontsSearchManager->getActiveCourses()
         ]);
     }
     

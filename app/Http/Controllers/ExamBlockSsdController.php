@@ -25,7 +25,7 @@ class ExamBlockSsdController extends Controller
         $this->authorize("viewany", Course::class);
         
         try {
-            $examBlock = $this->ebSsdManager->eagerLoadExamBlock($examBlockId);
+            $examBlock = $this->ebSsdManager->getExamBlockWithSsds($examBlockId);
         } catch (ExamBlockNotFoundException $exc) {
             return back()->with("error", $exc->getMessage());
         }

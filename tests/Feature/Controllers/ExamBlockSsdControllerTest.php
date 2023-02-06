@@ -51,7 +51,7 @@ class ExamBlockSsdControllerTest extends TestCase {
         $examBlock = ExamBlock::first();
         
         $this->ebSsdManager->expects($this->once())
-                ->method("eagerLoadExamBlock")
+                ->method("getExamBlockWithSsds")
                 ->with($examBlock->id)
                 ->willReturn($examBlock);
         
@@ -63,7 +63,7 @@ class ExamBlockSsdControllerTest extends TestCase {
         $this->beAdmin();
         
         $this->ebSsdManager->expects($this->once())
-                ->method("eagerLoadExamBlock")
+                ->method("getExamBlockWithSsds")
                 ->with(5)
                 ->willThrowException(new ExamBlockNotFoundException("error message"));
         

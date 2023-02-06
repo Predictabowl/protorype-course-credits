@@ -66,6 +66,7 @@ Route::delete("/course/{courseId}",[CourseController::class,"delete"])->name("co
 Route::get("/course/update/{course}",[CourseController::class,"updateCourseForm"])->name("courseShow");
 Route::get("/course/new",[CourseController::class,"newCourseForm"])->name("courseNew");
 Route::put("/course/{course}",[CourseController::class,"put"])->name("courseUpdate");
+Route::put("/course/{courseId}/active",[CourseController::class,"activate"])->name("courseActivate");
 Route::get("/course/{course}/examblock",[ExamBlockController::class,"index"])->name("courseDetails");
 Route::post("/course/{course}/examblock",[ExamBlockController::class,"post"])->name("examBlockCreate");
 Route::delete("/course/examblock/{examblock}",[ExamBlockController::class,"delete"])->name("examBlockDelete");

@@ -1,6 +1,7 @@
 {
     "A degree course must be selected": "Deve essere selezionato un corso",
     "Action": "Azione",
+    "Active": "Attivo",
     "Add": "Aggiungi",
     "Add Exam Block": "Aggiungi Blocco Esami",
     "Add row": "Aggiungi riga",
@@ -32,6 +33,7 @@
     "Course Filter": "Filtra per Corso",
     "Course Name": "Nome Corso",
     "Course Name already present": "Nome del Corso già presente",
+    "Course not found": "Corso non trovato",
     "Courses List": "Lista Corsi",
     "Courses Management": "Gestione Corsi",
     "Create": "Crea",

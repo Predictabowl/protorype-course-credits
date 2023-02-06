@@ -42,7 +42,7 @@ class CourseControllerTest extends TestCase
         ];
     }
     
-    public function test_index_authorizations_forbidden(){
+    public function test_authorizations_forbidden(){
         $this->be(User::factory()->create());
         
         $this->courseManager->expects($this->never())
@@ -59,6 +59,7 @@ class CourseControllerTest extends TestCase
                 ->assertForbidden();
         $this->get(route("courseShow",[$course->id]))->assertForbidden();
         $this->get(route("courseNew"))->assertForbidden();
+        $this->put(route("courseActivate",[$course->id]))->assertForbidden();
     }
     
     public function test_index_auth_admin_success(){
@@ -197,6 +198,28 @@ class CourseControllerTest extends TestCase
         $response->assertViewIs("courses.input")
             ->assertViewMissing("course")
             ->assertViewHas("action", route("courseCreate"));
+    }
+    
+    public function test_activateCourse_true(){
+        $this->beAdmin();
+        
+        $this->courseManager->expects($this->once())
+                ->method("setCourseActive")
+                ->with(5, true);
+        
+        $this->put(route("courseActivate",[5]),["active" => "on"])
+                ->assertNoContent();
+    }
+    
+    public function test_activateCourse_false(){
+        $this->beAdmin();
+        
+        $this->courseManager->expects($this->once())
+                ->method("setCourseActive")
+                ->with(5, false);
+        
+        $this->put(route("courseActivate",[5]))
+                ->assertNoContent();
     }
     
     private function beAdmin(): User{

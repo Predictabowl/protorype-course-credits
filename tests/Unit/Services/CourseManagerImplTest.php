@@ -153,7 +153,7 @@ class CourseManagerImplTest extends TestCase{
     
     public function test_addCourse_success(){
         $courseInfo = new Course(["id" => 2, "name" => "test"]);
-        $modCourse = new Course(["name" => "test"]);
+        $modCourse = new Course(["name" => "test", "active" => false]);
         $this->courseRepo->expects($this->once())
                 ->method("getFromName")
                 ->with("test")
@@ -233,5 +233,13 @@ class CourseManagerImplTest extends TestCase{
         $result = $this->sut->updateCourse($courseInfo);
         
         $this->assertSame($course, $result);
+    }
+    
+    public function test_setCourseActive(){
+        $this->courseRepo->expects($this->once())
+                ->method("setActiveStatus")
+                ->with(5, false);
+        
+        $this->sut->setCourseActive(5, false);
     }
 }

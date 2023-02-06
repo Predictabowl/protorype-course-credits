@@ -18,6 +18,8 @@ interface FrontsSearchManager {
     
     public function getCourses(): Collection;
     
+    public function getActiveCourses(): Collection;
+    
     public function getCurrentCourse(Request $request): ?Course;
     
 }

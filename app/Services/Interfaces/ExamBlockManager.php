@@ -21,5 +21,5 @@ interface ExamBlockManager {
     public function deleteExamBlock(int $examBlockId): void;
     public function addSsd(int $examBlockId, string $ssd): void;
     public function removeSsd(int $examBlockId, int $ssdId): void;
-    public function eagerLoadExamBlock(int $examBlockId): ExamBlock;
+    public function getExamBlockWithSsds(int $examBlockId): ExamBlock;
 }

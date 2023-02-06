@@ -9,9 +9,11 @@ namespace Tests\Unit\Services;
 
 use App\Domain\NewExamBlockInfo;
 use App\Exceptions\Custom\CourseNotFoundException;
+use App\Exceptions\Custom\SsdNotFoundException;
 use App\Mappers\Interfaces\ExamBlockInfoMapper;
 use App\Models\Course;
 use App\Models\ExamBlock;
+use App\Models\Ssd;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\SSDRepository;
@@ -113,5 +115,68 @@ class ExamBlockManagerImplTest extends TestCase{
                 ->with(new ExamBlock(["id" => $ebId]));
         
         $this->sut->updateExamBlock($ebInfo, $ebId);
+    }
+    
+    public function test_addSsd_whenMissing(){
+        $this->ssdRepo->expects($this->once())
+                ->method("getSsdFromCodeWithExamBlocks")
+                ->with("test code")
+                ->willReturn(null);
+        
+        $this->ebRepo->expects($this->never())
+                ->method("attachSsd");
+        
+        $this->expectException(SsdNotFoundException::class);
+        $this->sut->addSsd(3, "test code");
+    }
+    
+    public function test_addSsd_success(){
+        $ssdCode = "test code";
+        $ssd = new Ssd([
+            "id" => 7,
+            "code" => $ssdCode
+        ]);
+        $ssd->setRelation("examBlocks", collect([]));
+       
+        $this->ssdRepo->expects($this->once())
+                ->method("getSsdFromCodeWithExamBlocks")
+                ->with($ssdCode)
+                ->willReturn($ssd);
+        
+        $this->ebRepo->expects($this->once())
+                ->method("attachSsd")
+                ->with(3, 7);
+        
+        $this->sut->addSsd(3, $ssdCode);
+    }
+    
+    public function test_addSsd_whenAlreadyPresent(){
+        $ssdCode = "test code";
+        $ssd = new Ssd([
+            "id" => 7,
+            "code" => $ssdCode
+        ]);
+        $examBlock = new ExamBlock([
+            "id" => 3
+        ]);
+        $ssd->setRelation("examBlocks", collect([$examBlock]));
+       
+        $this->ssdRepo->expects($this->once())
+                ->method("getSsdFromCodeWithExamBlocks")
+                ->with($ssdCode)
+                ->willReturn($ssd);
+        
+        $this->ebRepo->expects($this->never())
+                ->method("attachSsd");
+        
+        $this->sut->addSsd(3, $ssdCode);
+    }
+    
+    public function test_removeSsd_success(){
+        $this->ebRepo->expects($this->once())
+                ->method("detachSsd")
+                ->with(11, 17);
+        
+        $this->sut->removeSsd(11, 17);
     }
 }

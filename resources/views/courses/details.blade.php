@@ -7,31 +7,52 @@
 
     <x-mainpanel>
         <x-panel>
-            <div class="flex justify-center">
-                @php
-                    $courseData = [
-                        'CFU' => $course->cfu,
-                        'Prova Finale' => $course->finalExamCfu,
-                        'Altre Attività' => $course->otherActivitiesCfu,
-                        'Numero di anni' => $course->numberOfYears,
-                        'Massimo numero di crediti riconoscibili' => $course->maxRecognizedCfu,
-                        'Crediti minimi richiesti per anno accademico' => $course->cfuTresholdForYear,
-                    ];
-                @endphp
-                <table aria-label="Dati Corso">
-                    <tbody>
-                        @foreach ($courseData as $key => $value)
-                            <tr {{ $loop->even ? 'class = bg-green-50' : '' }}>
-                                <th class="text-left">{{ $key }}</th>
-                                <td class="text-center">{{ $value }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <div class="flex justify-around gap-2">
+                <div>
+                    @php
+                        $courseData = [
+                            'CFU' => $course->cfu,
+                            'Prova Finale' => $course->finalExamCfu,
+                            'Altre Attività' => $course->otherActivitiesCfu,
+                            'Numero di anni' => $course->numberOfYears,
+                            'Massimo numero di crediti riconoscibili' => $course->maxRecognizedCfu,
+                            'Crediti minimi richiesti per anno accademico' => $course->cfuTresholdForYear,
+                        ];
+                    @endphp
+                    <table aria-label="Dati Corso">
+                        <tbody>
+                            @foreach ($courseData as $key => $value)
+                                <tr {{ $loop->even ? 'class = bg-green-50' : '' }}>
+                                    <th class="text-left">{{ $key }}</th>
+                                    <td class="text-center">{{ $value }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex align-middle gap-2">
+                    <div>
+                        <div>
+                            <x-label>
+                        </div>
+                            {{__("Active")}}:
+                        </x-label>
+                    </div>
+                    <div class="rounded-xl">
+                        <form action="{{route('courseActivate',[$course->id])}}" method="POST">
+                            @csrf
+                            @method("PUT")
+                            <input type="checkbox" name="active"
+                                class="rounded-xl text-green-700 w-6 h-6"
+                                {{$course->active ? "checked" : ""}}
+                                onChange="this.form.submit()"/>
+                        </form>
+                    </div>
+                </div>
             </div>
         </x-panel>
         <x-panel class="block max-h-screen overflow-scroll"
-                x-data="{ showEditExam: 0, showNewExam: 0, showNewExamBlock: false, showEditBlock: 0 }">
+                x-data="{ showEditForm: 0, showNewExam: 0, showNewExamBlock: false }">
             @foreach ($course->examBlocks as $examBlock)
                 <x-courses.exam-block-row :examBlock="$examBlock" />
             @endforeach

@@ -9,7 +9,9 @@
 namespace Tests\Unit\Services;
 
 use App\Domain\TakenExamDTO;
+use App\Exceptions\Custom\CourseNotFoundException;
 use App\Mappers\Interfaces\TakenExamMapper;
+use App\Models\Course;
 use App\Models\Front;
 use App\Models\TakenExam;
 use App\Repositories\Interfaces\CourseRepository;
@@ -148,7 +150,7 @@ class FrontManagerImplTest extends TestCase{
         $this->assertSame($front, $result);
     }
     
-   public function test_getOrCreateFront_when_Front_not_present(){
+   public function test_getOrCreateFront_whenFront_notPresent(){
         $toSave = new Front([
             "user_id" => self::FIXTURE_USER_ID,
             "course_id" => 3
@@ -166,6 +168,10 @@ class FrontManagerImplTest extends TestCase{
                 ->method("save")
                 ->with($toSave)
                 ->willReturn($saved);
+        $this->courseRepo->expects($this->once())
+                ->method("get")
+                ->with(3)
+                ->willReturn(new Course());
                 
         $result = $this->sut->getOrCreateFront(self::FIXTURE_USER_ID, 3);
         
@@ -187,6 +193,10 @@ class FrontManagerImplTest extends TestCase{
                 ->method("getFromUser")
                 ->with(self::FIXTURE_USER_ID)
                 ->willReturn($found);
+        $this->courseRepo->expects($this->once())
+                ->method("get")
+                ->with(7)
+                ->willReturn(new Course());
         $this->frontRepo->expects($this->once())
                 ->method("updateCourse")
                 ->with(5,7)
@@ -213,13 +223,15 @@ class FrontManagerImplTest extends TestCase{
                 ->method("updateCourse");
         $this->frontRepo->expects($this->never())
                 ->method("save");
+        $this->courseRepo->expects($this->never())
+                ->method("get");
         
         $result = $this->sut->getOrCreateFront(self::FIXTURE_USER_ID, 3);
         
         $this->assertSame($found, $result);
     }
     
-        public function test_getOrCreateFront_whenFrontExists_and_courseIsNull(){
+    public function test_getOrCreateFront_whenFrontExists_and_courseIsNull(){
         $found = new Front([
             "user_id" => self::FIXTURE_USER_ID,
             "course_id" => 3
@@ -233,11 +245,32 @@ class FrontManagerImplTest extends TestCase{
                 ->method("updateCourse");
         $this->frontRepo->expects($this->never())
                 ->method("save");
+        $this->courseRepo->expects($this->never())
+                ->method("get");
         
         $result = $this->sut->getOrCreateFront(self::FIXTURE_USER_ID, null);
         
         $this->assertSame($found, $result);
     }
+    
+    public function test_getOrCreateFront_courseIsMissing(){
+        $this->frontRepo->expects($this->once())
+                ->method("getFromUser")
+                ->with(self::FIXTURE_USER_ID)
+                ->willReturn(null);
+        $this->courseRepo->expects($this->once())
+                ->method("get")
+                ->with(3)
+                ->willReturn(null);
+        $this->frontRepo->expects($this->never())
+                ->method("updateCourse");
+        $this->frontRepo->expects($this->never())
+                ->method("save");
+
+        $this->expectException(CourseNotFoundException::class);
+        $this->sut->getOrCreateFront(self::FIXTURE_USER_ID, 3);
+        
+    }    
 
     private function makeTakenExam($id =1): TakenExam {
         $mock = new TakenExam();

@@ -51,4 +51,9 @@ class FrontsSearchManagerImpl implements FrontsSearchManager{
         return $this->frontRepo->getAll($filters,$pageSize);
     }
 
+    public function getActiveCourses(): Collection {
+        return $this->courseRepo->getAll(["active" => true])
+                ->sortBy("name")->values()->collect();
+    }
+
 }

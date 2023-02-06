@@ -21,4 +21,8 @@ class SSDRepositoryImpl implements SSDRepository
         return Ssd::where("code", $ssd)->first();
     }
 
+    public function getSsdFromCodeWithExamBlocks(string $ssd): ?Ssd {
+        return Ssd::where("code", $ssd)->with("examBlocks")->first();
+    }
+
 }

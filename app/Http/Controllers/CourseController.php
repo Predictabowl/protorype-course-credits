@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\Custom\CourseNameAlreadyExistsException;
 use App\Models\Course;
 use App\Services\Interfaces\CourseManager;
-use App\Services\Interfaces\CoursesAdminManager;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
 use function back;
 use function redirect;
@@ -57,16 +57,16 @@ class CourseController extends Controller{
          }
          return redirect(route("courseIndex"))
                  ->with("success","Aggiunto: ".$attributes["name"]);
-     }
+    }
      
-     public function delete(int $courseId){
+    public function delete(int $courseId){
          $this->authorize("delete", Course::class);
          
          $this->courseManager->removeCourse($courseId);
          return back();
-     }
+    }
      
-     public function put(Course $course){
+    public function put(Course $course){
          $this->authorize("update", $course);
          $attributes = $this->attributeValidation();
          $newCourse = new Course($attributes);
@@ -80,9 +80,18 @@ class CourseController extends Controller{
          
          return redirect(route("courseShow",[$course->id]))
                  ->with("success","Aggiornato: ".$newCourse->name);
-     }
+    }
+    
+    public function activate(int $courseId){
+         $this->authorize("create", Course::class);
+         $active = (request("active") != null) ? true : false;
+         
+         $this->courseManager->setCourseActive($courseId, $active);
+         
+         return Response::noContent();
+    }    
      
-     private function attributeValidation(): array{
+    private function attributeValidation(): array{
          return request()->validate([
             "name" => ["required", "string"],
             "cfu" => ["required", "numeric"],

@@ -1,7 +1,9 @@
 <div class="border-2 border-orange-300 rounded-xl p-3 my-2"
         id="{{'exam-block-row-'.$examBlock->id}}">
-   <x-courses.exam-block-header :examBlock="$examBlock"/>
-    <div class="mt-2">
+
+    <div><x-courses.exam-block-header :examBlock="$examBlock"/></div>
+    <div class="mt-3"><x-courses.exam-block-ssds :examBlock="$examBlock"/></div>
+    <div class="mt-3">
         <div class="table w-full">
             <div class="table-row tr-head font-bold text-center">
                 <div class="table-cell">Nome Esame</div>
@@ -44,11 +46,11 @@
                         ? showNewExam = {{ $examBlock->id }} : showNewExam = 0" />
                 </div>
             </form>
-            <div class="table-row" x-show="showNewExam != {{ $examBlock->id }}">
-                <x-buttons.plus-mini size="7"
-                    @click="showNewExam = (showNewExam !=
-                        {{ $examBlock->id }} ? showNewExam = {{ $examBlock->id }} : showNewExam = 0)" />
-            </div>
+        </div>
+        <div class="flex justify-center items-center" x-show="showNewExam !== {{ $examBlock->id }}">
+            <x-buttons.plus-mini size="7"
+                @click="showNewExam = (showNewExam !==
+                    {{ $examBlock->id }} ? showNewExam = {{ $examBlock->id }} : showNewExam = 0)" />
         </div>
     </div>
 </div>

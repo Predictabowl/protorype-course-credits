@@ -52,6 +52,7 @@ class CourseManagerImpl implements CourseManager {
 
     public function addCourse(Course $course): Course{
         unset($course["id"]);
+        $course->active = false;
         return DB::transaction(function() use($course){
             $loadedCourse = $this->courseRepo->getFromName($course->name);
             if(!is_null($loadedCourse)){
@@ -81,6 +82,12 @@ class CourseManagerImpl implements CourseManager {
             }
             return $this->courseRepo->update($course);
         });
-    }    
+    }
+
+    public function setCourseActive(int $courseId, bool $active): void {
+        DB::transaction(function() use($courseId, $active){
+            $this->courseRepo->setActiveStatus($courseId, $active);
+        });
+    }
 
 }

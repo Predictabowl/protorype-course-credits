@@ -7,6 +7,7 @@ use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Repositories\Interfaces\ExamBlockRepository;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 /**
@@ -49,6 +50,20 @@ class ExamBlockRepositoryImpl implements ExamBlockRepository{
 
     public function delete(int $id): bool {
         return ExamBlock::destroy($id);
+    }
+
+    public function attachSsd(int $examBlockId, int $ssdId): void {
+        DB::table("exam_block_ssd")->insert([
+            "ssd_id" => $ssdId,
+            "exam_block_id" => $examBlockId
+        ]);
+    }
+
+    public function detachSsd(int $examBlockId, int $ssdId): void {
+        DB::table("exam_block_ssd")
+                ->where("ssd_id", "=", $ssdId)
+                ->where("exam_block_id", "=", $examBlockId)
+                ->delete();
     }
 
 }

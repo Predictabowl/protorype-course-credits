@@ -125,8 +125,11 @@ class FrontControllerTest extends TestCase
                 ->willReturn($exams);
                 
         $this->searchManager->expects($this->once())
-                ->method("getCourses")
+                ->method("getActiveCourses")
                 ->willReturn($courses);
+        
+        $this->searchManager->expects($this->never())
+                ->method("getCourses");
         
         $response = $this->get(route("frontView",[$this->front]));
         

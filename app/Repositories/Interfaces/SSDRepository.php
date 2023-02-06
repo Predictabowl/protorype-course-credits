@@ -15,4 +15,5 @@ use App\Models\Ssd;
  */
 interface SSDRepository {
     public function getSsdFromCode(string $ssd): ?Ssd;
+    public function getSsdFromCodeWithExamBlocks(string $ssd): ?Ssd;
 }

@@ -44,13 +44,6 @@ class FrontRepositoryImpl implements FrontRepository{
             return null;
         }
         
-        $course = Course::find($front->course_id);
-        if (!isset($course)){
-            throw new CourseNotFoundException(
-                    "Could not find Course with id: ".$front->course_id);
-        }
-        
-        
         $front->save();
         return $front;
     }

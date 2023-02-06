@@ -1,13 +1,16 @@
-<div id="{{ 'exam-block-header-' . $examBlock->id }}" x-init="showEditBlock = 0">
-    <div x-show="showEditBlock != {{ $examBlock->id }} ">
+<div id="{{ 'exam-block-header-' . $examBlock->id }}" x-init="showEditForm = 0">
+    @php
+        $alpineShow = "examBlock".$examBlock->id;
+    @endphp
+    <div x-show="showEditForm !== '{{$alpineShow}}' " class="hover:bg-green-50">
         <div class="md:flex items-center">
             <div class="flex-auto">CFU: {{ $examBlock->cfu }}</div>
             <div class="flex-auto">Numero di Esami sceglibili: {{ $examBlock->max_exams }}</div>
             <div class="flex-auto">Anno di Corso: {{ $examBlock->courseYear }}</div>
             <div class="flex-initial" title="{{ __('Edit') }}">
                 <x-button-icon type="button"
-                    @click="showEditBlock = (showEditBlock != {{ $examBlock->id }})
-                    ? showEditBlock = {{ $examBlock->id }} : showEditBlock = 0">
+                    @click="showEditForm = (showEditForm !== '{{$alpineShow}}')
+                    ? showEditForm = '{{$alpineShow}}' : showEditForm = 0">
                     <x-heroicon-o-pencil-square class="h-7 w-7" />
                 </x-button-icon>
             </div>
@@ -31,14 +34,8 @@
                 </x-dropdown>
             </div>
         </div>
-        <div class="border rounded-md">
-            Compatibilità:
-            @foreach ($examBlock->ssds as $ssd)
-                <span class="mx-1">{{ $ssd->code }}</span>
-            @endforeach
-        </div>
     </div>
-    <form x-show="showEditBlock == {{ $examBlock->id }}" style="display: none"
+    <form x-show="showEditForm === '{{$alpineShow}}'" style="display: none"
             data-method="PUT"
             data-action="{{ route('examBlockUpdate', [$examBlock]) }}"
             data-element-id="{{ 'exam-block-header-'.$examBlock->id }}">
@@ -67,7 +64,7 @@
                     <x-buttons.confirmation-outline type="submit" onclick="submitForm(event,this)" />
                 </div>
                 <div class="table-cell align-middle w-10">
-                    <x-buttons.cancel-outline @click="showEditBlock = 0" />
+                    <x-buttons.cancel-outline @click="showEditForm = 0" />
                 </div>
             </div>
         </div>

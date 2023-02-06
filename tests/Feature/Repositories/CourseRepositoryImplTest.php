@@ -57,7 +57,8 @@ class CourseRepositoryImplTest extends TestCase {
             "otherActivitiesCfu" => 6,
             "maxRecognizedCfu" => 120,
             "numberOfYears" => 3,
-            "cfuTresholdForYear" => 40
+            "cfuTresholdForYear" => 40,
+            "active" => true
         ];
         $course = Course::make($attributes);
 
@@ -207,6 +208,19 @@ class CourseRepositoryImplTest extends TestCase {
         $this->assertEquals($course1, $all->get(0));
         $this->assertEquals($course3, $all->get(1));
     }
+    
+    public function test_getAll_withActiveFilters_success() {
+        $course1 = Course::factory()->create(["active" => true]);
+        Course::factory()->create(["active" => false]);
+        $course3 = Course::factory()->create(["active" => true]);
+        $course1 = Course::find($course1->id);
+        $course3 = Course::find($course3->id);
+
+        $all = $this->sut->getAll(["active" => true]);
+
+        $this->assertEquals($course1, $all->get(0));
+        $this->assertEquals($course3, $all->get(1));
+    }
 
     public function test_getFromName_whenMissing() {
         $course = $this->sut->getFromName("test name");
@@ -242,6 +256,23 @@ class CourseRepositoryImplTest extends TestCase {
         $this->assertArrayHasKey("exams",$relationships["exam_blocks"][0]);
         $this->assertArrayHasKey("ssd",$relationships["exam_blocks"][0]["exams"][0]);
         $this->assertArrayHasKey("ssds",$relationships["exam_blocks"][0]);
+    }
+    
+    public function test_setActiveStatus_whenCourseIsMissing(){
+
+        $this->expectException(CourseNotFoundException::class);
+        $this->sut->setActiveStatus(5, false);
+        
+        $this->assertDatabaseCount("courses", 0);
+    }
+    
+    public function test_setActiveStatus_false(){
+        $course = Course::factory()->create(["active" => true]);
+        
+        $this->sut->setActiveStatus($course->id, false);
+        
+        $this->assertDatabaseCount("courses", 1);
+        $this->assertDatabaseHas("courses", ["active" => false]);
     }
 
 }

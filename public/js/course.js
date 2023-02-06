@@ -2,9 +2,8 @@
 $(document).ready(function(){
     $("form").submit(function(event){
         event.preventDefault();
-        submitForm(event, this);
+//        submitForm(event, this);
     });
-    
 });
 
 function submitForm(event, button) {

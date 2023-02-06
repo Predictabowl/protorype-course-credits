@@ -17,9 +17,16 @@ use Illuminate\Support\Collection;
 interface CourseManager {
 
     public function getCourse(int $coruseId): ?Course;
+
     public function getCourseFullDepth(int $courseId): ?Course;
+
     public function getAllCourses(?array $filters = []): Collection;
+
     public function addCourse(Course $course): Course;
+
     public function removeCourse(int $courseId): bool;
+
     public function updateCourse(Course $course): Course;
+
+    public function setCourseActive(int $courseId, bool $active): void;
 }

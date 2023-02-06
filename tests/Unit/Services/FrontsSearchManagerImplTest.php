@@ -89,4 +89,17 @@ class FrontsSearchManagerImplTest extends TestCase
         $this->assertEquals(collect([$course2, $course1]), $result);
     }
     
+    public function test_getActiveCourses(){
+        $course1 = new Course(["name" => "element"]);
+        $course2 = new Course(["name" => "another"]);
+        $courses = new Collection([$course1, $course2]);
+        $this->courseRepo->expects($this->once())
+                ->method("getAll")
+                ->with(["active" => true])
+                ->willReturn($courses);
+
+        $result = $this->sut->getActiveCourses();
+        $this->assertEquals(collect([$course2, $course1]), $result);
+    }
+    
 }

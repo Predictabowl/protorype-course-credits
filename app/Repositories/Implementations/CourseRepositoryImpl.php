@@ -13,8 +13,6 @@ use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 /**
@@ -76,6 +74,15 @@ class CourseRepositoryImpl implements CourseRepository {
 
     public function getFromName(string $name): ?Course {
         return Course::where("name","=",$name)->get()->first();
+    }
+
+    public function setActiveStatus(int $courseId, bool $active): void {
+        $course = Course::find($courseId);
+        if (!isset($course)){
+            throw new CourseNotFoundException(__("Course not found")." id: ".$courseId);
+        }
+        $course->active = $active;
+        $course->save();
     }
 
 }

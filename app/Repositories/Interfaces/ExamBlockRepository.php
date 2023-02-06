@@ -3,7 +3,6 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\ExamBlock;
-use Illuminate\Support\Collection;
 
 /**
  *
@@ -15,4 +14,6 @@ interface ExamBlockRepository {
     public function save(ExamBlock $examBlock): ExamBlock;
     public function update(ExamBlock $examBlock): ExamBlock;
     public function delete(int $id): bool;
+    public function attachSsd(int $examBlockId, int $ssdId): void;
+    public function detachSsd(int $examBlockId, int $ssdId): void;
 }

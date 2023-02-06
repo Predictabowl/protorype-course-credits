@@ -9,6 +9,7 @@
 namespace App\Services\Implementations;
 
 use App\Domain\TakenExamDTO;
+use App\Exceptions\Custom\CourseNotFoundException;
 use App\Mappers\Interfaces\TakenExamMapper;
 use App\Models\Front;
 use App\Repositories\Interfaces\CourseRepository;
@@ -18,6 +19,7 @@ use App\Services\Interfaces\FrontManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Webmozart\Assert\InvalidArgumentException;
+use function __;
 
 /**
  * Description of FrontManagerImpl
@@ -88,13 +90,22 @@ class FrontManagerImpl implements FrontManager{
             if(isset($front)){
                 return $this->updateFront($front, $courseId);
             }
-
             return $this->createFront($userId, $courseId);
         });
         
     }
+    
+    private function checkCourseExistence(?int $courseId){
+        if(isset($courseId)){
+            $course =  $this->courseRepo->get($courseId);
+            if (!isset($course)){
+                throw new CourseNotFoundException(__("Course not found")." id: ".$courseId);
+            }
+        }
+    }
 
-    private function createFront(int $userId, ?int $courseId): Front{
+    private function createFront(int $userId, ?int $courseId): Front {
+        $this->checkCourseExistence($courseId);
         $newFront = new Front([
             "user_id" => $userId,
             "course_id" => $courseId
@@ -104,6 +115,7 @@ class FrontManagerImpl implements FrontManager{
     
     private function updateFront(Front $front, ?int $courseId): Front{
         if (isset($courseId) && $front->course_id != $courseId){
+            $this->checkCourseExistence($courseId);
             return $this->frontRepo->updateCourse($front->id, $courseId);
         }
         return $front;
