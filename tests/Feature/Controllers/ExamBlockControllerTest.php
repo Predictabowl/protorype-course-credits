@@ -148,7 +148,7 @@ class ExamBlockControllerTest extends TestCase {
         $response->assertForbidden();
     }
 
-    public function test_put_whenEntityIsMissing() {
+    public function test_put_whenExamBlockMissing() {
         $this->beAdmin();
         $examBlock = ExamBlock::factory()->create();
         $attributes = [
@@ -161,10 +161,9 @@ class ExamBlockControllerTest extends TestCase {
                 ->method("updateExamBlock")
                 ->willThrowException(new ExamBlockNotFoundException());
 
-        $response = $this->from(self::FIXTURE_START_URI)
-                ->put(route("examBlockUpdate", [$examBlock->id]),$attributes);
-
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $this->from(self::FIXTURE_START_URI)
+                ->put(route("examBlockUpdate", [$examBlock->id]),$attributes)
+                ->assertNotFound();
     }
 
     public function test_put_success(){
@@ -220,10 +219,10 @@ class ExamBlockControllerTest extends TestCase {
         ];
         $ebAttributes[$attrName] = $attrValue;
 
-        $response = $this->from(self::FIXTURE_START_URI)
-                ->post(route("examBlockCreate", [$this->course->id]), $ebAttributes);
-
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $this->from(self::FIXTURE_START_URI)
+            ->post(route("examBlockCreate", [$this->course->id]), $ebAttributes)
+            ->assertUnprocessable()
+            ->assertViewIs("components.courses.flash-error");
     }
     
     private function putValidationTest(string $attrName, $attrValue, int $blockId) {
@@ -234,10 +233,10 @@ class ExamBlockControllerTest extends TestCase {
         ];
         $ebAttributes[$attrName] = $attrValue;
 
-        $response = $this->from(self::FIXTURE_START_URI)
-                ->put(route("examBlockUpdate", [$blockId]), $ebAttributes);
-
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $this->from(self::FIXTURE_START_URI)
+            ->put(route("examBlockUpdate", [$blockId]), $ebAttributes)
+            ->assertUnprocessable()
+            ->assertViewIs("components.courses.flash-error");
     }
 
 }

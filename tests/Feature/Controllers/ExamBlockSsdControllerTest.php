@@ -116,6 +116,21 @@ class ExamBlockSsdControllerTest extends TestCase {
                 ->assertViewIs("components.courses.flash-error");
     }
     
+    public function test_put_ssdCode_emptyValidation(){
+        $this->beAdmin();
+        
+        $this->ebManager->expects($this->never())
+                ->method("addSsd");
+        
+        $this->ebManager->expects($this->never())
+                ->method("getExamBlockWithSsds");
+        
+        $this->from(self::FIXTURE_START_URI)
+                ->put(route("addExamBlockSsd",[7]),["ssd" => ""])
+                ->assertUnprocessable()
+                ->assertViewIs("components.courses.flash-error");
+    }
+    
     public function test_delete_success(){
         $this->beAdmin();
         

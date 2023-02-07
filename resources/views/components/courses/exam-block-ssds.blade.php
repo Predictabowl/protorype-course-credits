@@ -8,12 +8,13 @@
                 Compatibilità:
             </div>
             @foreach ($examBlock->ssds as $ssd)
-                <div  class="border hover:border-black rounded-md inline-flex items-center">
+                <div  class="border hover:border-black rounded-md inline-flex items-center"
+                        id="{{'exam-block-ssd-'.$ssd->id}}">
                     <span class="mx-1">{{ $ssd->code }}</span>
                     <div x-show="showEditForm === '{{ $alpineShow }}'">
                         <form data-action="{{ route('delExamBlockSsd',
                                 ['examBlockId' => $examBlock->id, 'ssdId' => $ssd->id]) }}"
-                            data-element-id="{{ 'exam-block-ssds-' . $examBlock->id }}" data-method="DELETE">
+                            data-element-id="{{ 'exam-block-ssd-' . $ssd->id }}" data-method="DELETE">
                             @csrf
                             @method("DELETE")
                             <x-button-icon class="hover:text-red-700" onclick="submitForm(event, this)">
@@ -23,13 +24,14 @@
                     </div>
                 </div>
             @endforeach
-            <div class="flex items-center" x-show = "showEditForm === '{{ $alpineShow}}'">
-                <form data-action="{{ route("addExamBlockSsd",[$examBlock->id])}}"
+            <div x-show = "showEditForm === '{{ $alpineShow}}'">
+                <form class="flex items-center"
+                        data-action="{{ route("addExamBlockSsd",[$examBlock->id])}}"
                         data-element-id="{{ 'exam-block-ssds-' . $examBlock->id }}" data-method="PUT">
                     @csrf
                     @method("PUT")
-                    <x-input type=text class="w-24 h-8" placeholder="ssd" name="ssd"></x-input>
-                    <x-buttons.confirmation-mini  type="submit" class="h-6" onclick="submitForm(event, this)"/>
+                    <x-input type=text class="w-24 h-8" placeholder="ssd" name="ssd" required></x-input>
+                    <x-buttons.confirmation-outline  type="submit" onclick="submitForm(event, this)"/>
                 </form>
             </div>
         </div>
@@ -41,7 +43,7 @@
                 <x-heroicon-m-pencil-square class="h-5 w-5" />
             </x-button-icon>
             <div x-show = "showEditForm === '{{ $alpineShow}}'" class="flex  h-min">
-                <x-buttons.cancel-mini  type="button" @click="showEditForm = 0" />
+                <x-buttons.cancel-outline  type="button" @click="showEditForm = 0" />
             </div>
         </div>
     </div>

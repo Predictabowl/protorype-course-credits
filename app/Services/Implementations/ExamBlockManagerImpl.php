@@ -10,6 +10,7 @@ namespace App\Services\Implementations;
 use App\Domain\NewExamBlockInfo;
 use App\Domain\SsdCode;
 use App\Exceptions\Custom\CourseNotFoundException;
+use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
 use App\Mappers\Interfaces\ExamBlockInfoMapper;
 use App\Models\ExamBlock;
@@ -53,7 +54,12 @@ class ExamBlockManagerImpl implements ExamBlockManager {
     }
 
     public function getExamBlockWithSsds(int $examBlockId): ExamBlock {
-        throw new \Exception("Method not yet implemented");
+        $examBlock = $this->ebRepo->getWithSsds($examBlockId);
+        if (!isset($examBlock)){
+            throw new ExamBlockNotFoundException(
+                    __("Exam Block not found")." id: ".$examBlockId);
+        }
+        return $examBlock;
     }
 
     public function removeSsd(int $examBlockId, int $ssdId): void {

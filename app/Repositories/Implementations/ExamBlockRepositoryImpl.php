@@ -17,8 +17,16 @@ use InvalidArgumentException;
  */
 class ExamBlockRepositoryImpl implements ExamBlockRepository{
 
-    public function get(int $id): ?ExamBlock {
+    public function getWithFullDepth(int $id): ?ExamBlock {
         return ExamBlock::with("exams.ssd", "ssds")->find($id);
+    }
+    
+    public function get(int $id): ?ExamBlock {
+        return ExamBlock::find($id);
+    }
+    
+    public function getWithSsds(int $id): ?ExamBlock {
+        return ExamBlock::with("ssds")->find($id);
     }
 
     public function save(ExamBlock $examBlock): ExamBlock{

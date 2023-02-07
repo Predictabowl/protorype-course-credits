@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Domain\NewExamBlockInfo;
-use App\Exceptions\Custom\ExamBlockNotFoundException;
+use App\Http\Controllers\Support\ControllerHelpers;
 use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\ExamBlockManager;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use function __;
 use function back;
 use function redirect;
@@ -72,23 +74,27 @@ class ExamBlockController extends Controller
                 $attributes["maxExams"],
                 $attributes["cfu"],
                 $attributes["courseYear"]);
-        try{
-            $editedExamBlock = $this->ebManager
+
+        $editedExamBlock = $this->ebManager
                     ->updateExamBlock($ebInfo, $examblock->id);
-        } catch (ExamBlockNotFoundException $ex) {
-            return back()->with("error",__("Missing Entity"));
-        }
         
         return Response::view("components.courses.exam-block-header",
                 ["examBlock" => $editedExamBlock]);
     }
-    
+     
     private function attributeValidation(): array{
-         return request()->validate([
+        $validationRules = [
             "cfu" => ["required", "numeric"],
             "courseYear" => ["nullable", "numeric"],
             "maxExams" => ["required","numeric"],
-         ]);
-     }
+         ]; 
+        $validator = Validator::make(request()->all(), $validationRules);
+        if($validator->fails()){
+            throw new ValidationException($validator, 
+                ControllerHelpers::flashResponse(
+                    $validator->errors()->all(), 422));
+        }
+        return $validator->getData();
+    }
     
 }

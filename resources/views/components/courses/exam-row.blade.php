@@ -68,10 +68,10 @@
                 type="checkbox" name="freeChoice" {{ $exam->free_choice ? 'checked' : '' }}>
         </div>
         <div class="table-cell align-middle text-center w-8" title="{{ __('Save') }}">
-            <x-buttons.confirmation-mini type="submit" onclick="submitForm(event, this)" />
+            <x-buttons.confirmation-outline type="submit" onclick="submitForm(event, this)" />
         </div>
         <div class="table-cell align-middle text-center w-8" title="{{ __('Cancel') }}">
-            <x-buttons.cancel-mini @click="showEditForm = 0" id="{{ 'cancel-button-' . $exam->id }}" />
+            <x-buttons.cancel-outline @click="showEditForm = 0" id="{{ 'cancel-button-' . $exam->id }}" />
         </div>
         {{-- </div> --}}
     </form>

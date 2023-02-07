@@ -10,7 +10,6 @@ use App\Models\ExamBlock;
 use App\Models\Ssd;
 use App\Repositories\Implementations\ExamBlockRepositoryImpl;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Tests\TestCase;
 
@@ -26,17 +25,13 @@ class ExamBlockRepositoryImplTest extends TestCase
         $this->sut = new ExamBlockRepositoryImpl();
     }
     
-    public function test_get_when_not_present(){
-        $result = $this->sut->get(2);
+    public function test_getWithFullDepth_when_not_present(){
+        $result = $this->sut->getWithFullDepth(2);
         
         $this->assertNull($result);
     }
   
-    /*
-     * This doesn't actually test the eager load, so the added options are
-     * bloat.
-     */
-    public function test_get_block_with_eagerLoading()
+    public function test_getWithFullDepth_block_with_eagerLoading()
     {
         $course = Course::factory()->create();
         $ssds = Ssd::factory(3)->create();
@@ -50,11 +45,55 @@ class ExamBlockRepositoryImplTest extends TestCase
         ]);
         $block->ssds()->attach($ssds);
         
-        $result = $this->sut->get(1);
+        $result = $this->sut->getWithFullDepth($block->id);
         
-        $block = ExamBlock::find(1);
-        $this->assertEquals($block->attributesToArray(), $result->attributesToArray());
-        $this->assertEquals(2, sizeof($result->getRelations()));
+        $this->assertTrue($result->relationLoaded("ssds"));
+        $this->assertTrue($result->relationLoaded("exams"));
+        $exams = $result->exams->each(function ($value){
+            $this->assertTrue($value->relationLoaded("ssd"));
+        });
+        $this->assertEquals(ExamBlock::first()->all(), $result->all());
+    }
+    
+    public function test_get_lock_with_lazyLoading()
+    {
+        $course = Course::factory()->create();
+        $ssds = Ssd::factory(3)->create();
+        
+        $block = ExamBlock::factory()->create([
+            "course_id" => $course
+        ]);
+        
+        $exam = Exam::factory()->create([
+            "exam_block_id" => $block
+        ]);
+        $block->ssds()->attach($ssds);
+        
+        $result = $this->sut->get($block->id);
+        
+        $this->assertEmpty($result->relationsToArray());
+        $this->assertEquals(ExamBlock::first()->all(), $result->all());
+    }
+    
+    public function test_getWithSsds_eagerLoading()
+    {
+        $course = Course::factory()->create();
+        $ssds = Ssd::factory(3)->create();
+        
+        $block = ExamBlock::factory()->create([
+            "course_id" => $course
+        ]);
+        
+        $exam = Exam::factory()->create([
+            "exam_block_id" => $block
+        ]);
+        $block->ssds()->attach($ssds);
+        
+        $result = $this->sut->getWithSsds($block->id);
+        
+        $this->assertTrue($result->relationLoaded("ssds"));
+        $this->assertFalse($result->relationLoaded("exams"));
+        $this->assertEquals(ExamBlock::first()->all(), $result->all());
     }
     
     public function test_save_withNoCourse_shouldThrow(){

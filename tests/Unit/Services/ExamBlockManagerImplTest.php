@@ -10,6 +10,7 @@ namespace Tests\Unit\Services;
 use App\Domain\NewExamBlockInfo;
 use App\Domain\SsdCode;
 use App\Exceptions\Custom\CourseNotFoundException;
+use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
 use App\Mappers\Interfaces\ExamBlockInfoMapper;
 use App\Models\Course;
@@ -183,4 +184,27 @@ class ExamBlockManagerImplTest extends TestCase{
         
         $this->sut->removeSsd(11, 17);
     }
+    
+    public function test_getExamBlockWithSsds_whenExamBlockMissing(){
+        $this->ebRepo->expects($this->once())
+                ->method("getWithSsds")
+                ->with(11)
+                ->willReturn(null);
+        
+        $this->expectException(ExamBlockNotFoundException::class);
+        $this->sut->getExamBlockWithSsds(11);
+    }
+    
+    public function test_getExamBlockWithSsds_success(){
+        $examBlock = new ExamBlock();
+        $this->ebRepo->expects($this->once())
+                ->method("getWithSsds")
+                ->with(11)
+                ->willReturn($examBlock);
+        
+        $result = $this->sut->getExamBlockWithSsds(11);
+        
+        $this->assertSame($examBlock, $result);
+    }
+
 }
