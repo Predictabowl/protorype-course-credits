@@ -74,9 +74,8 @@ Route::put("/course/examblock/{examblock}",[ExamBlockController::class,"put"])->
 Route::post("/course/examblock/{examblock}/exam",[ExamController::class,"post"])->name("examCreate");
 Route::delete("/course/examblock/exam/{exam}",[ExamController::class,"delete"])->name("examDelete");
 Route::put("/course/examblock/exam/{exam}",[ExamController::class,"put"])->name("examUpdate");
-Route::get("/course/examblock/ssds/{examBlockId}",[ExamBlockSsdController::class,"show"])->name("examBlockSsds");
-Route::post("/course/examblock/ssds/{examBlockId}",[ExamBlockSsdController::class,"post"])->name("addExamBlockSsd");
-Route::delete("/course/examblock/ssds/{examBlock}/{ssdId}",[ExamBlockSsdController::class,"delete"])
+Route::put("/course/examblock/ssds/{examBlockId}",[ExamBlockSsdController::class,"put"])->name("addExamBlockSsd");
+Route::delete("/course/examblock/ssds/{examBlockId}/{ssdId}",[ExamBlockSsdController::class,"delete"])
           ->name("delExamBlockSsd");
 
 //-------------- User Roles

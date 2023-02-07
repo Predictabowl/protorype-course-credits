@@ -8,6 +8,7 @@
 namespace Tests\Unit\Services;
 
 use App\Domain\NewExamBlockInfo;
+use App\Domain\SsdCode;
 use App\Exceptions\Custom\CourseNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
 use App\Mappers\Interfaces\ExamBlockInfoMapper;
@@ -19,6 +20,7 @@ use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\SSDRepository;
 use App\Services\Implementations\ExamBlockManagerImpl;
 use Tests\TestCase;
+use function collect;
 
 /**
  * Description of CourseAdminManagerImpl
@@ -118,20 +120,22 @@ class ExamBlockManagerImplTest extends TestCase{
     }
     
     public function test_addSsd_whenMissing(){
+        $ssdCode = new SsdCode("inf/02");
+        
         $this->ssdRepo->expects($this->once())
                 ->method("getSsdFromCodeWithExamBlocks")
-                ->with("test code")
+                ->with($ssdCode->getCode())
                 ->willReturn(null);
         
         $this->ebRepo->expects($this->never())
                 ->method("attachSsd");
         
         $this->expectException(SsdNotFoundException::class);
-        $this->sut->addSsd(3, "test code");
+        $this->sut->addSsd(3, $ssdCode);
     }
     
     public function test_addSsd_success(){
-        $ssdCode = "test code";
+        $ssdCode = new SsdCode("inf/01");
         $ssd = new Ssd([
             "id" => 7,
             "code" => $ssdCode
@@ -140,7 +144,7 @@ class ExamBlockManagerImplTest extends TestCase{
        
         $this->ssdRepo->expects($this->once())
                 ->method("getSsdFromCodeWithExamBlocks")
-                ->with($ssdCode)
+                ->with($ssdCode->getCode())
                 ->willReturn($ssd);
         
         $this->ebRepo->expects($this->once())
@@ -151,7 +155,7 @@ class ExamBlockManagerImplTest extends TestCase{
     }
     
     public function test_addSsd_whenAlreadyPresent(){
-        $ssdCode = "test code";
+        $ssdCode = new SsdCode("INF/01");
         $ssd = new Ssd([
             "id" => 7,
             "code" => $ssdCode
@@ -163,7 +167,7 @@ class ExamBlockManagerImplTest extends TestCase{
        
         $this->ssdRepo->expects($this->once())
                 ->method("getSsdFromCodeWithExamBlocks")
-                ->with($ssdCode)
+                ->with($ssdCode->getCode())
                 ->willReturn($ssd);
         
         $this->ebRepo->expects($this->never())

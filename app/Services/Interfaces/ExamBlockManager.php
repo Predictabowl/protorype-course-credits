@@ -8,6 +8,7 @@
 namespace App\Services\Interfaces;
 
 use App\Domain\NewExamBlockInfo;
+use App\Domain\SsdCode;
 use App\Models\ExamBlock;
 
 /**
@@ -19,7 +20,7 @@ interface ExamBlockManager {
     public function saveExamBlock(NewExamBlockInfo $examBlock, int $courseId): ExamBlock;
     public function updateExamBlock(NewExamBlockInfo $examBlock, int $examBlockId): ExamBlock;
     public function deleteExamBlock(int $examBlockId): void;
-    public function addSsd(int $examBlockId, string $ssd): void;
+    public function addSsd(int $examBlockId, SsdCode $ssdCode): void;
     public function removeSsd(int $examBlockId, int $ssdId): void;
     public function getExamBlockWithSsds(int $examBlockId): ExamBlock;
 }

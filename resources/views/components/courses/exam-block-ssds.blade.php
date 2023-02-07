@@ -10,16 +10,27 @@
             @foreach ($examBlock->ssds as $ssd)
                 <div  class="border hover:border-black rounded-md inline-flex items-center">
                     <span class="mx-1">{{ $ssd->code }}</span>
-                    <span x-show="showEditForm === '{{ $alpineShow }}'">
-                        <x-button-icon class="hover:text-red-700">
-                            <x-heroicon-m-trash class="h-5 w-5" />
-                        </x-button-icon>
-                    </span>
+                    <div x-show="showEditForm === '{{ $alpineShow }}'">
+                        <form data-action="{{ route('delExamBlockSsd',
+                                ['examBlockId' => $examBlock->id, 'ssdId' => $ssd->id]) }}"
+                            data-element-id="{{ 'exam-block-ssds-' . $examBlock->id }}" data-method="DELETE">
+                            @csrf
+                            @method("DELETE")
+                            <x-button-icon class="hover:text-red-700" onclick="submitForm(event, this)">
+                                <x-heroicon-m-trash class="h-5 w-5" />
+                            </x-button-icon>
+                        </form>
+                    </div>
                 </div>
             @endforeach
             <div class="flex items-center" x-show = "showEditForm === '{{ $alpineShow}}'">
-                <x-input type=text class="w-24 h-8" placeholder="ssd"></x-input>
-                <x-buttons.confirmation-mini  type="button" class="h-6"/>
+                <form data-action="{{ route("addExamBlockSsd",[$examBlock->id])}}"
+                        data-element-id="{{ 'exam-block-ssds-' . $examBlock->id }}" data-method="PUT">
+                    @csrf
+                    @method("PUT")
+                    <x-input type=text class="w-24 h-8" placeholder="ssd" name="ssd"></x-input>
+                    <x-buttons.confirmation-mini  type="submit" class="h-6" onclick="submitForm(event, this)"/>
+                </form>
             </div>
         </div>
         <div class="flex items-center">

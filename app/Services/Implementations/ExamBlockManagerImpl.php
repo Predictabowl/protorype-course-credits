@@ -8,6 +8,7 @@
 namespace App\Services\Implementations;
 
 use App\Domain\NewExamBlockInfo;
+use App\Domain\SsdCode;
 use App\Exceptions\Custom\CourseNotFoundException;
 use App\Exceptions\Custom\SsdNotFoundException;
 use App\Mappers\Interfaces\ExamBlockInfoMapper;
@@ -42,7 +43,7 @@ class ExamBlockManagerImpl implements ExamBlockManager {
         $this->ebMapper = $ebMapper;
     }
 
-    public function addSsd(int $examBlockId, string $ssdCode): void {
+    public function addSsd(int $examBlockId, SsdCode $ssdCode): void {
         DB::transaction(function() use($examBlockId, $ssdCode){
             $ssd = $this->getSsdOrThrow($ssdCode);
             if (!$ssd->examBlocks->contains("id", $examBlockId)) {
@@ -88,10 +89,10 @@ class ExamBlockManagerImpl implements ExamBlockManager {
         });
     }
     
-    private function getSsdOrThrow(string $code): Ssd{
-        $ssd = $this->ssdRepo->getSsdFromCodeWithExamBlocks($code);
+    private function getSsdOrThrow(SsdCode $code): Ssd{
+        $ssd = $this->ssdRepo->getSsdFromCodeWithExamBlocks($code->getCode());
         if (is_null($ssd)){
-            throw new SsdNotFoundException(__("SSD not found").": ".$code);
+            throw new SsdNotFoundException(__("SSD not found").": ".$code->getCode());
         }
         return $ssd;
     }

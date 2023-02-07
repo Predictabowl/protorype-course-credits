@@ -3,25 +3,18 @@
 namespace App\Domain;
 
 use App\Exceptions\Custom\InvalidInputException;
-use App\Support\Seeders\GenerateSSD;
-use function __;
 
 class NewExamInfo{
 
     private string $name;
-    private ?string $ssd;
+    private ?SsdCode $ssd;
     private bool $freeChoice;
 
     public function __construct(string $name, ?string $ssd,
             bool $freeChoice = false) {
         $this->name = $name;
         $this->freeChoice = $freeChoice;
-        if($freeChoice){
-            $this->ssd = null;
-        } else {
-            $this->ssd = strtoupper($ssd);
-            $this->validateSelf();
-        }
+        $this->validateCode($ssd);
     }
 
     public function getName(): string {
@@ -29,16 +22,26 @@ class NewExamInfo{
     }
 
     public function getSsd(): ?string {
-        return $this->ssd;
+        if (isset($this->ssd)){
+            return $this->ssd->getCode();
+        }
+        return null;
     }
 
     public function isFreeChoice(): bool {
         return $this->freeChoice;
     }
     
-    private function validateSelf(){
-        if(!GenerateSSD::isPossibleSSD($this->ssd)){
-            throw new InvalidInputException(__("Invalid SSD format").": ".$this->ssd);
+    
+    private function validateCode(?string $ssd){
+        if ($this->freeChoice){
+            $this->ssd = null;
+        } else {
+            if(isset($ssd)){
+                $this->ssd = new SsdCode($ssd);
+            } else {
+                throw new InvalidInputException("Ssd cannot be null if exam is not free choice.");
+            }
         }
     }
 }

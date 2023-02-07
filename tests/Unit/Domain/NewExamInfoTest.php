@@ -36,4 +36,9 @@ class NewExamInfoTest extends TestCase{
         
         $this->assertNull($exam->getSsd());
     }
+    
+    public function test_withNullSsdCode_andNotFreeChoice(){
+        $this->expectException(InvalidInputException::class);
+        $exam = new NewExamInfo("test name", null, false);
+    }
 }
