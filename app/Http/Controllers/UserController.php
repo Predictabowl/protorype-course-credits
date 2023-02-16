@@ -46,7 +46,7 @@ class UserController extends Controller
      * It needs a check to avoid to remove all admins from the system,
      * and it should be the service layer responsability
      * 
-     * Thsi method is not tested yet, it's here only for learning
+     * This method is not tested yet, it's here only for learning
      * purposes and should be properly implemented before opening the 
      * admin dashboard to the public.
      */
@@ -69,7 +69,8 @@ class UserController extends Controller
         $this->authorize("view", $user);
         
         return view("users.show",[
-            "user" => $user
+            "user" => $user,
+            "isAdminToggable" => $this->userManager->isAdminRoleToggable($user->id)
         ]);
     }
 }

@@ -109,9 +109,17 @@ class UserControllerTest extends TestCase
     public function test_show(){
         $user2 = User::factory()->create();
         
+        $this->manager->expects($this->once())
+                ->method("isAdminRoleToggable")
+                ->with($user2->id)
+                ->willReturn(false);
+        
         $this->get(route("userShow",$user2))
                 ->assertOk()
-                ->assertViewHas(["user" => $user2]);
+                ->assertViewHas([
+                    "user" => $user2,
+                    "isAdminToggable" => false
+                    ]);
     }
     
     public function test_delete_successful(){
@@ -126,6 +134,15 @@ class UserControllerTest extends TestCase
                 ->delete(route("userDelete",$user2))
                 ->assertRedirect(self::FIXTURE_START_URI)
                 ->assertSessionHas(["success" => "Eliminato utente: ".$user2->name]);
+    }
+    
+    public function test_deleteHimself_isForbidden(){
+        $this->manager->expects($this->never())
+                ->method("deleteUser");
+        
+        $this->from(self::FIXTURE_START_URI)
+                ->delete(route("userDelete",$this->user))
+                ->assertForbidden();
     }
     
     public function test_delete_failure(){

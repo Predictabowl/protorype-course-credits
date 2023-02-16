@@ -45,12 +45,6 @@
                                 <x-heroicon-o-x-mark class="h-6 w-6 text-red-700 m-auto" />
                             @endif
                         </td>
-                        <td class="w-10">
-                            <x-link-icon href="{{route('courseShow',[$course->id])}}"
-                                    id="{{'edit-course-'.$course->id}}">
-                                <x-heroicon-m-pencil-square class="h-5 w-5" />
-                            </x-link-icon>
-                        </td>
                     </tr>
                 @endforeach
             </x-table-fixed-header>

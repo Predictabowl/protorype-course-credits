@@ -7,7 +7,7 @@
 
     <x-mainpanel>
         <x-panel>
-            <div class="flex justify-around gap-2">
+            <div class="md:flex justify-center gap-10">
                 <div>
                     @php
                         $courseData = [
@@ -30,23 +30,34 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="flex align-middle gap-2">
-                    <div>
+                <div class="flex flex-col justify-center items-center gap-2">
+                    <div class="flex gap-2 rounded-md p-1">
                         <div>
-                            <x-label>
+                            <div>
+                                <x-label>
+                            </div>
+                                {{__("Active")}}:
+                            </x-label>
                         </div>
-                            {{__("Active")}}:
-                        </x-label>
+                        <div class="rounded-xl">
+                            <form action="{{route('courseActivate',[$course->id])}}" method="POST">
+                                @csrf
+                                @method("PUT")
+                                <input type="checkbox" name="active"
+                                    class="rounded-xl text-green-700 w-6 h-6"
+                                    {{$course->active ? "checked" : ""}}
+                                    onChange="this.form.submit()"/>
+                            </form>
+                        </div>
                     </div>
-                    <div class="rounded-xl">
-                        <form action="{{route('courseActivate',[$course->id])}}" method="POST">
-                            @csrf
-                            @method("PUT")
-                            <input type="checkbox" name="active"
-                                class="rounded-xl text-green-700 w-6 h-6"
-                                {{$course->active ? "checked" : ""}}
-                                onChange="this.form.submit()"/>
-                        </form>
+                    <div>
+                        <x-button-link href="{{route('courseShow',[$course->id])}}">
+                            {{ __("Edit") }}
+                        </x-button-link>
+                        {{-- <x-link-icon href="{{route('courseShow',[$course->id])}}"
+                                id="{{'edit-course-'.$course->id}}">
+                            <x-heroicon-m-pencil-square class="h-5 w-5" />
+                        </x-link-icon> --}}
                     </div>
                 </div>
             </div>

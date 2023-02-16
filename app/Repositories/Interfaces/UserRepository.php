@@ -10,6 +10,7 @@ namespace App\Repositories\Interfaces;
 
 use App\Models\User;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Support\Collection;
 
 /**
  *
@@ -20,6 +21,8 @@ interface UserRepository {
     public function get($id): ?User;
     
     public function getAll(array $filters, int $numInPage): Paginator;
+    
+    public function getByRole(string $role): Collection;
     
     public function save(User $user): bool;
     

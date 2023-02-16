@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\Custom\CourseNameAlreadyExistsException;
 use App\Models\Course;
 use App\Services\Interfaces\CourseManager;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Validation\ValidationException;
 use function back;
 use function redirect;
 use function request;
@@ -37,25 +35,24 @@ class CourseController extends Controller{
         
         return view("courses.input",[
             "course" => $course,
-            "action" => route("courseUpdate",[$course->id])]);
+            "action" => route("courseUpdate",[$course->id]),
+            "cancelAction" => route("courseDetails", [$course->id])]);
      }
      
     public function newCourseForm() {
         $this->authorize("create", Course::class);
         
-        return view("courses.input",["action" => route("courseCreate")]);
+        return view("courses.input",[
+            "action" => route("courseCreate"),
+            "cancelAction" => route("courseIndex")]);
     }
     
     public function post() {
          $this->authorize("create", Course::class);
          
-         $attributes = $this->attributeValidation();
-         try{
-            $this->courseManager->addCourse(new Course($attributes));
-         } catch (CourseNameAlreadyExistsException $ex){
-            throw ValidationException::withMessages(["name" => $ex->getMessage()]);
-         }
-         return redirect(route("courseIndex"))
+        $attributes = $this->attributeValidation();
+        $this->courseManager->addCourse(new Course($attributes));
+        return redirect(route("courseIndex"))
                  ->with("success","Aggiunto: ".$attributes["name"]);
     }
      
@@ -72,13 +69,9 @@ class CourseController extends Controller{
          $newCourse = new Course($attributes);
          $newCourse->id = $course->id;
          
-         try{
-            $this->courseManager->updateCourse($newCourse);
-         } catch (CourseNameAlreadyExistsException $ex){
-             throw ValidationException::withMessages(["name" => $ex->getMessage()]);
-         }
+        $this->courseManager->updateCourse($newCourse);
          
-         return redirect(route("courseShow",[$course->id]))
+        return redirect(route("courseDetails",[$course->id]))
                  ->with("success","Aggiornato: ".$newCourse->name);
     }
     

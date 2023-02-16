@@ -8,6 +8,7 @@
 
 namespace App\Services\Implementations;
 
+use App\Exceptions\Custom\OperationForbiddenException;
 use App\Models\Role;
 use App\Repositories\Interfaces\UserRepository;
 use App\Services\Interfaces\UserManager;
@@ -27,11 +28,12 @@ class UserManagerImpl implements UserManager{
         $this->userRepo = $userRepo;
     }
 
-    public function modRole($userId, array $attributes) {
+    public function modRole(int $userId, array $attributes): void {
         DB::transaction(function() use($userId, $attributes){
             if (array_key_exists(Role::ADMIN, $attributes)){
                 $this->userRepo->addRole($userId, Role::ADMIN);
             } else {
+                $this->checkLastAdminAndThrow($userId);
                 $this->userRepo->removeRole($userId, Role::ADMIN);
             }
             if (array_key_exists(Role::SUPERVISOR, $attributes)){
@@ -46,7 +48,7 @@ class UserManagerImpl implements UserManager{
         return $this->userRepo->getAll($filters,25);
     }
 
-    public function setName($userId, string $name) {
+    public function setName(int $userId, string $name): void {
         DB::transaction(function() use($userId, $name){
             $user = $this->userRepo->get($userId);
             $user->name = $name;
@@ -54,10 +56,30 @@ class UserManagerImpl implements UserManager{
         });
     }
 
-    public function deleteUser($userId): bool {
+    public function deleteUser(int $userId): bool {
         return DB::transaction(function() use($userId){
+            $this->checkLastAdminAndThrow($userId);
             return $this->userRepo->delete($userId);
         });
     }
+    
+    public function isAdminRoleToggable(int $userId): bool {
+        return !$this->checkIfLastAdmin($userId);
+    }
+    
+    private function checkLastAdminAndThrow(int $userId): void {
+        if ($this->checkIfLastAdmin($userId)){
+            throw new OperationForbiddenException(__("Cannot remove the last admin"));
+        }
+    }
+    
+    private function checkIfLastAdmin(int $userId): bool{
+        $admins = $this->userRepo->getByRole(Role::ADMIN);
+        if($admins->count() === 1 && $admins->first()->id === $userId){
+            return true;
+        }
+        return false;
+    }
+
 
 }

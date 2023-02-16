@@ -87,7 +87,7 @@
                         <x-button>
                             {{ __('Ok') }}
                         </x-button>
-                        <x-button-link href="{{route('courseIndex')}}">
+                        <x-button-link href="{{ $cancelAction }}">
                             {{ __('Cancel') }}
                         </x-button-link>
                         <x-flash />

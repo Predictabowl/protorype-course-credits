@@ -8,12 +8,14 @@
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\Custom\OperationForbiddenException;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepository;
 use App\Services\Implementations\UserManagerImpl;
 use Illuminate\Contracts\Pagination\Paginator;
 use Tests\TestCase;
+use function collect;
 
 /**
  * Description of UserManagerImplTest
@@ -73,6 +75,11 @@ class UserManagerImplTest extends TestCase{
                 ->withConsecutive([1, Role::ADMIN], [1, Role::SUPERVISOR])
                 ->willReturn(true);
         
+        $this->userRepo->expects($this->once())
+                ->method("getByRole")
+                ->with(Role::ADMIN)
+                ->willReturn(collect([new User(["id" => 3])]));
+        
         $this->sut->modRole(1, $attributes);
     }
     
@@ -87,6 +94,21 @@ class UserManagerImplTest extends TestCase{
                 ->withConsecutive([1, Role::ADMIN], [1, Role::SUPERVISOR])
                 ->willReturn(true);
         
+        $this->sut->modRole(1, $attributes);
+    }
+    
+    public function test_remove_lastAmindRole_isForbidden() {
+        $attributes = [];
+        
+        $this->userRepo->expects($this->never())
+                ->method("removeRole");
+        
+        $this->userRepo->expects($this->once())
+                ->method("getByRole")
+                ->with(Role::ADMIN)
+                ->willReturn(collect([new User(["id" => 1])]));
+
+        $this->expectException(OperationForbiddenException::class);
         $this->sut->modRole(1, $attributes);
     }
     
@@ -132,20 +154,95 @@ class UserManagerImplTest extends TestCase{
                 ->with($userId)
                 ->willReturn(false);
         
+        $this->userRepo->expects($this->once())
+                ->method("getByRole")
+                ->with(Role::ADMIN)
+                ->willReturn(collect([new User(["id" => 5])]));
+        
         $result = $this->sut->deleteUser($userId);
         
         $this->assertFalse($result);
     }
     
-    public function test_deleteUser_success(){
+    public function test_deleteUser_whenThereAreOtherAdmins_success(){
         $userId = 17;        
         $this->userRepo->expects($this->once())
                 ->method("delete")
                 ->with($userId)
                 ->willReturn(true);
         
+        $this->userRepo->expects($this->once())
+                ->method("getByRole")
+                ->with(Role::ADMIN)
+                ->willReturn(collect([new User(["id" => 5]), new User(["id" => 11])]));
+        
         $result = $this->sut->deleteUser($userId);
         
         $this->assertTrue($result);
     }
+    
+    public function test_deleteUser_shouldFail_ifItsTheLastAdmin(){
+        $userId = 17;        
+        $this->userRepo->expects($this->never())
+                ->method("delete");
+        
+        $user = new User(["id" => $userId]);
+        $this->userRepo->expects($this->once())
+                ->method("getByRole")
+                ->with(Role::ADMIN)
+                ->willReturn(collect([$user]));
+        
+        $this->expectException(OperationForbiddenException::class);
+        $this->sut->deleteUser($userId);
+        
+    }
+    
+    public function test_deleteUser_ifItsAdmin_butNotTheLast(){
+        $userId = 17;        
+        $this->userRepo->expects($this->once())
+                ->method("delete")
+                ->with($userId)
+                ->willReturn(true);
+        
+        $user = new User(["id" => $userId]);
+        $this->userRepo->expects($this->once())
+                ->method("getByRole")
+                ->with(Role::ADMIN)
+                ->willReturn(collect([$user, new User(["id" => 7])]));
+        
+        $result = $this->sut->deleteUser($userId);
+        
+        $this->assertTrue($result);
+    }
+    
+    public function test_isAdminRoleToggable_true(){
+        $userId = 13;
+        
+        $this->userRepo->expects($this->exactly(2))
+                ->method("getByRole")
+                ->with(Role::ADMIN)
+                ->willReturnOnConsecutiveCalls(
+                        collect([new User(), new User()]),
+                        collect([new User(["id" => 17])]));
+        
+        $result = $this->sut->isAdminRoleToggable($userId);
+        $this->assertTrue($result);
+        
+        $result2 = $this->sut->isAdminRoleToggable($userId);
+        $this->assertTrue($result2);
+    }
+    
+    public function test_isAdminRoleToggable_false(){
+        $userId = 13;
+        
+        $this->userRepo->expects($this->once())
+                ->method("getByRole")
+                ->with(Role::ADMIN)
+                ->willReturn(collect([new User(["id" => $userId])]));
+        
+        $result = $this->sut->isAdminRoleToggable($userId);
+        
+        $this->assertFalse($result);
+    }
+
 }

@@ -7,7 +7,6 @@ use App\Models\Course;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\Interfaces\CourseManager;
-use App\Services\Interfaces\CoursesAdminManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -160,7 +159,7 @@ class CourseControllerTest extends TestCase
         
         $response = $this->put(
                 route("courseUpdate",[Course::first()]),$this->courseAttributes);
-        $response->assertRedirectToRoute("courseShow",[$course->id]);
+        $response->assertRedirectToRoute("courseDetails",[$course->id]);
     }
     
     public function test_updateCourse_duplicateName(){
@@ -188,7 +187,8 @@ class CourseControllerTest extends TestCase
         
         $response->assertViewIs("courses.input")
                 ->assertViewHas("course", $course)
-                ->assertViewHas("action", route("courseUpdate",[$course->id]));
+                ->assertViewHas("action", route("courseUpdate",[$course->id]))
+                ->assertViewHas("cancelAction", route("courseDetails",[$course->id]));
     }
     
     public function test_newCourseForm(){
@@ -197,7 +197,8 @@ class CourseControllerTest extends TestCase
         
         $response->assertViewIs("courses.input")
             ->assertViewMissing("course")
-            ->assertViewHas("action", route("courseCreate"));
+            ->assertViewHas("action", route("courseCreate"))
+            ->assertViewHas("cancelAction", route("courseIndex"));
     }
     
     public function test_activateCourse_true(){

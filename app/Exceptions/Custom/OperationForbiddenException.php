@@ -8,12 +8,13 @@
 namespace App\Exceptions\Custom;
 
 use Exception;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Request;
+use function abort;
 
-class CourseNameAlreadyExistsException extends Exception{
+class OperationForbiddenException extends Exception{
     
-    public function render(): Response{
-        throw ValidationException::withMessages(["name" => $this->getMessage()]);
+    public function render (Request $request): Response{
+        abort(403, $this->getMessage());
     }
 }

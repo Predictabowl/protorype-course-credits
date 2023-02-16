@@ -15,24 +15,33 @@
                 <form method="POST" action="{{ route("userRoleUpdate",[$user]) }}">
                     @csrf
                     @method("PUT")
-                    {{-- To be changed with a dynamic role foreach --}}
-                    <div class="ml-4">
-                        <input type="checkbox" class="text-sm focus:outline-none focus:ring" id="admin" 
-                            name="{{ App\Models\Role::ADMIN }}"
-                            {{ $user->isAdmin() ? "checked" : ""}}>
-                        <label class="ml-2" for="admin">Amministratore</label>
+
+                    <div class="flex flex-col gap-4">
+                        {{-- To be changed with a dynamic role foreach --}}
+                        @if($isAdminToggable)
+                            <div>
+                                <input type="checkbox" class="text-sm focus:outline-none focus:ring" id="admin"
+                                    name="{{ App\Models\Role::ADMIN }}"
+                                    {{ $user->isAdmin() ? "checked" : "" }}>
+                                <label class="ml-2" for="admin"> {{ __("Administrator") }}</label>
+                            </div>
+                        @elseif($user->isAdmin())
+                            <div class="text-gray-700">
+                                {{ __("Administrator") }}
+                            </div>
+                        @endif
+                        <div>
+                            <input type="checkbox" class="text-sm focus:outline-none focus:ring" id="supervisor"
+                                name="{{ App\Models\Role::SUPERVISOR }}"
+                                {{ $user->isSupervisor() ? "checked" : ""}}>
+                            <label class="ml-2" for="supervisor">Supervisore</label>
+                        </div>
                     </div>
-                    <div class="ml-4 mt-4">
-                        <input type="checkbox" class="text-sm focus:outline-none focus:ring" id="supervisor"
-                            name="{{ App\Models\Role::SUPERVISOR }}"
-                            {{ $user->isSupervisor() ? "checked" : ""}}>
-                        <label class="ml-2" for="supervisor">Supervisore</label>
-                    </div>
-                    <x-button class="mt-4 ml-6 self-center">
-                        Conferma
+                    <x-button class="mt-4">
+                        {{ __("Confirm") }}
                     </x-button>
                 </form>
             </div>
-        </x-panel>            
+        </x-panel>
     </x-mainpanel>
 </x-app-layout>
