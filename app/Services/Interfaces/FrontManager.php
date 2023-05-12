@@ -7,6 +7,8 @@ use Illuminate\Support\Collection;
 
 interface FrontManager {
        
+    public function getAllSSds(): Collection;
+    
     public function getTakenExams(int $frontId): Collection;
 
     public function saveTakenExam($attributes, int $frontId);

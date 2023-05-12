@@ -14,6 +14,7 @@ use App\Mappers\Interfaces\TakenExamMapper;
 use App\Models\Front;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Interfaces\SSDRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Services\Interfaces\FrontManager;
 use Illuminate\Support\Collection;
@@ -32,18 +33,21 @@ class FrontManagerImpl implements FrontManager{
     private TakenExamRepository $takenExamRepo;
     private FrontRepository $frontRepo;
     private CourseRepository $courseRepo;
+    private SSDRepository $ssdRepo;
 
     public function __construct(TakenExamMapper $mapper,
             TakenExamRepository $takenExamRepo,
             FrontRepository $frontRepo,
-            CourseRepository $courseRepo) {
+            CourseRepository $courseRepo,
+            SSDRepository $ssdRepo) {
         $this->mapper = $mapper;
         $this->takenExamRepo = $takenExamRepo;
         $this->frontRepo = $frontRepo;
         $this->courseRepo = $courseRepo;
+        $this->ssdRepo = $ssdRepo;
     }
 
-    public function getTakenExams(int $frontId): Collection {
+        public function getTakenExams(int $frontId): Collection {
         $exams = $this->takenExamRepo->getFromFront($frontId);
         return $exams->map(
                 fn($exam) => $this->mapper->toDTO($exam));
@@ -120,4 +124,9 @@ class FrontManagerImpl implements FrontManager{
         }
         return $front;
     }
+
+    public function getAllSSds(): Collection {
+        return $this->ssdRepo->getAll();
+    }
+
 }

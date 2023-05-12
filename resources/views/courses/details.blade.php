@@ -65,7 +65,7 @@
         <x-panel class="block max-h-screen overflow-scroll"
                 x-data="{ showEditForm: 0, showNewExam: 0, showNewExamBlock: false }">
             @foreach ($course->examBlocks as $examBlock)
-                <x-courses.exam-block-row :examBlock="$examBlock" />
+                <x-courses.exam-block-row :examBlock="$examBlock" :ssds="$ssds"/>
             @endforeach
             <meta class="insert-point">
             <form x-show="showNewExamBlock" style="display: none" data-method="POST"

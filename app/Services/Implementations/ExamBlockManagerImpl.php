@@ -19,6 +19,7 @@ use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use App\Repositories\Interfaces\SSDRepository;
 use App\Services\Interfaces\ExamBlockManager;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use function __;
 
@@ -101,6 +102,10 @@ class ExamBlockManagerImpl implements ExamBlockManager {
             throw new SsdNotFoundException(__("SSD not found").": ".$code->getCode());
         }
         return $ssd;
+    }
+
+    public function getAllSsds(): Collection {
+        return $this->ssdRepo->getAll();
     }
 
 }

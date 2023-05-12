@@ -66,4 +66,13 @@ class SSDRepositoryImplTest extends TestCase{
         $this->assertEquals($ssd->all(), $result->all());
         $this->assertArrayHasKey("exam_blocks",$relations);
     }
+    
+    function test_getAll() {
+        $result = $this->sut->getAll();
+        
+        $all = Ssd::all();
+        $this->assertEquals($all, $result);
+//        $result->each(function(Ssd $ssd){
+//        });
+    }
 }

@@ -39,7 +39,8 @@ class ExamBlockController extends Controller
         }
         
         return view("courses.details", [
-            "course" => $courseData
+            "course" => $courseData,
+            "ssds" => $this->ebManager->getAllSsds()
         ]);
     }
     
@@ -55,7 +56,8 @@ class ExamBlockController extends Controller
         $examBlock = $this->ebManager->saveExamBlock($ebInfo, $course->id);
         
         return Response::view("components.courses.exam-block-row",
-                ["examBlock" => $examBlock]);
+                ["examBlock" => $examBlock,
+                "ssds" => $this->ebManager->getAllSsds()]);
         
     }
     

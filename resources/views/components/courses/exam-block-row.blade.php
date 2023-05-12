@@ -2,7 +2,7 @@
         id="{{'exam-block-row-'.$examBlock->id}}">
 
     <div><x-courses.exam-block-header :examBlock="$examBlock"/></div>
-    <div class="mt-3"><x-courses.exam-block-ssds :examBlock="$examBlock"/></div>
+    <div class="mt-3"><x-courses.exam-block-ssds :examBlock="$examBlock" :ssds="$ssds"/></div>
     <div class="mt-3">
         <div class="table w-full">
             <div class="table-row tr-head font-bold text-center">

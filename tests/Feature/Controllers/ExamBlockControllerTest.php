@@ -7,12 +7,14 @@ use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Models\Role;
+use App\Models\Ssd;
 use App\Models\User;
 use App\Services\Interfaces\CourseManager;
 use App\Services\Interfaces\ExamBlockManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use function app;
+use function collect;
 use function route;
 
 class ExamBlockControllerTest extends TestCase {
@@ -50,13 +52,20 @@ class ExamBlockControllerTest extends TestCase {
                 ->method("getCourseFullDepth")
                 ->with($course->id)
                 ->willReturn($course);
+        
+        $allSsds = collect([new Ssd(["course" => "code1"])]);
+        $this->ebManager->expects($this->once())
+                ->method("getAllSsds")
+                ->willReturn($allSsds);
 
         $response = $this->get(route("courseDetails", [$course->id]));
         $response->assertOk();
-        $response->assertViewHas(["course" => $course]);
+        $response->assertViewHas([
+            "course" => $course,
+            "ssds" => $allSsds]);
     }
 
-    public function test_index_whenCouseIsMissing() {
+    public function test_index_whenCourseIsMissing() {
         $this->beAdmin();
 
         $course = Course::first();
@@ -88,6 +97,11 @@ class ExamBlockControllerTest extends TestCase {
                 ->method("saveExamBlock")
                 ->with($ebInfo, $this->course->id)
                 ->willReturn($examBlock);
+        
+        $allSsds = collect([new Ssd(["course" => "code1"])]);
+        $this->ebManager->expects($this->once())
+                ->method("getAllSsds")
+                ->willReturn($allSsds);
 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("examBlockCreate", [$this->course->id]), [
@@ -97,7 +111,9 @@ class ExamBlockControllerTest extends TestCase {
         ]);
 
         $response->assertOk()
-                ->assertViewHas("examBlock", $examBlock);
+                ->assertViewHas([
+                    "examBlock" => $examBlock,
+                    "ssds" => $allSsds]);
     }
 
     public function test_post_validations() {

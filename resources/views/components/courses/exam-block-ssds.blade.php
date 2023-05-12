@@ -30,8 +30,15 @@
                         data-element-id="{{ 'exam-block-ssds-' . $examBlock->id }}" data-method="PUT">
                     @csrf
                     @method("PUT")
-                    <x-input type=text class="w-24 h-8" placeholder="ssd" name="ssd" required></x-input>
+                    <x-input list="ssd-list" type=text class="w-24 h-8" placeholder="ssd" name="ssd"
+                            autocomplete="off" required>
+                    </x-input>
                     <x-buttons.confirmation-outline  type="submit" onclick="submitForm(event, this)"/>
+                    <datalist id="ssd-list">
+                        @foreach ($ssds as $ssd)
+                            <option value="{{ $ssd->code }}">
+                        @endforeach
+                    </datalist>
                 </form>
             </div>
         </div>

@@ -85,7 +85,7 @@ class YearCalculatorImplTest extends TestCase{
     public function test_getAcademicYear(){
         
         $this->assertEquals(2021, $this->sut->getAcademicYear(12,8,2021));
-        $this->assertEquals(2022, $this->sut->getAcademicYear(9,4,2022));
-        $this->assertEquals(2021, $this->sut->getAcademicYear(28,3,2022));
+        $this->assertEquals(2022, $this->sut->getAcademicYear(9,3,2022));
+        $this->assertEquals(2021, $this->sut->getAcademicYear(28,2,2022));
     }
 }

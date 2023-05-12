@@ -16,6 +16,7 @@ use App\Models\Front;
 use App\Models\TakenExam;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\FrontRepository;
+use App\Repositories\Interfaces\SSDRepository;
 use App\Repositories\Interfaces\TakenExamRepository;
 use App\Services\Implementations\FrontManagerImpl;
 use Tests\TestCase;
@@ -36,6 +37,7 @@ class FrontManagerImplTest extends TestCase{
     private FrontManagerImpl $sut;
     private TakenExamMapper $mapper;
     private CourseRepository $courseRepo;
+    private SSDRepository $ssdRepo;
 
 
     protected function setUp():void
@@ -45,9 +47,11 @@ class FrontManagerImplTest extends TestCase{
         $this->frontRepo = $this->createMock(FrontRepository::class);
         $this->mapper = $this->createMock(TakenExamMapper::class);
         $this->courseRepo = $this->createMock(CourseRepository::class);
+        $this->ssdRepo = $this->createMock(SSDRepository::class);
 
         $this->sut = new FrontManagerImpl($this->mapper,
-                $this->takenRepo, $this->frontRepo, $this->courseRepo);
+                $this->takenRepo, $this->frontRepo, $this->courseRepo,
+                $this->ssdRepo);
     }
 
 
@@ -270,7 +274,18 @@ class FrontManagerImplTest extends TestCase{
         $this->expectException(CourseNotFoundException::class);
         $this->sut->getOrCreateFront(self::FIXTURE_USER_ID, 3);
         
-    }    
+    }
+    
+    public function test_getAllSsds(){
+        $ssdColl = collect(["something"]);
+        $this->ssdRepo->expects($this->once())
+                ->method("getAll")
+                ->willReturn($ssdColl);
+        
+        $result = $this->sut->getAllSSds();
+        
+        $this->assertSame($ssdColl, $result);
+    }
 
     private function makeTakenExam($id =1): TakenExam {
         $mock = new TakenExam();

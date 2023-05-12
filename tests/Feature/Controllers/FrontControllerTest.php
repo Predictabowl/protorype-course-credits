@@ -6,6 +6,7 @@ use App\Domain\TakenExamDTO;
 use App\Models\Course;
 use App\Models\Front;
 use App\Models\Role;
+use App\Models\Ssd;
 use App\Models\User;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\FrontsSearchManager;
@@ -123,6 +124,11 @@ class FrontControllerTest extends TestCase
                 ->method("getTakenExams")
                 ->with($this->front->id)
                 ->willReturn($exams);
+        
+        $allSsds = collect([new Ssd(["code" => "Mario"])]);
+        $this->frontManager->expects($this->once())
+                ->method("getAllSsds")
+                ->willReturn($allSsds);
                 
         $this->searchManager->expects($this->once())
                 ->method("getActiveCourses")
@@ -138,7 +144,8 @@ class FrontControllerTest extends TestCase
         $response->assertViewHas([
             "exams" => $exams,
             "courses" => $courses,
-            "front" => $this->front]);
+            "front" => $this->front,
+            "ssds" => $allSsds]);
                 
     }
     

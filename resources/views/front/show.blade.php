@@ -31,12 +31,17 @@
                                 @enderror
                             </div>
                             <div>
-                                <x-input class="w-32" type="text" name="ssd" placeholder="SSD"
-                                    value="{{ old('ssd') }}" required />
+                                <x-input class="w-32" type="text" name="ssd" placeholder="SSD" list="ssd-list"
+                                     value="{{ old('ssd') }}" autocomplete="off" required />
 
                                 @error('ssd')
                                     <span class="text-xs text-red-500">{{ $message }}</span>
                                 @enderror
+                                <datalist id="ssd-list">
+                                    @foreach ($ssds as $ssd)
+                                        <option value="{{ $ssd->code }}">
+                                    @endforeach
+                                </datalist>
                             </div>
                             <div>
                                 <x-input class="w-20" type="number" name="grade" placeholder="{{ __('Grade') }}"

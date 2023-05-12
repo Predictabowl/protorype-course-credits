@@ -102,7 +102,7 @@
                     Email: <span style="font-weight: bold;">{{ $front->user->email }}</span>
                 </div>
                 <div>
-                    Cellulare: <span style="border-bottom:1px solid; padding-left: 200px;">&nbsp;</span>
+                    Luogo e Data di Nascita: <span style="border-bottom:1px solid; padding-left: 500px;">&nbsp;</span>
                 </div>
             </section>
 

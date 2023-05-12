@@ -206,5 +206,16 @@ class ExamBlockManagerImplTest extends TestCase{
         
         $this->assertSame($examBlock, $result);
     }
+    
+    public function test_getAllSsds(){
+        $allSsds = collect([]);
+        $this->ssdRepo->expects($this->once())
+                ->method("getAll")
+                ->willReturn($allSsds);
+        
+        $result = $this->sut->getAllSsds();
+        
+        $this->assertSame($allSsds, $result);
+    }
 
 }

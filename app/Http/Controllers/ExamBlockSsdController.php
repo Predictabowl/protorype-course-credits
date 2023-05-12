@@ -30,7 +30,8 @@ class ExamBlockSsdController extends Controller
         $examBlock = $this->ebManager->getExamBlockWithSsds($examBlockId);
         
         return view("components.courses.exam-block-ssds",[
-            "examBlock" => $examBlock
+            "examBlock" => $examBlock,
+            "ssds" => $this->ebManager->getAllSsds()
         ]);
     }
     
@@ -41,7 +42,8 @@ class ExamBlockSsdController extends Controller
         
         $examBlock = $this->ebManager->getExamBlockWithSsds($examBlockId);
         return view("components.courses.exam-block-ssds",[
-            "examBlock" => $examBlock
+            "examBlock" => $examBlock,
+            "ssds" => $this->ebManager->getAllSsds()
         ]);
     }
     

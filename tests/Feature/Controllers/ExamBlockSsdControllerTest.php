@@ -75,11 +75,18 @@ class ExamBlockSsdControllerTest extends TestCase {
                 ->with(5)
                 ->willReturn($examBlock);
         
+        $allSsds = collect([new Ssd(["course" => "code1"])]);
+        $this->ebManager->expects($this->once())
+                ->method("getAllSsds")
+                ->willReturn($allSsds);
+        
         $this->from(self::FIXTURE_START_URI)
                 ->put(route("addExamBlockSsd",[5]),["ssd" => $ssdCode->getCode()])
                 ->assertOk()
                 ->assertViewIs("components.courses.exam-block-ssds")
-                ->assertViewHas("examBlock", $examBlock);
+                ->assertViewHas([
+                    "examBlock" => $examBlock,
+                    "ssds" => $allSsds]);
     }
     
     public function test_put_invalidSsdCode(){
@@ -144,11 +151,18 @@ class ExamBlockSsdControllerTest extends TestCase {
             ->method("getExamBlockWithSsds")
             ->with(7)
             ->willReturn($examBlock);
-                
+        
+        $allSsds = collect([new Ssd(["course" => "code1"])]);
+        $this->ebManager->expects($this->once())
+                ->method("getAllSsds")
+                ->willReturn($allSsds);        
+        
         $this->delete(route("delExamBlockSsd",[
             "examBlockId" => 7, "ssdId" => 11]))
                 ->assertOk()
-                ->assertViewHas("examBlock", $examBlock)
+                ->assertViewHas([
+                    "examBlock" => $examBlock,
+                    "ssds" => $allSsds])
                 ->assertViewIs("components.courses.exam-block-ssds");
     }
 
