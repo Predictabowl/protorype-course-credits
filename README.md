@@ -12,7 +12,10 @@ Essendo un LAMP, per l'installazione è necessario:
 - Un web server (e.g. <a  href="https://httpd.apache.org/">Apache</a>)
 - Un istanza di database relazionale, preferibilmente <a href="https://www.postgresql.org/">PostgreSQL</a>, è possibile utilizzare direttamente un'immagine di <a href="https://hub.docker.com/_/postgres/">postgres Docker</a>. Alternativamente è possibile utilizzare anche <a href="https://www.mysql.com/">MySQL</a>
 - PHP 8.2
-- Un indirizzo di posta elettronica che verrà utilizzato per l'autenticazione degli utenti che si vogliono registrare.
+- git
+- [composer](https://getcomposer.org/download/)
+- npm (Node.js)
+- Un indirizzo di posta elettronica che verrà utilizzato per l'autenticazione degli utenti che si vogliono registrare. Se necessario la posta può essere omessa disabilitando il sistema di verifica.
 
 Questo documento presuppone la conoscenza su come configurare Linux, web server e del database scelto.
 
@@ -21,7 +24,7 @@ Clonare il presente repository tramite git
 ```
 git clone https://github.com/Predictabowl/protorype-course-credits.git
 ```
-All'interno della directory clonata installare le dipendenze necessarie tramite <a href="https://getcomposer.org/">composer</a>.
+All'interno della directory clonata installare le dipendenze necessarie tramite composer.
 ```
 composer install --no-dev
 ```
@@ -34,6 +37,10 @@ Sempre sul file ``.env`` impostare i dati per poter accedere al server di posta 
 Generare la chiave di crittografia dalla directory principale tramite il comando
 ```
 php artisan key:generate
+```
+Installare e compilare i package npm
+```
+npm run prod
 ```
 Effettuare la migrazione del database con il comando (il database deve essere già in funzione)
 ```
