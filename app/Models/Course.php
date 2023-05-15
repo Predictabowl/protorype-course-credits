@@ -26,5 +26,10 @@ class Course extends Model
             $query->where(fn ($query) => $query
                 ->where("name", "like", "%".$filters["search"]."%"));
         }
+        
+        if (isset($filters["active"])){
+            $query->where(fn ($query) => $query
+                ->where("active", "=", $filters["active"]));
+        }
     }
 }

@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\Interfaces\FrontManagerFactory;
 use App\Models\Front;
 use App\Services\Interfaces\FrontManager;
 use App\Services\Interfaces\FrontsSearchManager;
-use function app;
 use function back;
 use function request;
 use function view;
@@ -14,27 +12,28 @@ use function view;
 class FrontController extends Controller
 {
     
-    private FrontManagerFactory $frontManagerFactory;
+    private FrontManager $frontManager;
+    private FrontsSearchManager $frontsSearchManager;
     
-    public function __construct(FrontManagerFactory $frontManagerFactory) {
+    public function __construct(FrontManager $frontManager,
+            FrontsSearchManager $frontsSearchManager) {
         
         $this->middleware(["auth","verified"]);
         // The following auto biding policy makes viewAny fails... this is a Laravel bug
         // It's better to use the $this->authorize() method
         //$this->middleware("can:view,front");
         //$this->middleware("can:viewAny,App/Front");
-        $this->frontManagerFactory = $frontManagerFactory;
+        $this->frontManager = $frontManager;
+        $this->frontsSearchManager = $frontsSearchManager;
     }
     
     public function index(){
         $this->authorize("viewAny", Front::class);
         
-        $manager = app()->make(FrontsSearchManager::class);
-        
         return view("front.index", [
-            "fronts" => $manager->getFilteredFronts(request(),25),
-            "courses" => $manager->getCourses(),
-            "currentCourse" => $manager->getCurrentCourse(request())
+            "fronts" => $this->frontsSearchManager->getFilteredFronts(request(),25),
+            "courses" => $this->frontsSearchManager->getCourses(),
+            "currentCourse" => $this->frontsSearchManager->getCurrentCourse(request())
         ]);
     }
     
@@ -42,25 +41,20 @@ class FrontController extends Controller
     {   
         $this->authorize("view",$front);
         
-        $manager = $this->makeFrontManager($front->id);
         return view("front.show",[
-            "exams" => $manager->getTakenExams(),
+            "exams" => $this->frontManager->getTakenExams($front->id),
             "front" => $front,
-            "courses" => $manager->getCourses()->sortBy("name")
+            "courses" => $this->frontsSearchManager->getActiveCourses(),
+            "ssds" => $this->frontManager->getAllSSds()
         ]);
     }
     
     public function put(Front $front)
     {   
         $this->authorize("update",$front);
-        //no validation to be done because is not user input
-        $manager = $this->makeFrontManager($front->id);
-        $manager->setCourse(request()->get("courseId"));
+        $this->frontManager->setCourse(
+                $front->id, request()->get("courseId"));
         return back();
-    }
-    
-    private function makeFrontManager($id): FrontManager{
-        return $this->frontManagerFactory->getFrontManager($id);
     }
     
 }

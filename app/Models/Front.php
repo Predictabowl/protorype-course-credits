@@ -11,7 +11,7 @@ class Front extends Model
     
     protected $attributes = ["course_id" => null];
     
-    protected $fillable = ["user_id", "course_id"];
+    protected $fillable = ["id", "user_id", "course_id"];
     
 
     public function user()

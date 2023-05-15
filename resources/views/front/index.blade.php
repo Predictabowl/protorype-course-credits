@@ -7,78 +7,73 @@
 
     <x-mainpanel>
 
-        <x-panel>
-            <div class="flex justify-between">
-                <x-searchUserBar class="mb-4" filter="course" placeholder="Cerca per nome o email"/>
-            </div>
+        <x-panel class="h-screen">
+            <div class="md:flex justify-between mb-4">
+                <x-searchUserBar filter="course" class="justify-center" placeholder="Cerca per nome o email" />
+                <div class="flex bg-gray-100 rounded-xl px-3 py-2 items-center">
+                    <x-dropdown align="sm_right" width="w-max" max_height="15rem">
+                        <x-slot name="trigger">
+                            <button
+                                class="flex items-center text-sm hover:text-blue-600
+                                text-gray-500 focus:outline-none focus:text-gray-700
+                                focus:border-gray-300 transition duration-150 ease-in-out">
+                                <div class="text-base text-black hover:text-blue-600">
+                                    {{ __('Course Filter') }}:
+                                </div>
+                                <div class="ml-2">
+                                    @if (isset($currentCourse))
+                                        {{ $currentCourse->name }}
+                                    @else
+                                        {{ __('All') }}
+                                    @endif
+                                </div>
+                                <x-downArrow class="ml-1"/>
+                            </button>
+                        </x-slot>
 
-            <div class="place-content-center">
-                <table class="min-w-full rounded-lg">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th> {{ __("Student") }}</th>
-                            <th class="flex place-content-center">
-                                <x-dropdown align="right" width="w-max">
-                                    <x-slot name="trigger">
-                                        <button class="flex items-center text-sm hover:text-blue-600 text-gray-500 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                                            <div class="font-bold text-base text-black hover:text-blue-600">
-                                                {{ __("Course") }}:
-                                            </div>
-                                            @if(isset($currentCourse))
-                                                <div class="ml-2">
-                                                    {{ $currentCourse->name }}
-                                                </div>
-                                            @endif
-                                            <div class="ml-1">
-                                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        </button>
-                                    </x-slot>
-
-                                    <x-slot name="content">
-                                        <!-- Courses List -->
-                                        <div class="text-left text-sm font-normal">
-                                            <x-dropdown-link href="{{ route('frontIndex') }}/?{{http_build_query(
-                                                    request()->except('course','page'))}}">
-                                                Tutti
-                                            </x-dropdown-link>
-                                        @foreach($courses as $course)
-                                            <?php $link = route('frontIndex')."/?".http_build_query(
-                                                array_replace(request()->except('page'),['course' => $course->id]))
-                                            ?>
-                                            <x-dropdown-link :href="$link">
-                                                {{ $course->name }}
-                                            </x-dropdown-link>
-                                        @endforeach
-                                        </div>
-                                    </x-slot>
-                                </x-dropdown>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($fronts as $front)
-                        <tr class="hover:bg-blue-100 ">
-                            <td>
-                                <a class="hover:bg-blue-700 hover:text-white hover:font-semibold" 
-                                    href="{{ route('frontView',[$front])}}">
-                                        {{ $front->user->name }}
-                                </a>
-                            </td>
-                            <td>
-                                @if(isset($front->course))
-                                    {{ $front->course->name}}
-                                @else
-                                    {{ __("None Selected") }}
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        <x-slot name="content">
+                            <!-- Courses List -->
+                            <div class="text-left text-sm font-normal">
+                                <x-dropdown-link
+                                    href="{{ route('frontIndex') }}/?{{ http_build_query(request()->except('course', 'page')) }}">
+                                    {{ __('All') }}
+                                </x-dropdown-link>
+                                @foreach ($courses as $course)
+                                    <?php
+                                        $link = route('frontIndex') . '/?' . http_build_query(
+                                            array_replace(request()->except('page'), ['course' => $course->id]));
+                                    ?>
+                                    <x-dropdown-link :href="$link">
+                                        {{ $course->name }}
+                                    </x-dropdown-link>
+                                @endforeach
+                            </div>
+                        </x-slot>
+                    </x-dropdown>
+                </div>
             </div>
+            <x-table-fixed-header max_height="85%">
+                <x-slot name="header">
+                    <th> {{ __('Student') }}</th>
+                    <th> {{ __('Course Chosen') }}</th>
+                </x-slot>
+                @foreach ($fronts as $front)
+                    <tr class="tr-body">
+                        <td>
+                            <a class="td-link" href="{{ route('frontView', [$front]) }}">
+                                {{ $front->user->name }}
+                            </a>
+                        </td>
+                        <td>
+                            @if (isset($front->course))
+                                {{ $front->course->name }}
+                            @else
+                                {{ __('None Selected') }}
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            </x-table-fixed-header>
             <div class="mt-4">
                 {{ $fronts->links() }}
             </div>

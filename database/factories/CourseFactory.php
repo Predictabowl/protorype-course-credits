@@ -28,7 +28,8 @@ class CourseFactory extends Factory
             "finalExamCfu" => $this->faker->numberBetween(6, 12),
             "otherActivitiesCfu" => $this->faker->numberBetween(0, 9),
             "numberOfYears" => $this->faker->numberBetween(2,3),
-            "cfuTresholdForYear" => $this->faker->numberBetween(30,50)
+            "cfuTresholdForYear" => $this->faker->numberBetween(30,50),
+            "active" => true
         ];
     }
 }

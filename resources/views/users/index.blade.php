@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Gestione Utenti
+            {{ __("Users Management") }}
         </h2>
     </x-slot>
 
@@ -15,21 +15,21 @@
                 <table class="min-w-full rounded-lg">
                     <thead>
                         <tr class="bg-gray-100">
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Ruoli</th>
-                            <th>Data creazione</th>
+                            <th>{{ __("Name") }}</th>
+                            <th>{{ __("Email") }}</th>
+                            <th>{{ __("Roles") }}</th>
+                            <th>{{ __("Creation's Date") }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($users as $user)
-                        <tr class="hover:bg-blue-100 active:bg-blue-400">
+                        <tr class="tr-body">
                             <td> {{ $user->name }} </td>
                             <td> {{ $user->email}} </td>
                             <td>
-                                @foreach($user->roles as $role)
-                                    {{ $role->name }},
-                                @endforeach
+                                @php
+                                    echo $user->roles->implode("name", ", ");
+                                @endphp
                             </td>
                             <td class="text-center"> {{ $user->created_at->isoFormat("DD MMMM YYYY") }}</td>
                             <td class="w-10">
@@ -40,17 +40,20 @@
                                 </a>
                             </td>
                             <td class="w-10">
-                                <form id="form-{{$user->id}}" method="POST" action="{{ route("userDelete",[$user]) }}">
-                                    @csrf
-                                    @method("DELETE")
-                                    <x-button-icon type="button"
+                                @can("delete", $user)
+                                    <form id="form-{{$user->id}}" method="POST"
+                                            action="{{ route("userDelete",[$user]) }}">
+                                        @csrf
+                                        @method("DELETE")
+                                        <x-button-icon type="button" name="id" title="{{__('Delete')}}"
                                         x-on:click="
-                                            showConfirmationBox = true;
-                                            $refs.boxName.innerHTML = '{{$user->name}}';
-                                            formId = 'form-{{ $user->id }}'" name="id" title="{{__('Delete')}}">
-                                        <x-heroicon-m-trash class="h-5 w-5"/>
-                                    </x-button-icon>
-                                </form>
+                                        showConfirmationBox = true;
+                                        $refs.boxName.innerHTML = '{{$user->name}}';
+                                        formId = 'form-{{ $user->id }}'">
+                                            <x-heroicon-m-trash class="h-5 w-5"/>
+                                        </x-button-icon>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                         @endforeach

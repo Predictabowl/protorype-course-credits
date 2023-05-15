@@ -1,6 +1,11 @@
-@import 'tailwindcss/base';
+/* @import 'tailwindcss/base';
 @import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-/*@tailwind base;
+@import 'tailwindcss/utilities'; */
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+@tailwind base;
 @tailwind components;
-@tailwind utilities;*/
+@tailwind utilities;
+
+/* .td-link{
+    @apply text-blue-700
+} */

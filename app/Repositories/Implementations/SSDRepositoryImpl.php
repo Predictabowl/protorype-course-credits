@@ -9,6 +9,7 @@ namespace App\Repositories\Implementations;
 
 use App\Models\Ssd;
 use App\Repositories\Interfaces\SSDRepository;
+use Illuminate\Support\Collection;
 
 /**
  *
@@ -19,6 +20,14 @@ class SSDRepositoryImpl implements SSDRepository
     
     public function getSsdFromCode(string $ssd): ?Ssd {
         return Ssd::where("code", $ssd)->first();
+    }
+
+    public function getSsdFromCodeWithExamBlocks(string $ssd): ?Ssd {
+        return Ssd::where("code", $ssd)->with("examBlocks")->first();
+    }
+
+    public function getAll(): Collection {
+        return Ssd::all();
     }
 
 }

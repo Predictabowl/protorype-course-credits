@@ -22,6 +22,7 @@ class CreateCoursesTable extends Migration
             $table->unsignedTinyInteger("finalExamCfu");
             $table->unsignedTinyInteger("numberOfYears");
             $table->unsignedSmallInteger("cfuTresholdForYear");
+            $table->boolean("active")->default(true);
             $table->timestamps();
         });
     }

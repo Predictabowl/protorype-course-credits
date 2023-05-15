@@ -17,16 +17,13 @@ class StudentControllerTest extends TestCase
     use RefreshDatabase;
     
     
-    private UserFrontManager $userFrontManager;
-    private UserFrontManagerFactory $ufManagerFactory;
+    private FrontManager $frontManager;
     
     protected function setUp(): void {
         parent::setUp();
         
-        $this-> userFrontManager = $this->createMock(UserFrontManager::class);
-        $this->ufManagerFactory = $this->createMock(UserFrontManagerFactory::class);
-        
-        app()->instance(UserFrontManagerFactory::class, $this-> ufManagerFactory);
+        $this-> frontManager = $this->createMock(FrontManager::class);
+        app()->instance(FrontManager::class, $this-> frontManager);
     }
 
     
@@ -39,19 +36,10 @@ class StudentControllerTest extends TestCase
     public function test_showFront_should_redirect_to_front_controller(){
         $user =  User::factory()->create();
         $front = Front::create(["user_id" => $user->id]);
-        $frontManager = $this->createMock(FrontManager::class);
         
-        $this->ufManagerFactory->expects($this->once())
-                ->method("get")
+        $this->frontManager->expects($this->once())
+                ->method("getOrCreateFront")
                 ->with($user->id)
-                ->willReturn($this->userFrontManager);
-        
-        $this->userFrontManager->expects($this->once())
-                ->method("getFrontManager")
-                ->willReturn($frontManager);
-        
-        $frontManager->expects($this->once())
-                ->method("getFront")
                 ->willReturn($front);
         
         $response = $this->actingAs($user)

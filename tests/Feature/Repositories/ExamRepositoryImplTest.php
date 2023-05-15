@@ -14,7 +14,6 @@ use App\Models\Exam;
 use App\Models\ExamBlock;
 use App\Models\Ssd;
 use App\Repositories\Implementations\ExamRepositoryImpl;
-use App\Support\Seeders\ExamSupport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
@@ -91,6 +90,23 @@ class ExamRepositoryImplTest extends TestCase{
         $this->assertEquals($ssd->id, $found->ssd_id);
     }
     
+   public function test_save_whenSsdId_isMissing(){
+        $ssd = Ssd::factory()->create();
+        $toSave = Exam::factory()->make([
+            "name" => "test name",
+            "free_choice" => true,
+            "ssd_id" => null
+        ]);
+        
+        $bSaved = $this->sut->save($toSave);
+        
+        $this->assertEquals($bSaved,$toSave);
+        $this->assertDatabaseCount("exams",1);
+        $found = Exam::first();
+        $this->assertEquals("test name", $found->name);
+        $this->assertNull($found->ssd_id);
+    }    
+    
     public function test_update_whenInvalidSsd_shouldThrow(){
         $exam = Exam::factory()->create();
         $exam->ssd_id += 1;
@@ -110,20 +126,60 @@ class ExamRepositoryImplTest extends TestCase{
     public function test_update_success(){
         $exam = Exam::factory()->create([
             "name" => "original name",
-            "ssd_id" => Ssd::factory()->create()
+            "ssd_id" => Ssd::factory()->create(),
+            "free_choice" => false
+        ]);
+
+        $ssd = Ssd::factory()->create();
+        $loaded = Exam::first();
+        $this->assertEquals("original name",$loaded->name);
+        
+        $updatedExam = new Exam([
+                "id" => $exam->id,
+                "name" => "new name",
+                "ssd_id" => $ssd->id,
+                "exam_block_id" => $exam->exam_block_id+1,
+                "free_choice" => true
+            ]);
+        
+        $result = $this->sut->update($updatedExam);
+        
+        $modified = Exam::first();
+        $this->assertDatabaseCount("exams",1);
+        $this->assertEquals("new name",$modified->name);
+        $this->assertEquals($ssd->id, $modified->ssd_id);
+        $this->assertEquals($exam->exam_block_id, $modified->exam_block_id);
+        $this->assertEquals(1, $modified->free_choice);
+        $this->assertEquals($modified->toArray(), $result->toArray());
+    }
+    
+    public function test_update_whenSsdIsNull(){
+        $exam = Exam::factory()->create([
+            "name" => "original name",
+            "ssd_id" => Ssd::factory()->create(),
+            "free_choice" => false
         ]);
 
         $loaded = Exam::first();
         $this->assertEquals("original name",$loaded->name);
         
-        $exam->name = "new name";
+        $updatedExam = new Exam([
+                "id" => $exam->id,
+                "name" => "new name",
+                "ssd_id" => null,
+                "exam_block_id" => $exam->exam_block_id+1,
+                "free_choice" => true
+            ]);
         
-        $bResult = $this->sut->update($exam);
+        $result = $this->sut->update($updatedExam);
         
-        $this->assertEquals($bResult,$exam);
-        $this->assertDatabaseCount("exams",1);
         $modified = Exam::first();
+        $this->assertDatabaseCount("exams",1);
         $this->assertEquals("new name",$modified->name);
+        $this->assertNull($modified->ssd_id);
+        $this->assertEquals($exam->exam_block_id, $modified->exam_block_id);
+        $this->assertEquals(1, $modified->free_choice);
+        $this->assertEquals($modified->toArray(), $result->toArray());
     }
     
     public function test_deleteExam(){

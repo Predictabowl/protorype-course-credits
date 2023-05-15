@@ -7,11 +7,14 @@ use App\Exceptions\Custom\ExamBlockNotFoundException;
 use App\Models\Course;
 use App\Models\ExamBlock;
 use App\Models\Role;
+use App\Models\Ssd;
 use App\Models\User;
-use App\Services\Interfaces\CourseAdminManager;
+use App\Services\Interfaces\CourseManager;
+use App\Services\Interfaces\ExamBlockManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use function app;
+use function collect;
 use function route;
 
 class ExamBlockControllerTest extends TestCase {
@@ -20,15 +23,18 @@ class ExamBlockControllerTest extends TestCase {
 
     const FIXTURE_START_URI = "course/examblock";
 
-    private CourseAdminManager $courseManager;
+    private CourseManager $courseManager;
+    private ExamBlockManager $ebManager;
     private Course $course;
 
     protected function setUp(): void {
         parent::setUp();
         $this->course = Course::factory()->create();
 
-        $this->courseManager = $this->createMock(CourseAdminManager::class);
-        app()->instance(CourseAdminManager::class, $this->courseManager);
+        $this->ebManager = $this->createMock(ExamBlockManager::class);
+        $this->courseManager = $this->createMock(CourseManager::class);
+        app()->instance(CourseManager::class, $this->courseManager);
+        app()->instance(ExamBlockManager::class, $this->ebManager);
     }
 
     public function test_index_authorization_forbidden() {
@@ -43,21 +49,28 @@ class ExamBlockControllerTest extends TestCase {
 
         $course = Course::first();
         $this->courseManager->expects($this->once())
-                ->method("getCourseFullData")
+                ->method("getCourseFullDepth")
                 ->with($course->id)
                 ->willReturn($course);
+        
+        $allSsds = collect([new Ssd(["course" => "code1"])]);
+        $this->ebManager->expects($this->once())
+                ->method("getAllSsds")
+                ->willReturn($allSsds);
 
         $response = $this->get(route("courseDetails", [$course->id]));
         $response->assertOk();
-        $response->assertViewHas(["course" => $course]);
+        $response->assertViewHas([
+            "course" => $course,
+            "ssds" => $allSsds]);
     }
 
-    public function test_index_whenCouseIsMissing() {
+    public function test_index_whenCourseIsMissing() {
         $this->beAdmin();
 
         $course = Course::first();
         $this->courseManager->expects($this->once())
-                ->method("getCourseFullData")
+                ->method("getCourseFullDepth")
                 ->with($course->id)
                 ->willReturn(null);
 
@@ -68,7 +81,7 @@ class ExamBlockControllerTest extends TestCase {
     public function test_post_auth() {
         $this->be(User::factory()->create());
 
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("saveExamBlock");
 
         $response = $this->post(route("examBlockCreate", [$this->course->id]));
@@ -79,9 +92,16 @@ class ExamBlockControllerTest extends TestCase {
         $this->beAdmin();
         $ebInfo = new NewExamBlockInfo(3, 7, 2);
 
-        $this->courseManager->expects($this->once())
+        $examBlock = ExamBlock::factory()->create();
+        $this->ebManager->expects($this->once())
                 ->method("saveExamBlock")
-                ->with($ebInfo, $this->course->id);
+                ->with($ebInfo, $this->course->id)
+                ->willReturn($examBlock);
+        
+        $allSsds = collect([new Ssd(["course" => "code1"])]);
+        $this->ebManager->expects($this->once())
+                ->method("getAllSsds")
+                ->willReturn($allSsds);
 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("examBlockCreate", [$this->course->id]), [
@@ -90,12 +110,15 @@ class ExamBlockControllerTest extends TestCase {
             "courseYear" => 2
         ]);
 
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $response->assertOk()
+                ->assertViewHas([
+                    "examBlock" => $examBlock,
+                    "ssds" => $allSsds]);
     }
 
     public function test_post_validations() {
         $this->beAdmin();
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("saveExamBlock");
 
         $this->postValidationTest("cfu", "a4");
@@ -109,7 +132,7 @@ class ExamBlockControllerTest extends TestCase {
         $this->be(User::factory()->create());
         $examBlock = ExamBlock::factory()->create();
 
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("deleteExamBlock");
 
         $response = $this->delete(route("examBlockDelete", [$examBlock->id]));
@@ -120,7 +143,7 @@ class ExamBlockControllerTest extends TestCase {
         $this->beAdmin();
         $examBlock = ExamBlock::factory()->create();
 
-        $this->courseManager->expects($this->once())
+        $this->ebManager->expects($this->once())
                 ->method("deleteExamBlock")
                 ->with($examBlock->id);
 
@@ -134,14 +157,14 @@ class ExamBlockControllerTest extends TestCase {
         $this->be(User::factory()->create());
         $examBlock = ExamBlock::factory()->create();
 
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("updateExamBlock");
 
         $response = $this->put(route("examBlockUpdate", [$examBlock->id]));
         $response->assertForbidden();
     }
 
-    public function test_put_whenEntityIsMissing() {
+    public function test_put_whenExamBlockMissing() {
         $this->beAdmin();
         $examBlock = ExamBlock::factory()->create();
         $attributes = [
@@ -150,14 +173,13 @@ class ExamBlockControllerTest extends TestCase {
             "courseYear" => 3
         ];
 
-        $this->courseManager->expects($this->once())
+        $this->ebManager->expects($this->once())
                 ->method("updateExamBlock")
                 ->willThrowException(new ExamBlockNotFoundException());
 
-        $response = $this->from(self::FIXTURE_START_URI)
-                ->put(route("examBlockUpdate", [$examBlock->id]),$attributes);
-
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $this->from(self::FIXTURE_START_URI)
+                ->put(route("examBlockUpdate", [$examBlock->id]),$attributes)
+                ->assertNotFound();
     }
 
     public function test_put_success(){
@@ -169,20 +191,23 @@ class ExamBlockControllerTest extends TestCase {
             "courseYear" => 3
         ];        
         
-        $this->courseManager->expects($this->once())
+        $editedExamBlock = ExamBlock::factory()->make(["id" => 11]);
+        $this->ebManager->expects($this->once())
                 ->method("updateExamBlock")
-                ->with(new NewExamBlockInfo(2, 6, 3));
+                ->with(new NewExamBlockInfo(2, 6, 3))
+                ->willReturn($editedExamBlock);
         
         $response = $this->from(self::FIXTURE_START_URI)
                 ->put(route("examBlockUpdate",[$examBlock->id]), $attributes);
         
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $response->assertOk()
+                ->assertViewHas("examBlock", $editedExamBlock);
     }
     
     public function test_put_validations() {
         $this->beAdmin();
         $examBlock = ExamBlock::factory()->create();
-        $this->courseManager->expects($this->never())
+        $this->ebManager->expects($this->never())
                 ->method("updateExamBlock");
 
         $this->putValidationTest("cfu", "a4", $examBlock->id);
@@ -210,10 +235,10 @@ class ExamBlockControllerTest extends TestCase {
         ];
         $ebAttributes[$attrName] = $attrValue;
 
-        $response = $this->from(self::FIXTURE_START_URI)
-                ->post(route("examBlockCreate", [$this->course->id]), $ebAttributes);
-
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $this->from(self::FIXTURE_START_URI)
+            ->post(route("examBlockCreate", [$this->course->id]), $ebAttributes)
+            ->assertUnprocessable()
+            ->assertViewIs("components.courses.flash-error");
     }
     
     private function putValidationTest(string $attrName, $attrValue, int $blockId) {
@@ -224,10 +249,10 @@ class ExamBlockControllerTest extends TestCase {
         ];
         $ebAttributes[$attrName] = $attrValue;
 
-        $response = $this->from(self::FIXTURE_START_URI)
-                ->put(route("examBlockUpdate", [$blockId]), $ebAttributes);
-
-        $response->assertRedirect(self::FIXTURE_START_URI);
+        $this->from(self::FIXTURE_START_URI)
+            ->put(route("examBlockUpdate", [$blockId]), $ebAttributes)
+            ->assertUnprocessable()
+            ->assertViewIs("components.courses.flash-error");
     }
 
 }

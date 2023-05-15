@@ -15,11 +15,19 @@ services:
          - database-data:/var/lib/postresql/data/
       ports:
          - "5432:5432"
+      networks:
+         - test-pg
     mailhog:
       image: 'mailhog/mailhog:latest'
       ports:
          - 1025:1025
          - 8025:8025
+      networks:
+          - test-pg
+
+networks:
+    test-pg:
+        driver: bridge
 
 volumes:
    database-data:

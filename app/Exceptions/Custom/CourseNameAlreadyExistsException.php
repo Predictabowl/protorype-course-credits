@@ -7,6 +7,13 @@
 
 namespace App\Exceptions\Custom;
 
-class CourseNameAlreadyExistsException extends \Exception{
-    //put your code here
+use Exception;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+
+class CourseNameAlreadyExistsException extends Exception{
+    
+    public function render(): Response{
+        throw ValidationException::withMessages(["name" => $this->getMessage()]);
+    }
 }

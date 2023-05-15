@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Exceptions\Custom\CourseNameAlreadyExistsException;
 use App\Models\Course;
 use App\Models\Role;
 use App\Models\User;
-use App\Services\Interfaces\CoursesAdminManager;
+use App\Services\Interfaces\CourseManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 use function app;
 use function route;
@@ -17,7 +19,7 @@ class CourseControllerTest extends TestCase
     
     const FIXTURE_START_URI = "course";
     
-    private CoursesAdminManager $coursesManager;
+    private CourseManager $courseManager;
     private array $courseAttributes;
     
     protected function setUp(): void {
@@ -25,8 +27,8 @@ class CourseControllerTest extends TestCase
         
         $this->course = Course::factory()->create();
         
-        $this->coursesManager = $this->createMock(CoursesAdminManager::class);
-        app()->instance(CoursesAdminManager::class, $this->coursesManager);
+        $this->courseManager = $this->createMock(CourseManager::class);
+        app()->instance(CourseManager::class, $this->courseManager);
         
         $this->courseAttributes = [
             "name" => "test name",
@@ -39,11 +41,24 @@ class CourseControllerTest extends TestCase
         ];
     }
     
-    public function test_index_authorization_forbidden(){
+    public function test_authorizations_forbidden(){
         $this->be(User::factory()->create());
         
-        $response = $this->get(route("courseIndex"));
-        $response->assertStatus(403);
+        $this->courseManager->expects($this->never())
+                ->method("removeCourse");
+        $this->courseManager->expects($this->never())
+                ->method("updateCourse");
+        $course = Course::first();
+        
+        $this->get(route("courseIndex"))->assertStatus(403);
+        $this->post(route("courseCreate"),[new Course([])])->assertForbidden();
+        $this->from((route("courseIndex")))->delete(route("courseDelete",[$course]))
+                ->assertForbidden();
+        $this->from((route("courseIndex")))->put(route("courseUpdate",[$course]))
+                ->assertForbidden();
+        $this->get(route("courseShow",[$course->id]))->assertForbidden();
+        $this->get(route("courseNew"))->assertForbidden();
+        $this->put(route("courseActivate",[$course->id]))->assertForbidden();
     }
     
     public function test_index_auth_admin_success(){
@@ -51,7 +66,7 @@ class CourseControllerTest extends TestCase
         
         Course::factory(3)->create();
         $courses = Course::all();
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("getallCourses")
                 ->with([])
                 ->willReturn($courses);
@@ -67,7 +82,7 @@ class CourseControllerTest extends TestCase
         
         Course::factory(3)->create();
         $courses = Course::all();
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("getallCourses")
                 ->with($filters)
                 ->willReturn($courses);
@@ -77,30 +92,21 @@ class CourseControllerTest extends TestCase
         $response->assertViewHas(["courses" => $courses]);
     }
     
-    public function test_create_course_auth(){
-        $this->be(User::factory()->create());
-        
-        $course = new Course(["name" => "test name"]);
-        
-        $response = $this->post(route("courseCreate"),[$course]);
-        $response->assertForbidden();
-    }
-    
     public function test_create_course_success(){
         $this->beAdmin();
         $course = new Course($this->courseAttributes);
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("addCourse")
                 ->with($course);
         
-        $response = $this->from((route("courseIndex")))
-                ->post(route("courseCreate"),$this->courseAttributes);
-        $response->assertRedirect(route("courseIndex"));
+        $response = $this->post(route("courseCreate"),$this->courseAttributes);
+        $response->assertRedirectToRoute("courseIndex");
     }
     
     public function test_create_course_validations(){
         $this->beAdmin();
-        $this->coursesManager->expects($this->never())
+        Course::factory()->create(["name" => "existing name"]);
+        $this->courseManager->expects($this->never())
                 ->method("addCourse");
         
         $this->performPostValidationTest("name",null);
@@ -116,38 +122,29 @@ class CourseControllerTest extends TestCase
         $this->performPostValidationTest("cfuTresholdForYear","ch6");
     }
     
+    public function test_create_course_duplicateName(){
+        $this->beAdmin();
+        $this->courseManager->expects($this->once())
+                ->method("addCourse")
+                ->willThrowException(new CourseNameAlreadyExistsException("test message"));
+        
+        $response = $this->from(self::FIXTURE_START_URI)
+                ->post(route("courseCreate"),$this->courseAttributes);
+        
+        $response->assertRedirect(self::FIXTURE_START_URI)
+                ->assertSessionHasErrors(["name" => "test message"]);
+    }
+        
     public function test_deleteCourse(){
         $this->beAdmin();
         $course = Course::first();
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("removeCourse")
                 ->with($course->id);
         
         $response = $this->from((route("courseIndex")))
                 ->delete(route("courseDelete",[$course->id]));
-        $response->assertRedirect(route("courseIndex"));
-    }
-    
-    public function test_deleteCourse_auth(){
-        $this->be(User::factory()->create());
-        
-        $this->coursesManager->expects($this->never())
-                ->method("removeCourse");
-        
-        $response = $this->from((route("courseIndex")))
-                ->delete(route("courseDelete",[Course::first()]));
-        $response->assertForbidden();
-    }
-    
-    public function test_updateCourse_auth(){
-        $this->be(User::factory()->create());
-        
-        $this->coursesManager->expects($this->never())
-                ->method("updateCourse");
-        
-        $response = $this->from((route("courseIndex")))
-                ->put(route("courseUpdate",[Course::first()]));
-        $response->assertForbidden();
+        $response->assertRedirectToRoute("courseIndex");
     }
     
     public function test_updateCourse_success(){
@@ -156,13 +153,74 @@ class CourseControllerTest extends TestCase
         $newCourse = new Course($this->courseAttributes);
         $newCourse->id = $course->id;
         
-        $this->coursesManager->expects($this->once())
+        $this->courseManager->expects($this->once())
                 ->method("updateCourse")
                 ->with($newCourse);
         
-        $response = $this->from((route("courseIndex")))
-                ->put(route("courseUpdate",[Course::first()]),$this->courseAttributes);
-        $response->assertRedirect(route("courseIndex"));
+        $response = $this->put(
+                route("courseUpdate",[Course::first()]),$this->courseAttributes);
+        $response->assertRedirectToRoute("courseDetails",[$course->id]);
+    }
+    
+    public function test_updateCourse_duplicateName(){
+        $this->beAdmin();
+        $course = Course::first();
+        $newCourse = new Course($this->courseAttributes);
+        $newCourse->id = $course->id;
+        
+        $this->courseManager->expects($this->once())
+                ->method("updateCourse")
+                ->willThrowException(new CourseNameAlreadyExistsException("test message"));
+        
+        $response = $this->from(self::FIXTURE_START_URI)->put(
+                route("courseUpdate",[$course->id]),$this->courseAttributes);
+        
+        $response->assertRedirect(self::FIXTURE_START_URI)
+                ->assertSessionHasErrors(["name" => "test message"]);
+    }
+    
+    public function test_updateCourseForm(){
+        $this->beAdmin();
+        $course = Course::first();
+        
+        $response = $this->get(route("courseShow",[$course->id]));
+        
+        $response->assertViewIs("courses.input")
+                ->assertViewHas("course", $course)
+                ->assertViewHas("action", route("courseUpdate",[$course->id]))
+                ->assertViewHas("cancelAction", route("courseDetails",[$course->id]));
+    }
+    
+    public function test_newCourseForm(){
+        $this->beAdmin();
+        $response = $this->get(route("courseNew"));
+        
+        $response->assertViewIs("courses.input")
+            ->assertViewMissing("course")
+            ->assertViewHas("action", route("courseCreate"))
+            ->assertViewHas("cancelAction", route("courseIndex"));
+    }
+    
+    public function test_activateCourse_true(){
+        $this->beAdmin();
+        
+        $this->courseManager->expects($this->once())
+                ->method("setCourseActive")
+                ->with(5, true);
+        
+        $this->put(route("courseActivate",[5]),["active" => "on"])
+                ->assertNoContent();
+    }
+    
+    public function test_activateCourse_false(){
+        $this->beAdmin();
+        
+        $this->courseManager->expects($this->once())
+                ->method("setCourseActive")
+                ->with(5, false);
+        
+        $this->put(route("courseActivate",[5]))
+                ->assertNoContent();
     }
     
     private function beAdmin(): User{
@@ -175,7 +233,7 @@ class CourseControllerTest extends TestCase
         return $admin;
     }
     
-    private function performPostValidationTest(string $attrName, $attrValue){
+    private function performPostValidationTest(string $attrName, $attrValue): TestResponse{
         $localAttributes = [
             "name" => "test name",
             "cfu" => 6,
@@ -187,9 +245,11 @@ class CourseControllerTest extends TestCase
         ];
         $localAttributes[$attrName] = $attrValue;
         
-        $response = $this->from((route("courseIndex")))
+        $response = $this->from(self::FIXTURE_START_URI)
                 ->post(route("courseCreate"),$localAttributes);
         
-        $response->assertRedirect(route("courseIndex"));
+        $response->assertRedirect(self::FIXTURE_START_URI)
+                ->assertSessionHasErrors($attrName);
+        return $response;
     }
 }

@@ -8,13 +8,15 @@
 
 namespace App\Repositories\Implementations;
 
-use \App\Repositories\Interfaces\UserRepository;
-use App\Models\User;
-use \App\Models\Role;
+use App\Models\Role;
 use App\Models\RoleUser;
+use App\Models\User;
+use App\Repositories\Interfaces\UserRepository;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 
 /**
  * Description of UserRepositoryImpl
@@ -33,7 +35,7 @@ class UserRepositoryImpl implements UserRepository {
 
     public function save(User $user): bool {
         if (isset($user->id)){
-            throw new \InvalidArgumentException("User ID should be null while saving");
+            throw new InvalidArgumentException("User ID should be null while saving");
         }
         return $user->save();
     }
@@ -73,9 +75,13 @@ class UserRepositoryImpl implements UserRepository {
 
     public function update(User $user): bool {
         if (!isset($user->id)){
-            throw new \InvalidArgumentException("User ID missing");
+            throw new InvalidArgumentException("User ID missing");
         }
         return $user->update();
+    }
+
+    public function getByRole(string $role): Collection {
+        return User::whereRelation("roles", "name", $role)->get();
     }
 
 }

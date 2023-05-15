@@ -17,11 +17,11 @@ use App\Models\ExamBlock;
  * @author piero
  */
 class ExamBlockInfoMapperImpl implements ExamBlockInfoMapper{
-    public function map(NewExamBlockInfo $examBlock, int $courseId): ExamBlock {
+    public function map(NewExamBlockInfo $examBlock, ?int $courseId): ExamBlock {
         return new ExamBlock([
             "max_exams" => $examBlock->getMaxExams(),
             "cfu" => $examBlock->getCfu(),
-            "course_year" => $examBlock->getCourseYear(),
+            "courseYear" => $examBlock->getCourseYear(),
             "course_id" => $courseId
         ]);
     }

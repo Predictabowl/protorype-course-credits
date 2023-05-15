@@ -6,10 +6,10 @@ use App\Exceptions\Custom\CourseNotFoundException;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\ExamBlock;
-use App\Models\ExamBlockOption;
 use App\Models\Ssd;
 use App\Repositories\Implementations\CourseRepositoryImpl;
 use App\Repositories\Interfaces\ExamBlockRepository;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
@@ -57,13 +57,16 @@ class CourseRepositoryImplTest extends TestCase {
             "otherActivitiesCfu" => 6,
             "maxRecognizedCfu" => 120,
             "numberOfYears" => 3,
-            "cfuTresholdForYear" => 40
+            "cfuTresholdForYear" => 40,
+            "active" => true
         ];
         $course = Course::make($attributes);
 
         $result = $this->sut->save($course);
 
-        $this->assertTrue($result);
+        $realCourse = Course::first();
+        $this->assertEquals($realCourse->attributesToArray(),
+                $result->attributesToArray());
         $this->assertDatabaseCount("courses", 1);
         $this->assertDatabaseHas("courses", $attributes);
     }
@@ -89,7 +92,7 @@ class CourseRepositoryImplTest extends TestCase {
         $this->assertFalse($saved);
     }
 
-    public function test_save_with_duplicate_name_should_fail() {
+    public function test_save_with_duplicate_name_shouldThrow() {
         $attributes = [
             "name" => "test name",
             "cfu" => 180,
@@ -104,9 +107,9 @@ class CourseRepositoryImplTest extends TestCase {
         ];
         $course = Course::make($attributes2);
 
-        $result = $this->sut->save($course);
+        $this->expectException(QueryException::class);
+        $this->sut->save($course);
 
-        $this->assertFalse($result);
         $this->assertDatabaseCount("courses", 1);
         $this->assertDatabaseMissing("courses", $attributes2);
     }
@@ -165,11 +168,15 @@ class CourseRepositoryImplTest extends TestCase {
         $course = Course::factory()->create([
             "name" => "old name"
         ]);
-        $course->name = "new name";
+        $updatedCourse = Course::factory()->make([
+                "id" => $course->id,
+                "name" => "new name"
+            ]);
 
-        $result = $this->sut->update($course);
+        $result = $this->sut->update($updatedCourse);
 
-        $this->assertTrue($result);
+        $realCourse = Course::first();
+        $this->assertEquals($realCourse->all(), $result->all());
         $modified = Course::find($course->id);
         $this->assertEquals("new name", $modified->name);
     }
@@ -197,6 +204,19 @@ class CourseRepositoryImplTest extends TestCase {
         $course3 = Course::find($course3->id);
 
         $all = $this->sut->getAll(["search" => "test"]);
+
+        $this->assertEquals($course1, $all->get(0));
+        $this->assertEquals($course3, $all->get(1));
+    }
+    
+    public function test_getAll_withActiveFilters_success() {
+        $course1 = Course::factory()->create(["active" => true]);
+        Course::factory()->create(["active" => false]);
+        $course3 = Course::factory()->create(["active" => true]);
+        $course1 = Course::find($course1->id);
+        $course3 = Course::find($course3->id);
+
+        $all = $this->sut->getAll(["active" => true]);
 
         $this->assertEquals($course1, $all->get(0));
         $this->assertEquals($course3, $all->get(1));
@@ -234,6 +254,25 @@ class CourseRepositoryImplTest extends TestCase {
         $this->assertEquals(1,sizeof($relationships));
         $this->assertArrayHasKey("exam_blocks",$relationships);
         $this->assertArrayHasKey("exams",$relationships["exam_blocks"][0]);
+        $this->assertArrayHasKey("ssd",$relationships["exam_blocks"][0]["exams"][0]);
+        $this->assertArrayHasKey("ssds",$relationships["exam_blocks"][0]);
+    }
+    
+    public function test_setActiveStatus_whenCourseIsMissing(){
+
+        $this->expectException(CourseNotFoundException::class);
+        $this->sut->setActiveStatus(5, false);
+        
+        $this->assertDatabaseCount("courses", 0);
+    }
+    
+    public function test_setActiveStatus_false(){
+        $course = Course::factory()->create(["active" => true]);
+        
+        $this->sut->setActiveStatus($course->id, false);
+        
+        $this->assertDatabaseCount("courses", 1);
+        $this->assertDatabaseHas("courses", ["active" => false]);
     }
 
 }

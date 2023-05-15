@@ -7,6 +7,14 @@
 
 namespace App\Exceptions\Custom;
 
-class ExamBlockNotFoundException extends \Exception{
-    //put your code here
+use Exception;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use function abort;
+
+class ExamBlockNotFoundException extends Exception{
+    
+    public function render (Request $request): Response{
+        abort(404, $this->getMessage());
+    }
 }

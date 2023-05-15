@@ -8,8 +8,6 @@
 
 namespace App\Factories\Interfaces;
 
-use App\Models\Front;
-use App\Models\Course;
 use App\Services\Interfaces\StudyPlanBuilder;
 
 /**
@@ -18,5 +16,5 @@ use App\Services\Interfaces\StudyPlanBuilder;
  */
 interface StudyPlanBuilderFactory {
     
-    public function getStudyPlanBuilder($frontId, $courseId): StudyPlanBuilder;
+    public function get(int $frontId, int $courseId): StudyPlanBuilder;
 }

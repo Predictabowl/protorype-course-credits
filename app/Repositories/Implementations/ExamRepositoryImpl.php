@@ -12,7 +12,6 @@ use App\Exceptions\Custom\SsdNotFoundException;
 use App\Models\Exam;
 use App\Models\Ssd;
 use App\Repositories\Interfaces\ExamRepository;
-use App\Support\Seeders\ExamSupport;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
@@ -38,9 +37,11 @@ class ExamRepositoryImpl implements ExamRepository{
             throw new InvalidArgumentException("New exam id must not be set");
         }
         
-        $ssd = Ssd::find($exam->ssd_id);
-        if(!isset($ssd)){
-            throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
+        if(isset($exam->ssd_id)){
+            $ssd = Ssd::find($exam->ssd_id);
+            if(!isset($ssd)){
+                throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
+            }
         }
         $exam->save();
         return $exam;
@@ -52,13 +53,18 @@ class ExamRepositoryImpl implements ExamRepository{
             throw new ExamNotFoundException("Exam not found with id: ".$exam->id);
         }
 
-        $ssd = Ssd::find($exam->ssd_id);
-        if(!isset($ssd)){
-            throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
+        if(isset($exam->ssd_id)){
+            $ssd = Ssd::find($exam->ssd_id);
+            if(!isset($ssd)){
+                throw new SsdNotFoundException("ssd not found with id: ".$exam->ssd_id);
+            }
         }
 
-        $exam->save();
-        return $exam;
+        $loaded->name = $exam->name;
+        $loaded->ssd_id = $exam->ssd_id;
+        $loaded->free_choice = $exam->free_choice;
+        $loaded->save();
+        return $loaded;
     }
 
     public function delete(int $id): void {

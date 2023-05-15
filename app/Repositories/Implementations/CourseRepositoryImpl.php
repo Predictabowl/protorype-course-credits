@@ -13,8 +13,6 @@ use App\Models\Course;
 use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\ExamBlockRepository;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 /**
@@ -43,43 +41,48 @@ class CourseRepositoryImpl implements CourseRepository {
 
     public function get(int $id, bool $fullDepth = false): ?Course {
         if ($fullDepth){
-            return Course::with("examBlocks.exams")->find($id);
+            return Course::with("examBlocks.exams.ssd","examBlocks.ssds")->find($id);
         }
-        return Course::find($id);
+        $course = Course::find($id);
+        
+        return $course;
     }
 
-    public function save(Course $course): bool {
+    public function save(Course $course): Course{
         if (isset($course->id)){
             throw new InvalidArgumentException("The id of a new Course must be empty");
         }
 
-        try{
-            return $course->save();
-        } catch (QueryException $exc){
-            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
-            return false;
-        }
+        $course->save();
+        return $course;
     }
 
     public function getAll(array $filters = []): Collection {
         return Course::filter($filters)->get();
     }
 
-    public function update(Course $course): bool {
+    public function update(Course $course): Course{
         $oldCourse = Course::find($course->id);
-        if(!isset($oldCourse)){
+        if(is_null($oldCourse)){
             throw new CourseNotFoundException("Course not found with id: ".$course->id);
         }
-        try{
-            return $course->save();
-        } catch (QueryException $exc){
-            Log::error(__CLASS__ . "::" . __METHOD__ . " " . $exc->getMessage());
-            return false;
-        }
+        
+        $oldCourse->setRawAttributes($course->getAttributes());
+        $oldCourse->save();
+        return $oldCourse;
     }
 
     public function getFromName(string $name): ?Course {
         return Course::where("name","=",$name)->get()->first();
+    }
+
+    public function setActiveStatus(int $courseId, bool $active): void {
+        $course = Course::find($courseId);
+        if (!isset($course)){
+            throw new CourseNotFoundException(__("Course not found")." id: ".$courseId);
+        }
+        $course->active = $active;
+        $course->save();
     }
 
 }

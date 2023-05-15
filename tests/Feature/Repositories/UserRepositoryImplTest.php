@@ -16,25 +16,26 @@ class UserRepositoryImplTest extends TestCase {
     const FIXTURE_USER_NUM = 3;
     const FIXTURE_COURSE_NUM = 3;
 
-    private $repository;
+    private UserRepositoryImpl $sut;
 
     protected function setUp(): void {
         parent::setUp();
 
-        $this->repository = new UserRepositoryImpl();
+        $this->sut = new UserRepositoryImpl();
     }
 
     public function test_get_successful() {
         $user = User::factory()->create();
 
-        $found = $this->repository->get($user->id);
+        $found = $this->sut->get($user->id);
 
         $this->assertEquals($user->attributesToArray(), $found->attributesToArray());
+        $this->assertTrue($found->relationLoaded("roles"));
     }
 
     public function test_get_fail() {
 
-        $found = $this->repository->get(1);
+        $found = $this->sut->get(1);
 
         $this->assertNull($found);
     }
@@ -47,7 +48,7 @@ class UserRepositoryImplTest extends TestCase {
         ];
         $user = new User($attributes);
 
-        $result = $this->repository->save($user);
+        $result = $this->sut->save($user);
         
         $this->assertDatabaseHas("users", $attributes);
         $this->assertTrue($result);
@@ -64,7 +65,7 @@ class UserRepositoryImplTest extends TestCase {
 
         $this->expectException(\InvalidArgumentException::class);
         
-        $this->repository->save($user);
+        $this->sut->save($user);
         
         $this->assertDatabaseCount("users", 0);
     }
@@ -72,7 +73,7 @@ class UserRepositoryImplTest extends TestCase {
     public function test_delete_successful(){
         User::factory(2)->create();
         
-        $result = $this->repository->delete(2);
+        $result = $this->sut->delete(2);
         
         $this->assertEquals(1, $result);
         $this->assertDatabaseCount("users", 1);
@@ -82,7 +83,7 @@ class UserRepositoryImplTest extends TestCase {
     public function test_delete_failure(){
         User::factory(2)->create();
         
-        $result = $this->repository->delete(3);
+        $result = $this->sut->delete(3);
         
         $this->assertEquals(0, $result);
         $this->assertDatabaseCount("users", 2);
@@ -94,10 +95,10 @@ class UserRepositoryImplTest extends TestCase {
         User::factory()->create();
         Role::create(["name" => Role::ADMIN]);
         
-        $result = $this->repository->addRole(1,Role::ADMIN);
+        $result = $this->sut->addRole(1,Role::ADMIN);
         $this->assertTrue($result);
         
-        $result = $this->repository->addRole(1,Role::ADMIN);
+        $result = $this->sut->addRole(1,Role::ADMIN);
         $this->assertTrue($result);
         
         $this->assertDatabaseHas("role_user", [
@@ -110,7 +111,7 @@ class UserRepositoryImplTest extends TestCase {
     public function test_addRole_when_role_is_missing_should_fail(){
         User::factory()->create();
         
-        $result = $this->repository->addRole(1,Role::ADMIN);
+        $result = $this->sut->addRole(1,Role::ADMIN);
     
         $this->assertFalse($result);
         $this->assertDatabaseCount("role_user",0);
@@ -120,7 +121,7 @@ class UserRepositoryImplTest extends TestCase {
         Role::create(["name" => "admin"]);
         Log::shouldReceive("error")->once();
         
-        $result = $this->repository->addRole(1,Role::ADMIN);
+        $result = $this->sut->addRole(1,Role::ADMIN);
     
         $this->assertFalse($result);
         
@@ -131,7 +132,7 @@ class UserRepositoryImplTest extends TestCase {
         User::factory()->create();
         Role::create(["name" => Role::SUPERVISOR]);
         
-        $result = $this->repository->removeRole(1,Role::SUPERVISOR);
+        $result = $this->sut->removeRole(1,Role::SUPERVISOR);
         
         $this->assertTrue($result);
         $this->assertDatabaseCount("role_user",0);
@@ -144,7 +145,7 @@ class UserRepositoryImplTest extends TestCase {
         $role = Role::create(["name" => Role::SUPERVISOR]);
         $user->roles()->attach($role);
         
-        $result = $this->repository->removeRole(1,Role::SUPERVISOR);
+        $result = $this->sut->removeRole(1,Role::SUPERVISOR);
         
         $this->assertTrue($result);
         $this->assertDatabaseCount("role_user",1);
@@ -163,7 +164,7 @@ class UserRepositoryImplTest extends TestCase {
         Role::create(["name" => Role::SUPERVISOR]);
         Log::shouldReceive("error")->once();
         
-        $result = $this->repository->removeRole(1,Role::SUPERVISOR);
+        $result = $this->sut->removeRole(1,Role::SUPERVISOR);
         
         $this->assertFalse($result);
         $this->assertDatabaseCount("role_user",0);
@@ -173,7 +174,7 @@ class UserRepositoryImplTest extends TestCase {
         User::factory()->create();
         Role::create(["name" => Role::SUPERVISOR]);
         
-        $result = $this->repository->removeRole(1,Role::ADMIN);
+        $result = $this->sut->removeRole(1,Role::ADMIN);
         
         $this->assertTrue($result);
         $this->assertDatabaseCount("role_user",0);
@@ -181,7 +182,7 @@ class UserRepositoryImplTest extends TestCase {
     
     public function test_getAll_wtih_no_users() {
         
-        $result = $this->repository->getAll([]);
+        $result = $this->sut->getAll([]);
         
         $this->assertEmpty($result);
     }
@@ -193,7 +194,7 @@ class UserRepositoryImplTest extends TestCase {
         $user1->roles()->attach($role);
         $user2->roles()->attach($role);
         
-        $result = $this->repository->getAll([]);
+        $result = $this->sut->getAll([]);
         
         $this->assertCount(2, $result);
         $this->assertEquals(User::with("roles")->first(), $result[0]);
@@ -213,7 +214,7 @@ class UserRepositoryImplTest extends TestCase {
         $user1->roles()->attach($role);
         $user2->roles()->attach($role);
         
-        $result = $this->repository->getAll(["search" => "mar"]);
+        $result = $this->sut->getAll(["search" => "mar"]);
         
         $this->assertCount(1, $result);
         $this->assertEquals(User::with("roles")->first(), $result[0]);
@@ -232,7 +233,7 @@ class UserRepositoryImplTest extends TestCase {
         $user1->roles()->attach($role);
         $user2->roles()->attach($role);
         
-        $result = $this->repository->getAll(["search" => "email2"]);
+        $result = $this->sut->getAll(["search" => "email2"]);
         
         $this->assertCount(1, $result);
         $this->assertEquals(User::with("roles")->find(2), $result[0]);
@@ -244,7 +245,7 @@ class UserRepositoryImplTest extends TestCase {
         ]);
         $user->name = "new name";
 
-        $result = $this->repository->update($user);
+        $result = $this->sut->update($user);
         
         $this->assertDatabaseCount("users", 1);
         $this->assertDatabaseHas("users", ["name" => "new name"]);
@@ -262,7 +263,7 @@ class UserRepositoryImplTest extends TestCase {
 
         $this->expectException(\InvalidArgumentException::class);
         
-        $result = $this->repository->update($user);
+        $result = $this->sut->update($user);
         
         $this->assertDatabaseCount("users", 0);
         $this->assertFalse($result);
@@ -277,11 +278,32 @@ class UserRepositoryImplTest extends TestCase {
         ]);
         $user->id = 5;
 
-//        $this->expectException(\InvalidArgumentException::class);
-        
-        $result = $this->repository->update($user);
+        $result = $this->sut->update($user);
         
         $this->assertDatabaseCount("users", 0);
         $this->assertFalse($result);
+    }
+    
+    public function test_getByRoles_whenNoRoleFound(){
+        User::factory(3)->create();
+        
+        $result = $this->sut->getByRole("norole");
+        
+        $this->assertEmpty($result->toArray());
+    }
+    
+    public function test_getByRole(){
+        $user1 = User::factory()->create();
+        User::factory()->create();
+        $user3 = User::factory()->create();
+        $role1 = Role::create(["name" => "a role"]);
+        $user1->roles()->attach($role1);
+        $user1->save();
+        $user3->roles()->attach($role1);
+        $user3->save();
+        
+        $result = $this->sut->getByRole("a role");
+        
+        $this->assertCount(2, $result->toArray());
     }
 }

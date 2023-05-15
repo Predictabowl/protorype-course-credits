@@ -27,7 +27,7 @@ interface FrontRepository {
     /**
      * Create a new Front if not present.
      * If the front is already present will update the course
-     * If there's already the same user_id present then the front can't
+     * If there's already the same user_id present then the front won't can't
      * be saved.
      *
      * @return Front|null the saved Front, null if can't be saved

@@ -1,9 +1,8 @@
 <?php
 
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPInterface.php to edit this template
  */
 
 namespace App\Services\Interfaces;
@@ -16,10 +15,18 @@ use Illuminate\Support\Collection;
  * @author piero
  */
 interface CourseManager {
- 
-    public function getExamBlocks(): Collection;
 
-    public function getExamOptions(): Collection;
-    
-    public function getCourse(): Course;
+    public function getCourse(int $coruseId): ?Course;
+
+    public function getCourseFullDepth(int $courseId): ?Course;
+
+    public function getAllCourses(?array $filters = []): Collection;
+
+    public function addCourse(Course $course): Course;
+
+    public function removeCourse(int $courseId): bool;
+
+    public function updateCourse(Course $course): Course;
+
+    public function setCourseActive(int $courseId, bool $active): void;
 }

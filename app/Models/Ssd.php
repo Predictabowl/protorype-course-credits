@@ -24,7 +24,7 @@ class Ssd extends Model
         return $this->hasMany(TakenExam::class);
     }
     
-    public function ExamBlocks(){
+    public function examBlocks(){
         return $this->belongsToMany(ExamBlock::class);
     }
     

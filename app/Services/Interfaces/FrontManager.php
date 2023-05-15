@@ -7,18 +7,19 @@ use Illuminate\Support\Collection;
 
 interface FrontManager {
        
-    public function getTakenExams(): Collection;
+    public function getAllSSds(): Collection;
+    
+    public function getTakenExams(int $frontId): Collection;
 
-    public function saveTakenExam($attributes);
+    public function saveTakenExam($attributes, int $frontId);
 
-    public function deleteTakenExam($examId);
+    public function deleteTakenExam(int $examId);
     
-    public function deleteAllTakenExams();
+    public function deleteAllTakenExams(int $frontId);
     
-    public function setCourse($courseId): bool;
+    public function setCourse(int $frontId, int $courseId): bool;
     
-    public function getFront(): Front;
-    
-    public function getCourses(): Collection;
-    
+    public function getFront(int $frontId): ?Front;
+
+    public function getOrCreateFront(int $userId, ?int $courseId = null): Front;
 }

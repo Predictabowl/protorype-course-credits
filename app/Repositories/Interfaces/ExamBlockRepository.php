@@ -3,7 +3,6 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\ExamBlock;
-use Illuminate\Support\Collection;
 
 /**
  *
@@ -12,8 +11,11 @@ use Illuminate\Support\Collection;
 interface ExamBlockRepository {
     
     public function get(int $id): ?ExamBlock;
-    public function getFilteredByCourse(int $courseId): Collection;
-    public function save(ExamBlock $examBlock): bool;
-    public function update(ExamBlock $examBlock);
+    public function getWithSsds(int $id): ?ExamBlock;
+    public function getWithFullDepth(int $id): ?ExamBlock;
+    public function save(ExamBlock $examBlock): ExamBlock;
+    public function update(ExamBlock $examBlock): ExamBlock;
     public function delete(int $id): bool;
+    public function attachSsd(int $examBlockId, int $ssdId): void;
+    public function detachSsd(int $examBlockId, int $ssdId): void;
 }

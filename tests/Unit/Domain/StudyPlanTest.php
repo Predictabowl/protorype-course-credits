@@ -8,12 +8,15 @@
 
 namespace Tests\Unit\Domain;
 
-use App\Models\Course;
-use PHPUnit\Framework\TestCase;
-use App\Domain\ExamStudyPlanDTO;
-use App\Domain\TakenExamDTO;
 use App\Domain\ExamBlockStudyPlanDTO;
+use App\Domain\ExamStudyPlanDTO;
 use App\Domain\StudyPlan;
+use App\Domain\TakenExamDTO;
+use App\Models\ExamBlock;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use TypeError;
+use function collect;
 
 /**
  * Description of StudyPlanTest
@@ -29,9 +32,10 @@ class StudyPlanTest extends TestCase{
         $taken = new TakenExamDTO(1,"taken1", "ssd", 9, 24);
         $takenPk = $taken->getId();
         
-        $studyPlan = new StudyPlan(collect([$block]));
+        $studyPlan = new StudyPlan();
+        $studyPlan->addExamBlock($block);
         
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         
         $studyPlan->addExamLink($option, $taken);
     }
@@ -43,7 +47,10 @@ class StudyPlanTest extends TestCase{
         $taken1 = new TakenExamDTO(1,"taken1", "ssd", 10, 19);
         $taken2 = new TakenExamDTO(2,"taken2", "ssd", 6, 27);
         
-        $studyPlan = new StudyPlan(collect([$block]));
+        $studyPlan = new StudyPlan();
+        collect([$block])->each(function($block) use($studyPlan){
+            $studyPlan->addExamBlock($block);
+        });
 
         $studyPlan->addExamLink($option1, $taken1);
         $studyPlan->addExamLink($option1, $taken2);
@@ -59,7 +66,7 @@ class StudyPlanTest extends TestCase{
     }
     
     public function test_getRecognizedCredits_with_empty_studyPlan() {
-        $studyPlan = new StudyPlan(collect([]));
+        $studyPlan = new StudyPlan();
         $integration = $studyPlan->getRecognizedCredits();
         
         $this->assertEquals(0, $integration);
@@ -130,6 +137,14 @@ class StudyPlanTest extends TestCase{
         $value = $studyPlan->getLeftoverAllottedCfu();
         
         $this->assertNull($value);
+    }
+    
+    public function test_cannotConstruct_mixedCollection(){
+        $block1 = new ExamBlockStudyPlanDTO(1,2,9,1);
+        $block2 = new ExamBlock(["id" => 7]);
+        
+        $this->expectException(TypeError::class);
+        new StudyPlan(collect([$block1, $block2]));
     }
     
     public function test_addExamLink_with_max_cfu() {

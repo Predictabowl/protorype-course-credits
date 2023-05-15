@@ -23,7 +23,8 @@ class SsdFactory extends Factory
     public function definition()
     {
         return [
-            "code" => strtoupper($this->faker->regexify(GenerateSSD::SSD_REGEX))
+            "code" => strtoupper($this->faker->unique()->
+                    regexify(GenerateSSD::SSD_REGEX))
         ];
     }
 }

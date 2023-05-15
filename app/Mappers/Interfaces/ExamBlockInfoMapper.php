@@ -16,5 +16,5 @@ use App\Models\ExamBlock;
  */
 interface ExamBlockInfoMapper {
 
-    public function map(NewExamBlockInfo $examBlock, int $courseId): ExamBlock;
+    public function map(NewExamBlockInfo $examBlock, ?int $courseId): ExamBlock;
 }

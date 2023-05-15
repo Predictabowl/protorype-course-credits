@@ -7,7 +7,6 @@ use App\Factories\Interfaces\StudyPlanManagerFactory;
 use App\Models\Front;
 use Illuminate\Support\Facades\Gate;
 use function __;
-use function app;
 use function back;
 use function session;
 use function view;
@@ -16,15 +15,17 @@ use function view;
 class StudyPlanController extends Controller
 {
     
-    public function __construct() {
+    private StudyPlanManagerFactory $spManagerFactory;
+    
+    public function __construct(StudyPlanManagerFactory $spManagerFactory) {
         $this->middleware(["auth","verified"]);
+        $this->spManagerFactory = $spManagerFactory;
     }
 
     public function show(Front $front){
         Gate::authorize("view-studyPlan", $front);
         
-        $manager = app()->make(StudyPlanManagerFactory::class)
-                ->get($front);
+        $manager = $this->spManagerFactory->get($front);
                 
         $studyPlan = $manager->getStudyPlan();
         if (!isset($studyPlan)){

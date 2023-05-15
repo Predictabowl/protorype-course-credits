@@ -7,7 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
-use Symfony\Component\HttpFoundation\Response as Response2;
+use Symfony\Component\HttpFoundation\Response as ResponseFacade;
 
 class CoursePolicy
 {

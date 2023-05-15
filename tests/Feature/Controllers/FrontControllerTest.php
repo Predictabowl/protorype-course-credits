@@ -2,19 +2,19 @@
 
 namespace Tests\Feature\Controllers;
 
-
+use App\Domain\TakenExamDTO;
 use App\Models\Course;
 use App\Models\Front;
-use App\Models\User;
-use App\Domain\TakenExamDTO;
 use App\Models\Role;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Ssd;
+use App\Models\User;
 use App\Services\Interfaces\FrontManager;
-use App\Factories\Interfaces\FrontManagerFactory;
 use App\Services\Interfaces\FrontsSearchManager;
-
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use function app;
+use function collect;
+use function route;
 
 class FrontControllerTest extends TestCase
 {
@@ -35,27 +35,18 @@ class FrontControllerTest extends TestCase
             "user_id" => $this->user->id
         ]);
         
-        $factory = $this->createMock(FrontManagerFactory::class);
         $this->frontManager = $this->createMock(FrontManager::class);
         $this->searchManager = $this->createMock(FrontsSearchManager::class);
-        app()->instance(FrontManagerFactory::class, $factory);
+        app()->instance(FrontManager::class, $this->frontManager);
         app()->instance(FrontsSearchManager::class, $this->searchManager);
-        
-        $factory->expects($this->any())
-                ->method("getFrontManager")
-                ->with($this->front->id)
-                ->willReturn($this->frontManager);
     }
     
     public function test_access_redirect_without_authentication(){
-        $response = $this->get(route("frontIndex",1));
-        $response->assertRedirect(route("login"));
+        $this->get(route("frontIndex",1))->assertRedirect(route("login"));
         
-        $response = $this->get(route("frontView",1));
-        $response->assertRedirect(route("login"));
+        $this->get(route("frontView",1))->assertRedirect(route("login"));
         
-        $response = $this->put(route("frontView",1), []);
-        $response->assertRedirect(route("login"));
+        $this->put(route("frontView",1), [])->assertRedirect(route("login"));
     }
     
     public function test_index_authorization(){
@@ -131,11 +122,20 @@ class FrontControllerTest extends TestCase
         $this->be($this->user);
         $this->frontManager->expects($this->once())
                 ->method("getTakenExams")
+                ->with($this->front->id)
                 ->willReturn($exams);
-                
+        
+        $allSsds = collect([new Ssd(["code" => "Mario"])]);
         $this->frontManager->expects($this->once())
-                ->method("getCourses")
+                ->method("getAllSsds")
+                ->willReturn($allSsds);
+                
+        $this->searchManager->expects($this->once())
+                ->method("getActiveCourses")
                 ->willReturn($courses);
+        
+        $this->searchManager->expects($this->never())
+                ->method("getCourses");
         
         $response = $this->get(route("frontView",[$this->front]));
         
@@ -144,7 +144,8 @@ class FrontControllerTest extends TestCase
         $response->assertViewHas([
             "exams" => $exams,
             "courses" => $courses,
-            "front" => $this->front]);
+            "front" => $this->front,
+            "ssds" => $allSsds]);
                 
     }
     
@@ -152,7 +153,7 @@ class FrontControllerTest extends TestCase
         $this->be($this->user);
         $this->frontManager->expects($this->once())
                 ->method("setCourse")
-                ->with(3);
+                ->with($this->front->id, 3);
                 
         $response = $this->from(self::FIXTURE_START_URI)
                 ->put(route("frontView",[$this->front]),["courseId" => 3]);

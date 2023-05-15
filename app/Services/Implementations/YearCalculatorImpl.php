@@ -18,6 +18,9 @@ use App\Domain\StudyPlan;
  * @author piero
  */
 class YearCalculatorImpl implements YearCalculator{
+    
+    private const MONTH_FOR_YEAR_CHANGE = 3;
+    
     /**
      * This implementation only use the recognized credits from the study plan.
      * 
@@ -27,6 +30,9 @@ class YearCalculatorImpl implements YearCalculator{
      */
     public function getCourseYear(Course $course, StudyPlan $plan): int {
         $cfu = $plan->getRecognizedCredits();
+        if($course->cfuTresholdForYear < 1){
+            return 1;
+        }
         return (int)min(($cfu / $course->cfuTresholdForYear)+1, $course->numberOfYears);
     }
     
@@ -39,7 +45,7 @@ class YearCalculatorImpl implements YearCalculator{
      * @return int
      */
     public function getAcademicYear(int $day, int $month, int $year): int {
-        if($month < 4){
+        if($month < YearCalculatorImpl::MONTH_FOR_YEAR_CHANGE){
             $year--;
         }
         return $year;

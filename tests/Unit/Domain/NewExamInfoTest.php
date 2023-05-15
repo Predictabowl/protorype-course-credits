@@ -9,8 +9,8 @@
 namespace Tests\Unit\Domain;
 
 use App\Domain\NewExamInfo;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
+use App\Exceptions\Custom\InvalidInputException;
+use Tests\TestCase;
 
 /**
  * Description of ExamBlockLinkerTest
@@ -27,7 +27,7 @@ class NewExamInfoTest extends TestCase{
     }
     
     public function test_ssd_wrongFormat_shouldThrow(){
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidInputException::class);
         $exam = new NewExamInfo("test name", "INF-/01");
     }
     
@@ -35,5 +35,10 @@ class NewExamInfoTest extends TestCase{
         $exam = new NewExamInfo("test name", "inf/01", true);
         
         $this->assertNull($exam->getSsd());
+    }
+    
+    public function test_withNullSsdCode_andNotFreeChoice(){
+        $this->expectException(InvalidInputException::class);
+        $exam = new NewExamInfo("test name", null, false);
     }
 }

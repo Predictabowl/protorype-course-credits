@@ -11,20 +11,27 @@ use function collect;
 
 class StudyPlan implements Serializable{
 
-    private $examBlocks;
-    private $leftovers;
-    private $maxCfu;
+    private Collection $examBlocks;
+    private Collection $leftovers;
+    private ?int $maxCfu;
 
     /**
      * Class Constructor
      * @param    $approvedExam   
      */
-    public function __construct(Collection $examBlocks, ?int $maxCfu = null) {
-        $this->examBlocks = $examBlocks->mapWithKeys(
-                fn(ExamBlockStudyPlanDTO $block) => 
-                    [$block->getId() => $block]);
+    public function __construct(?Collection $examBlocks = null, ?int $maxCfu = null) {
+        $this->examBlocks = collect([]);
+        if(isset($examBlocks)){
+            $examBlocks->each(function(ExamBlockStudyPlanDTO $block){
+                $this->addExamBlock($block);
+            });
+        }
         $this->leftovers = collect([]);
         $this->maxCfu = $maxCfu;
+    }
+    
+    public function addExamBlock(ExamBlockStudyPlanDTO $block): void{
+        $this->examBlocks[$block->getId()] = $block;
     }
     
     public function getMaxCfu(): ?int {
@@ -56,12 +63,12 @@ class StudyPlan implements Serializable{
         $this->examBlocks[$id]->setOption($exam);
     }
 
-    public function getExams() {
+    public function getExams(): Collection {
         return $this->examBlocks->map(fn(ExamBlockStudyPlanDTO $block) =>
                 $block->getExamOptions())->flatten();
     }
     
-    public function getExamBlocks() {
+    public function getExamBlocks(): Collection {
         return $this->examBlocks;
     }
     
@@ -84,7 +91,7 @@ class StudyPlan implements Serializable{
         }
         return null;
     }
-
+    
     public function serialize(): string {
         return serialize([
             "examBlocks" => $this->examBlocks,

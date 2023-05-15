@@ -7,8 +7,10 @@ use App\Repositories\Interfaces\CourseRepository;
 use App\Repositories\Interfaces\FrontRepository;
 use App\Services\Implementations\FrontsSearchManagerImpl;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
+use function collect;
 
 class FrontsSearchManagerImplTest extends TestCase
 {
@@ -73,6 +75,31 @@ class FrontsSearchManagerImplTest extends TestCase
         $result = $this->sut->getFilteredFronts($request, 12);
         
         $this->assertSame($paginator, $result);
+    }
+    
+    public function test_getCourses(){
+        $course1 = new Course(["name" => "element"]);
+        $course2 = new Course(["name" => "another"]);
+        $courses = new Collection([$course1, $course2]);
+        $this->courseRepo->expects($this->once())
+                ->method("getAll")
+                ->willReturn($courses);
+
+        $result = $this->sut->getCourses();
+        $this->assertEquals(collect([$course2, $course1]), $result);
+    }
+    
+    public function test_getActiveCourses(){
+        $course1 = new Course(["name" => "element"]);
+        $course2 = new Course(["name" => "another"]);
+        $courses = new Collection([$course1, $course2]);
+        $this->courseRepo->expects($this->once())
+                ->method("getAll")
+                ->with(["active" => true])
+                ->willReturn($courses);
+
+        $result = $this->sut->getActiveCourses();
+        $this->assertEquals(collect([$course2, $course1]), $result);
     }
     
 }

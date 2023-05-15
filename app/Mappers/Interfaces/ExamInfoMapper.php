@@ -16,5 +16,5 @@ use App\Models\Exam;
  */
 interface ExamInfoMapper {
 
-    public function map(NewExamInfo $examInfo, int $examBlockId, ?int $ssdId): Exam;
+    public function map(NewExamInfo $examInfo, ?int $examBlockId, ?int $ssdId): Exam;
 }

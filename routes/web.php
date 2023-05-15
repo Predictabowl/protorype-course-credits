@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExamBlockController;
+use App\Http\Controllers\ExamBlockSsdController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\StudentController;
@@ -61,15 +62,21 @@ Route::put("/userUpdate/{user}",[UserController::class,"put"]);
 //-------------- Course (Admin only)
 Route::get("/course",[CourseController::class,"index"])->name("courseIndex");
 Route::post("/course",[CourseController::class,"post"])->name("courseCreate");
-Route::delete("/course/{course}",[CourseController::class,"delete"])->name("courseDelete");
+Route::delete("/course/{courseId}",[CourseController::class,"delete"])->name("courseDelete");
+Route::get("/course/update/{course}",[CourseController::class,"updateCourseForm"])->name("courseShow");
+Route::get("/course/new",[CourseController::class,"newCourseForm"])->name("courseNew");
 Route::put("/course/{course}",[CourseController::class,"put"])->name("courseUpdate");
-Route::get("/course/{course}",[ExamBlockController::class,"index"])->name("courseDetails");
+Route::put("/course/{courseId}/active",[CourseController::class,"activate"])->name("courseActivate");
+Route::get("/course/{course}/examblock",[ExamBlockController::class,"index"])->name("courseDetails");
 Route::post("/course/{course}/examblock",[ExamBlockController::class,"post"])->name("examBlockCreate");
 Route::delete("/course/examblock/{examblock}",[ExamBlockController::class,"delete"])->name("examBlockDelete");
 Route::put("/course/examblock/{examblock}",[ExamBlockController::class,"put"])->name("examBlockUpdate");
 Route::post("/course/examblock/{examblock}/exam",[ExamController::class,"post"])->name("examCreate");
 Route::delete("/course/examblock/exam/{exam}",[ExamController::class,"delete"])->name("examDelete");
 Route::put("/course/examblock/exam/{exam}",[ExamController::class,"put"])->name("examUpdate");
+Route::put("/course/examblock/ssds/{examBlockId}",[ExamBlockSsdController::class,"put"])->name("addExamBlockSsd");
+Route::delete("/course/examblock/ssds/{examBlockId}/{ssdId}",[ExamBlockSsdController::class,"delete"])
+          ->name("delExamBlockSsd");
 
 //-------------- User Roles
 Route::put("/userRole/{user}",[UserController::class,"putRoles"])->name("userRoleUpdate");

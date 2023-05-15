@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\Interfaces\UserFrontManagerFactory;
+use App\Services\Interfaces\FrontManager;
 use function auth;
 use function redirect;
 
 class StudentController extends Controller
 {
-    private UserFrontManagerFactory $ufManagerFactory;
+    private FrontManager $frontManager;
     
-    public function __construct(UserFrontManagerFactory $ufManagerFactory) {
+    public function __construct(FrontManager $frontManager) {
         $this->middleware(["auth","verified"]);
-        $this->ufManagerFactory = $ufManagerFactory;
+        $this->frontManager = $frontManager;
     }
     
     public function showFront()
     {   
-        $frontManager = $this->ufManagerFactory
-                ->get(auth()->user()->id)->getFrontManager();
-        return redirect()->route("frontView", [$frontManager->getFront()]);
+        return redirect()->route("frontView", [
+            $this->frontManager->getOrCreateFront(auth()->user()->id)
+        ]);
 
     }
 
